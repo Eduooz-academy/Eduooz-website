@@ -4,10 +4,10 @@
 .glass-header {
   position: fixed;
   top: 10px;
-  left: 50%;
+  left: 55%;
   transform: translateX(-50%);
-  width: 90%;
-  max-width: 1400px;
+  width: 78%;
+  max-width: 1200px;
   height: 80px;
   display: flex;
   justify-content: space-between;
@@ -782,23 +782,22 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.98);
+    height: 100dvh;
+    background: #fdfcff;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
-    justify-content: center;
-    /* Falls back to top-aligned instead of clipping when an open dropdown
-       makes the content taller than the screen (unsupported browsers just
-       keep plain "center" from the declaration above). */
-    justify-content: safe center;
-    align-items: center;
-    gap: 40px;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0;
     z-index: 1000;
     transform: translateX(-100%);
-    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    transition: transform 0.45s cubic-bezier(0.77, 0, 0.175, 1);
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 90px 20px 40px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 86px 0 max(24px, env(safe-area-inset-bottom));
   }
 
   .nav-links.active {
@@ -806,12 +805,59 @@
   }
 
   .nav-links a {
-    font-size: 1.5rem;
+    font-size: 1.02rem;
+    font-weight: 600;
     color: var(--brand-dark) !important;
+    text-align: left;
+  }
+
+  /* Every top-level entry (plain link or dropdown trigger) shares one
+     alignment system: a full-width, left-aligned, equal-height row. */
+  .nav-links > a,
+  .nav-links > .nav-item.dropdown {
+    display: block;
+    width: 100%;
+  }
+
+  .nav-links > a,
+  .nav-item.dropdown > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(91, 33, 182, 0.08);
+  }
+
+  .nav-links a.active {
+    color: var(--brand-purple) !important;
+    font-weight: 700;
+    background: rgba(91, 33, 182, 0.06);
+  }
+
+  .nav-item.dropdown.open > a {
+    color: var(--brand-purple) !important;
+    background: rgba(91, 33, 182, 0.05);
   }
 
   .mobile-menu-toggle {
     display: flex;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .mobile-menu-toggle:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 3px;
+  }
+
+  .glass-header:has(.nav-links.active) {
+    background: #fff;
+    border-bottom: 1px solid rgba(91, 33, 182, 0.1);
   }
 
   .header-cta {
@@ -2417,46 +2463,44 @@ body.chat-is-open .scroll-to-top {
 /* =========================================
    MOBILE RESPONSIVE
    ========================================= */
+
+/* Wrapper elements introduced purely to animate mobile accordions
+   (see initMobileAccordion in components.js). display:contents makes them
+   invisible to layout everywhere else, so desktop keeps its exact existing
+   flex/grid structure with zero visual change. */
+.dropdown-panel-inner,
+.course-section-body,
+.course-section-body-inner {
+  display: contents;
+}
+
 @media (max-width: 1024px) {
-  .mega-menu {
-    position: static;
-    transform: none !important;
-    width: 100%;
-    max-width: 100%;
-    flex-direction: column;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    display: none;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    margin-top: 10px;
-    max-height: none;
-  }
-
-  /* Touch browsers can simulate :hover on tap, which fights with the
-     click-to-toggle handler below, so visibility is driven by .open only. */
-  .nav-item.dropdown.open .mega-menu {
-    display: block;
-  }
-
+  /* ---- Level 1: About Us / Courses trigger panels ---- */
+  .mega-menu,
   .simple-menu {
     position: static;
     transform: none !important;
     width: 100%;
+    max-width: 100%;
     background: transparent;
     border: none;
     box-shadow: none;
-    display: none;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    padding: 4px 0 4px 12px;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    max-height: none;
+    padding: 0 16px;
+    margin: 0;
   }
 
+  .nav-item.dropdown.open .mega-menu,
   .nav-item.dropdown.open .simple-menu {
-    display: block;
+    grid-template-rows: 1fr;
+    margin: 6px 0 12px;
   }
 
   .nav-item.dropdown.open .dropdown-caret {
@@ -2470,27 +2514,93 @@ body.chat-is-open .scroll-to-top {
     display: none;
   }
 
-  .simple-menu-item {
-    padding: 12px 14px;
-    font-size: 0.9rem;
-    border-radius: 14px;
+  .dropdown-panel-inner {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
   }
 
+  /* ---- About Us: one cohesive card instead of five floating ones ---- */
+  .simple-menu .dropdown-panel-inner {
+    display: flex;
+    flex-direction: column;
+    background: rgba(91, 33, 182, 0.04);
+    border: 1px solid rgba(91, 33, 182, 0.09);
+    border-radius: 16px;
+    padding: 4px;
+  }
+
+  .simple-menu-item {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 12px;
+    padding: 12px 12px;
+    gap: 12px;
+    font-size: 0.88rem;
+    border-bottom: 1px solid rgba(91, 33, 182, 0.07);
+  }
+
+  .simple-menu-item:last-child {
+    border-bottom: none;
+  }
+
+  .simple-menu-item:hover,
+  .simple-menu-item:active,
+  .simple-menu-item:focus-visible {
+    transform: none;
+    background: rgba(91, 33, 182, 0.07);
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .simple-menu-item .course-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    font-size: 0.82rem;
+  }
+
+  .simple-menu-item span {
+    font-size: 0.85rem;
+  }
+
+  /* ---- Courses: compact grouped category selector ---- */
   .mega-menu-sidebar {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     border-right: none;
-    padding: 0;
+    background: rgba(91, 33, 182, 0.04);
+    border: 1px solid rgba(91, 33, 182, 0.09);
+    border-radius: 16px;
+    padding: 4px;
+    margin-bottom: 10px;
   }
 
   .sidebar-item {
-    padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.05);
-    margin-bottom: 5px;
+    padding: 13px 12px;
+    background: transparent;
+    margin-bottom: 0;
     border-radius: 12px;
+    border-bottom: 1px solid rgba(91, 33, 182, 0.07);
   }
 
-  .sidebar-item.active::before {
-    display: none;
+  .sidebar-item:last-child {
+    border-bottom: none;
+  }
+
+  .sidebar-item:hover {
+    background: rgba(91, 33, 182, 0.06);
+  }
+
+  .sidebar-item.active {
+    background: rgba(91, 33, 182, 0.09);
+    box-shadow: none;
+  }
+
+  .sidebar-info h4 {
+    font-size: 0.9rem;
   }
 
   .sidebar-info p {
@@ -2498,23 +2608,144 @@ body.chat-is-open .scroll-to-top {
   }
 
   .mega-menu-content {
-    padding: 15px 0;
+    padding: 0;
   }
 
   .category-panel {
     display: none;
   }
 
-  /* On mobile, show all panels or handle via accordion */
   .category-panel.active {
     display: block;
   }
 
+  /* ---- Level 3: course-section headers act as accordion toggles ---- */
+  .course-section {
+    margin-bottom: 8px;
+  }
+
+  .course-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .course-section-title {
+    margin: 0;
+    padding: 0;
+    border-bottom: none;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.86rem;
+  }
+
+  .course-section-toggle {
+    appearance: none;
+    -webkit-appearance: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 12px 14px;
+    background: rgba(91, 33, 182, 0.05);
+    border: 1px solid rgba(91, 33, 182, 0.09);
+    border-radius: 12px;
+    font: inherit;
+    text-transform: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .course-section-toggle:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+
+  .section-caret {
+    display: inline-block;
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: var(--brand-purple);
+    transition: transform 0.22s ease;
+  }
+
+  .course-section.expanded .course-section-toggle {
+    background: rgba(91, 33, 182, 0.09);
+    border-color: rgba(91, 33, 182, 0.2);
+  }
+
+  .course-section.expanded .section-caret {
+    transform: rotate(180deg);
+  }
+
+  .course-section-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .course-section.expanded .course-section-body {
+    grid-template-rows: 1fr;
+  }
+
+  .course-section-body-inner {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 6px;
+  }
+
+  /* ---- Level 4: compact list rows instead of large pills ---- */
   .course-grid {
     grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .course-card {
-    padding: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(91, 33, 182, 0.08);
+    box-shadow: none;
+  }
+
+  .course-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .course-card .course-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+
+  .course-card span {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  .course-subsection {
+    margin-bottom: 12px;
+  }
+
+  .course-subsection-title {
+    margin: 10px 0 6px;
+  }
+}
+
+@media (max-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .nav-links,
+  .mega-menu,
+  .simple-menu,
+  .course-section-body,
+  .section-caret,
+  .dropdown-caret,
+  .mobile-menu-toggle .bar {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

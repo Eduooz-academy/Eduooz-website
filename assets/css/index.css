@@ -401,7 +401,7 @@ body {
 
 @media (max-width: 768px) {
   .glass-pill {
-    align-self: center;
+    align-self: flex-start;
   }
   .cta-cluster {
     flex-direction: column;
@@ -3896,6 +3896,18 @@ body {
   visibility: hidden;
 }
 
+/* Scoped overrides: match nursing landing page card dimensions */
+.fac-showcase-section .alumni-showcase-grid {
+  margin-top: 80px;
+  padding-bottom: 10px;
+}
+.fac-showcase-section .alumni-card-wrapper:nth-child(2) {
+  margin-top: 100px;
+}
+.fac-showcase-section .alumni-img-box {
+  height: 420px;
+}
+
 @media (max-width: 1024px) {
   .alumni-showcase-grid {
     grid-template-columns: 1fr;
@@ -3935,18 +3947,6 @@ body {
   .fac-showcase-section .alumni-card-wrapper:nth-child(2) {
     margin-top: 0;
   }
-}
-
-/* Scoped overrides: match nursing landing page card dimensions */
-.fac-showcase-section .alumni-showcase-grid {
-  margin-top: 80px;
-  padding-bottom: 10px;
-}
-.fac-showcase-section .alumni-card-wrapper:nth-child(2) {
-  margin-top: 100px;
-}
-.fac-showcase-section .alumni-img-box {
-  height: 420px;
 }
 
 /* =========================================

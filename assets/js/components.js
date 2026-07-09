@@ -73,6 +73,10 @@
 
         if (containerId === "header-container") {
           highlightActiveNav();
+          // initMobileAccordion must run first: it wraps the course-section
+          // content and builds the toggle buttons that the other two
+          // functions' selectors and reset logic rely on.
+          initMobileAccordion();
           // initMegaMenu must attach its sidebar-item click handler before
           // initMobileNavbar's "close on link click" handler (registration
           // order = firing order for listeners on the same element), so the
@@ -355,6 +359,14 @@
         active.classList.add("active");
         active.setAttribute("aria-selected", "true");
       }
+
+      // Switching category always starts from the fully-collapsed course
+      // list, so the panel that opens is never the huge, all-expanded one.
+      document.querySelectorAll(".course-section.expanded").forEach((s) => {
+        s.classList.remove("expanded");
+        const t = s.querySelector(".course-section-toggle");
+        if (t) t.setAttribute("aria-expanded", "false");
+      });
     }
 
     sidebarItems.forEach((item) => {
@@ -389,6 +401,111 @@
   }
 
   /**
+   * Prepare the mobile "About Us" / "Courses" panels and the deep course
+   * lists for progressive disclosure:
+   * - Wraps each dropdown panel's content in a single element so it can be
+   *   collapsed/expanded with a CSS grid-template-rows transition instead
+   *   of an abrupt display:none/block swap.
+   * - Turns each course-section heading ("Central Nursing Exams", etc.)
+   *   into an accordion toggle so its course list only renders on demand,
+   *   instead of dumping every course for a category on screen at once.
+   * All of this is inert on desktop: the wrapper elements default to
+   * display:contents (see header-footer.css) and the collapse styling only
+   * exists inside the mobile media query, so desktop's layout is unchanged.
+   */
+  function initMobileAccordion() {
+    function wrapChildrenOnce(el, wrapperClass) {
+      if (!el || el.querySelector(":scope > ." + wrapperClass)) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = wrapperClass;
+      while (el.firstChild) wrapper.appendChild(el.firstChild);
+      el.appendChild(wrapper);
+    }
+
+    wrapChildrenOnce(document.querySelector(".simple-menu"), "dropdown-panel-inner");
+    wrapChildrenOnce(document.querySelector(".mega-menu"), "dropdown-panel-inner");
+
+    let sectionId = 0;
+    document.querySelectorAll(".course-section").forEach((section) => {
+      const title = section.querySelector(":scope > .course-section-title");
+      if (!title || section.querySelector(":scope > .course-section-body")) {
+        return;
+      }
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "course-section-toggle";
+      while (title.firstChild) toggle.appendChild(title.firstChild);
+
+      const caret = document.createElement("i");
+      caret.className = "fa-solid fa-chevron-down section-caret";
+      caret.setAttribute("aria-hidden", "true");
+      toggle.appendChild(caret);
+
+      const bodyId = "course-section-body-" + ++sectionId;
+      const body = document.createElement("div");
+      body.className = "course-section-body";
+      body.id = bodyId;
+      const inner = document.createElement("div");
+      inner.className = "course-section-body-inner";
+      body.appendChild(inner);
+
+      let node = title.nextSibling;
+      while (node) {
+        const next = node.nextSibling;
+        inner.appendChild(node);
+        node = next;
+      }
+
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-controls", bodyId);
+      // This control only does something inside the mobile collapse CSS, so
+      // keep it out of the desktop tab order rather than adding an inert
+      // stop to desktop's keyboard flow.
+      toggle.tabIndex = window.innerWidth <= 1024 ? 0 : -1;
+
+      title.appendChild(toggle);
+      section.appendChild(body);
+
+      toggle.addEventListener("click", function () {
+        const currentSection = this.closest(".course-section");
+        const panel = this.closest(".category-panel");
+        const wasExpanded = currentSection.classList.contains("expanded");
+
+        if (panel) {
+          panel
+            .querySelectorAll(":scope .course-section.expanded")
+            .forEach((s) => {
+              if (s === currentSection) return;
+              s.classList.remove("expanded");
+              const t = s.querySelector(".course-section-toggle");
+              if (t) t.setAttribute("aria-expanded", "false");
+            });
+        }
+
+        currentSection.classList.toggle("expanded", !wasExpanded);
+        this.setAttribute("aria-expanded", String(!wasExpanded));
+
+        // If opening this section pushed it toward/past the bottom edge,
+        // gently bring it back into view once the expand transition has
+        // had a moment to run — never a hard jump, and never on collapse.
+        if (!wasExpanded) {
+          const toggleEl = this;
+          setTimeout(() => {
+            toggleEl.scrollIntoView({
+              behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+                .matches
+                ? "auto"
+                : "smooth",
+              block: "nearest",
+            });
+          }, 240);
+        }
+      });
+    });
+  }
+
+  /**
    * Initialize mobile navbar functionality
    * - Close on outside click
    * - Toggle overlay
@@ -406,16 +523,36 @@
         const trigger = el.querySelector(":scope > a");
         if (trigger) trigger.setAttribute("aria-expanded", "false");
       });
+      // Reset the deep course accordion too, so reopening the menu later
+      // always starts from the compact, fully-collapsed state.
+      navLinks.querySelectorAll(".course-section.expanded").forEach((el) => {
+        el.classList.remove("expanded");
+        const toggle = el.querySelector(":scope > .course-section-title .course-section-toggle");
+        if (toggle) toggle.setAttribute("aria-expanded", "false");
+      });
     }
 
     navbarToggler.addEventListener("click", function () {
       this.classList.toggle("active");
       navLinks.classList.toggle("active");
-      document.body.style.overflow = navLinks.classList.contains("active")
-        ? "hidden"
-        : "";
+      const isOpen = navLinks.classList.contains("active");
+      document.body.style.overflow = isOpen ? "hidden" : "";
+      this.setAttribute("aria-expanded", String(isOpen));
+      this.setAttribute(
+        "aria-label",
+        isOpen ? "Close navigation menu" : "Open navigation menu",
+      );
 
-      if (!navLinks.classList.contains("active")) closeOpenDropdowns();
+      if (!isOpen) closeOpenDropdowns();
+    });
+
+    // role="button" alone doesn't give this <div> native Enter/Space
+    // activation, so wire it up explicitly.
+    navbarToggler.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        this.click();
+      }
     });
 
     // On mobile, dropdown triggers (About Us, Courses) toggle their submenu
