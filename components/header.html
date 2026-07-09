@@ -11,8 +11,9 @@
   <div
     class="mobile-menu-toggle"
     id="menu-toggle"
-    aria-label="Toggle navigation menu"
+    aria-label="Open navigation menu"
     aria-expanded="false"
+    aria-controls="primary-navigation"
     role="button"
     tabindex="0"
   >
@@ -21,7 +22,7 @@
     <span class="bar"></span>
   </div>
 
-  <nav class="nav-links" aria-label="Main navigation">
+  <nav id="primary-navigation" class="nav-links" aria-label="Main navigation">
     <a href="index.html" class="hover-underline">Home</a>
     <div class="nav-item dropdown">
       <a
@@ -129,7 +130,7 @@
           </a>
 
           <a
-            href="courses/lab-tech.html"
+            href="courses/mlt.html"
             class="sidebar-item"
             data-category="mlt"
             role="tab"
