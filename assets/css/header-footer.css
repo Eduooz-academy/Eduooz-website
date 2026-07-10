@@ -4,9 +4,9 @@
 .glass-header {
   position: fixed;
   top: 10px;
-  left: 48%;
+  left: 50%;
   transform: translateX(-50%);
-  width: 78%;
+  width: 90%;
   max-width: 1200px;
   height: 80px;
   display: flex;
@@ -24,6 +24,12 @@
     0 8px 32px rgba(91, 33, 182, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: all 0.4s ease;
+}
+
+.glass-header.container {
+  width: min(1260px, calc(100% - 10%));
+  max-width: 1260px;
+  box-sizing: border-box;
 }
 
 .logo {
