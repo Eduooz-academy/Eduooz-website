@@ -692,9 +692,6 @@ body {
   gap: 30px;
   position: relative;
   z-index: 5;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 20px;
 }
 
 /* We remove the editorial stagger effect because dense grids look better aligned */
@@ -1142,10 +1139,6 @@ body {
 
   .trajectory-section-heading::before {
     left: 0;
-  }
-
-  .monolith-grid {
-    padding: 0 10px;
   }
 
   .monolith-card {

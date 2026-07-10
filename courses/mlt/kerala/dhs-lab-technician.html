@@ -143,12 +143,12 @@
       href="../../../assets/css/global-heading-system.css"
     />
     <link rel="stylesheet" href="../../../assets/css/header-footer.css" />
-    <link rel="stylesheet" href="../../../assets/css/course-main.css" />
     <link rel="stylesheet" href="../../../assets/css/faq-enquiry.css" />
     <link rel="stylesheet" href="../../../assets/css/course-landing.css" />
     <script src="../../../assets/js/faq-enquiry.js" defer></script>
     <script src="../../../assets/js/course-landing.js" defer></script>
     <script src="../../../assets/js/google-reviews.js" defer></script>
+    <script src="../../../assets/js/forms.js"></script>
 
     <script>
       // ========== EXAM CONFIGURATION DHS MLT ==========
@@ -294,7 +294,7 @@
               <a href="mailto:info@eduooz.com" class="btn-liquid-cyan magnetic-btn"
                 >Enquire Now <span class="arrow">↗</span></a
               >
-              <a href="#exam-overview" class="btn-glass-outline magnetic-btn"
+              <a href="#syllabus" class="btn-glass-outline magnetic-btn"
                 ><i class="fa-solid fa-book-open"></i> View Syllabus</a
               >
             </div>
@@ -414,9 +414,72 @@
       </div>
     </section>
 
+    <!-- STICKY ICON NAVIGATION -->
+    <nav
+      class="exam-sticky-nav"
+      id="exam-sticky-nav"
+      aria-label="Quick Navigation"
+    >
+      <div class="esn-track">
+        <div class="esn-item">
+          <a class="esn-btn" href="#exam-snapshot" aria-label="Overview">
+            <span class="esn-pulse-ring"></span>
+            <i class="fa-solid fa-chart-pie"></i>
+          </a>
+          <span class="esn-tooltip" aria-hidden="true"
+            >Overview<span class="esn-arr"></span
+          ></span>
+        </div>
+        <div class="esn-item">
+          <a class="esn-btn" href="#eligibility" aria-label="Eligibility">
+            <span class="esn-pulse-ring"></span>
+            <i class="fa-solid fa-user-check"></i>
+          </a>
+          <span class="esn-tooltip" aria-hidden="true"
+            >Eligibility<span class="esn-arr"></span
+          ></span>
+        </div>
+        <div class="esn-item">
+          <a class="esn-btn" href="#syllabus" aria-label="Syllabus">
+            <span class="esn-pulse-ring"></span>
+            <i class="fa-solid fa-book-open"></i>
+          </a>
+          <span class="esn-tooltip" aria-hidden="true"
+            >Syllabus<span class="esn-arr"></span
+          ></span>
+        </div>
+        <div class="esn-item">
+          <a class="esn-btn" href="#papers" aria-label="Papers">
+            <span class="esn-pulse-ring"></span>
+            <i class="fa-solid fa-file-lines"></i>
+          </a>
+          <span class="esn-tooltip" aria-hidden="true"
+            >Papers<span class="esn-arr"></span
+          ></span>
+        </div>
+        <div class="esn-item">
+          <a class="esn-btn" href="#materials" aria-label="Materials">
+            <span class="esn-pulse-ring"></span>
+            <i class="fa-solid fa-folder-open"></i>
+          </a>
+          <span class="esn-tooltip" aria-hidden="true"
+            >Materials<span class="esn-arr"></span
+          ></span>
+        </div>
+        <div class="esn-item">
+          <a class="esn-btn" href="#faq" aria-label="FAQ">
+            <span class="esn-pulse-ring"></span>
+            <i class="fa-solid fa-circle-question"></i>
+          </a>
+          <span class="esn-tooltip" aria-hidden="true"
+            >FAQ<span class="esn-arr"></span
+          ></span>
+        </div>
+      </div>
+    </nav>
 
     <!-- EXAM OVERVIEW -->
-    <section class="exam-snapshot-section" id="exam-overview">
+    <section class="exam-snapshot-section" id="exam-snapshot">
       <div class="container">
         <div class="text-center">
           <div class="section-label">
@@ -689,6 +752,285 @@
         </div>
       </section>
     </div>
+
+    <!-- ELIGIBILITY CHECKER -->
+    <section class="elig-checker-section" id="elig-checker">
+      <div class="container">
+        <div class="text-center">
+          <div class="section-label">
+            <span class="label-dot"></span> Interactive Tool
+          </div>
+          <h2 class="section-title">
+            Check Your <span class="text-gradient">Eligibility.</span>
+          </h2>
+        </div>
+        <div class="elig-checker-card g-exam-reveal">
+          <!-- form fields built by initEligibilityChecker() from window.eligibilityCheckerConfig -->
+          <form id="elig-checker-form"></form>
+          <div class="elig-result" id="elig-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OFFICIAL SYLLABUS -->
+    <section class="syllabus-section" id="syllabus">
+      <div class="container">
+        <div class="text-center">
+          <div class="section-label">
+            <span class="label-dot"></span> Complete Curriculum
+          </div>
+          <h2 class="section-title">
+            Official Exam <span class="text-gradient">Syllabus.</span>
+          </h2>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div
+          class="syllabus-tabs-nav"
+          role="tablist"
+          aria-label="Syllabus subjects"
+        >
+          <button
+            class="syl-tab active"
+            role="tab"
+            aria-selected="true"
+            id="syl-tab-awareness"
+            aria-controls="syl-panel-awareness"
+            data-tab="awareness"
+          >
+            <span class="syl-tab-icon"><i class="fa-solid fa-book"></i></span>
+            <span class="syl-tab-label">General Awareness</span>
+          </button>
+          <button
+            class="syl-tab"
+            role="tab"
+            aria-selected="false"
+            id="syl-tab-aptitude"
+            aria-controls="syl-panel-aptitude"
+            data-tab="aptitude"
+          >
+            <span class="syl-tab-icon"
+              ><i class="fa-solid fa-calculator"></i
+            ></span>
+            <span class="syl-tab-label">Aptitude Test</span>
+          </button>
+          <button
+            class="syl-tab"
+            role="tab"
+            aria-selected="false"
+            id="syl-tab-labtech"
+            aria-controls="syl-panel-labtech"
+            data-tab="labtech"
+          >
+            <span class="syl-tab-icon"
+              ><i class="fa-solid fa-vial"></i
+            ></span>
+            <span class="syl-tab-label">Lab Technology</span>
+          </button>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="syllabus-tab-panels">
+          <!-- General Awareness -->
+          <div
+            class="syl-panel active"
+            id="syl-panel-awareness"
+            role="tabpanel"
+            aria-labelledby="syl-tab-awareness"
+          >
+            <div class="syl-panel-inner">
+              <div class="syl-panel-lists">
+                <ul class="syllabus-list">
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Current
+                    Affairs
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Politics
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Rivers
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Lakes &amp; Seas
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian History
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Famous
+                    Places
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Parliament
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> General Sciences
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Tourism
+                  </li>
+                </ul>
+                <ul class="syllabus-list">
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Sports
+                    (Latest Updates)
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian Artists,
+                    Countries, Capitals, and Civics
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Famous Authors and
+                    Books
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> National and
+                    International News Updates
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Inventions and
+                    Discoveries
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Famous Dates and
+                    Days
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Indian
+                    Environmental Issues
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Latest General
+                    Knowledge
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aptitude Test -->
+          <div
+            class="syl-panel"
+            id="syl-panel-aptitude"
+            role="tabpanel"
+            aria-labelledby="syl-tab-aptitude"
+          >
+            <div class="syl-panel-inner">
+              <div class="syl-panel-lists">
+                <ul class="syllabus-list">
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Number System
+                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Percentage</li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Time and Distance
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Time and Work
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Profit and Loss
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Simple Interest
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Compound Interest
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Permutation and
+                    Combination
+                  </li>
+                </ul>
+                <ul class="syllabus-list">
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Ratio and
+                    Proportion
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Mixture and
+                    Alligation
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Height and
+                    Distance
+                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> 2D and 3D</li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Trains and
+                    Distance
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Boat and Stream
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Problem on Ages
+                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Discount</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab Technology -->
+          <div
+            class="syl-panel"
+            id="syl-panel-labtech"
+            role="tabpanel"
+            aria-labelledby="syl-tab-labtech"
+          >
+            <div class="syl-panel-inner">
+              <div class="syl-panel-lists">
+                <ul class="syllabus-list">
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Clinical
+                    Biochemistry
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Hematology &amp;
+                    Blood Banking
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Clinical
+                    Microbiology &amp; Serology
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Histopathology
+                    &amp; Cytology
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Clinical
+                    Pathology
+                  </li>
+                </ul>
+                <ul class="syllabus-list">
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Parasitology
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Laboratory
+                    Instrumentation &amp; Quality Control
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Anatomy &amp;
+                    Physiology for Lab Diagnostics
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Immunohematology
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-chevron-right"></i> Laboratory Safety
+                    &amp; Biomedical Waste Management
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /syllabus-tab-panels -->
+      </div>
+    </section>
 
     <!-- HOW TO PREPARE -->
     <section class="prepare-section" id="preparation">
@@ -1549,6 +1891,320 @@
       </div>
     </section>
 
+    <!-- FACULTY SHOWCASE CAROUSEL -->
+    <section class="fac-showcase-section" id="faculty">
+      <div class="fac-ambient">
+        <div class="fac-blob-1"></div>
+        <div class="fac-blob-2"></div>
+        <div class="fac-particles" id="fac-particles"></div>
+      </div>
+      <div class="container">
+        <div class="text-center g-exam-reveal">
+          <div class="section-label">
+            <span class="label-dot"></span> Meet Your Mentors
+          </div>
+          <h2 class="section-title">
+            Learn From The Experts Behind<br /><span class="text-gradient"
+              >Thousands Of Lab Technician Success Stories.</span
+            >
+          </h2>
+          <p class="fac-section-sub">
+            Guidance from experienced educators, subject specialists, rank
+            holders, and exam strategists who understand exactly what it takes
+            to crack the DHS MLT Exam.
+          </p>
+        </div>
+
+        <div class="marquee-wrapper">
+          <div class="marquee-track track-right">
+            <div class="marquee-text">
+              <span
+                >15+ YEARS EXPERIENCE 500+ RANK HOLDERS  EXPERT
+                FACULTY PROVEN RESULTS </span
+              >
+              <span
+                >15+ YEARS EXPERIENCE  500+ RANK HOLDERS  EXPERT
+                FACULTY  PROVEN RESULTS </span
+              >
+            </div>
+          </div>
+
+          <div class="marquee-track track-left">
+            <div class="marquee-text">
+              <span
+                >NURSING PHARMACY LAB TECHNOLOGY
+                COMPETITIVE EXAMS INTERNATIONAL LICENSING </span
+              >
+              <span
+                >NURSING PHARMACY LAB TECHNOLOGY
+                COMPETITIVE EXAMS INTERNATIONAL LICENSING </span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="alumni-showcase-grid container">
+          <div class="alumni-card-wrapper" data-speed="0.12">
+            <div class="alumni-cycle-animator">
+              <div class="prismatic-card">
+                <div class="card-glare-light"></div>
+                <div class="card-content-3d">
+                  <div class="alumni-img-box">
+                    <img src="../../../assets/images/Mentors/SHINE.png" alt="Shine Stephen Nursing Mentor and Assistant Professor" />
+                    <div class="rank-badge">Assistant Professor | PGIMER MSc (N) | PhD Scholar</div>
+                    <div class="alumni-text-overlay">
+                      <h3>Shine Stephen</h3>
+
+                    </div>
+                  </div>
+                  <div class="alumni-info">
+                    <div class="placement-dest">
+                      <span class="dest-icon"><i class="fa-solid fa-trophy"></i></span>
+                      <span>Assistant Professor (Govt. Nursing College, on leave), former AIIMS New Delhi faculty, PGIMER MSc (N) 1st rank holder, KPSC rank holder &amp; INC-WHO PhD Scholar.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alumni-card-wrapper" data-speed="-0.1">
+            <div class="alumni-cycle-animator">
+              <div class="prismatic-card">
+                <div class="card-glare-light"></div>
+                <div class="card-content-3d">
+                  <div class="alumni-img-box">
+                    <img src="../../../assets/images/Mentors/optimized/nayana-shaji.jpg" alt="Nayana Shaji Pharmacology Faculty" />
+                    <div class="rank-badge">M.Pharm Pharmacology | GPAT Rank Holder</div>
+                    <div class="alumni-text-overlay">
+                      <h3>Nayana Shaji</h3>
+
+                    </div>
+                  </div>
+                  <div class="alumni-info">
+                    <div class="placement-dest">
+                      <span class="dest-icon"><i class="fa-solid fa-award"></i></span>
+                      <span>M.Pharm Pharmacology faculty, distinction holder, GPAT rank holder, and Kerala &amp; Central Exam rank holder with strong pharmaceutical expertise.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alumni-card-wrapper" data-speed="0.08">
+            <div class="alumni-cycle-animator">
+              <div class="prismatic-card">
+                <div class="card-glare-light"></div>
+                <div class="card-content-3d">
+                  <div class="alumni-img-box">
+                    <img src="../../../assets/images/Mentors/optimized/vidhu-r-vijayan.jpg" alt="Vidhu R Vijayan Orthopedic Nursing Faculty" />
+                    <div class="rank-badge">MSc Nursing (Orthopedic)</div>
+                    <div class="alumni-text-overlay">
+                      <h3>Vidhu R Vijayan</h3>
+
+                    </div>
+                  </div>
+                  <div class="alumni-info">
+                    <div class="placement-dest">
+                      <span class="dest-icon"><i class="fa-solid fa-stethoscope"></i></span>
+                      <span>Orthopedic nursing specialist with MSc Nursing and international NCLEX RN qualification, bringing clinical depth to nursing exam preparation.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fac-car-dots" id="fac-car-dots"></div>
+      </div>
+    </section>
+
+    <!-- VIDEO TESTIMONIALS -->
+    <section class="testimonials-section">
+      <div class="testimonials-mesh-bg">
+        <div
+          class="mesh-blob blob-purple"
+          style="top: -5%; left: -8%; width: 550px; height: 550px; opacity: 0.3"
+        ></div>
+        <div
+          class="mesh-blob blob-cyan"
+          style="
+            bottom: -5%;
+            right: -5%;
+            width: 450px;
+            height: 450px;
+            opacity: 0.2;
+          "
+        ></div>
+      </div>
+      <div class="container relative-z">
+        <div class="testimonials-header">
+          <div class="section-label">
+            <span class="label-dot"></span> Real Results, Real Lab Technicians
+          </div>
+          <h2 class="section-title">
+            Hear It From The Lab Technicians <br />Who
+            <span class="text-gradient">Cracked DHS MLT Exam.</span>
+          </h2>
+        </div>
+        <div class="testimonials-layout">
+          <article class="testi-featured" id="testiFeatured">
+            <figure class="testi-featured-thumb">
+              <img
+                id="testiFeaturedImg"
+                src="https://img.youtube.com/vi/E1X1RFFt138/maxresdefault.jpg"
+                alt="Super notes for Assistant Professor in Nursing"
+                loading="lazy"
+              />
+              <div class="testi-featured-overlay">
+                <button
+                  class="testi-play-btn"
+                  id="testiPlayBtn"
+                  aria-label="Play video"
+                >
+                  <span class="testi-play-ripple"></span>
+                  <i class="fa-solid fa-play"></i>
+                </button>
+              </div>
+              <div class="testi-info-float">
+                <div class="testi-avatar-ring">
+                  <img
+                    id="testiAvatarImg"
+                    src="https://img.youtube.com/vi/E1X1RFFt138/maxresdefault.jpg"
+                    alt="Super notes for Assistant Professor in Nursing"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="testi-info-text">
+                  <div class="testi-info-name" id="testiName">
+                    Super notes for Assistant Professor in Nursing
+                  </div>
+                  <div class="testi-info-sub" id="testiSub">
+                    Eduooz - Nurses Learning Hub &middot; 2025
+                  </div>
+                </div>
+                <div class="testi-info-badge" id="testiBadge">
+                  <i class="fa-solid fa-check"></i> Latest Upload
+                </div>
+              </div>
+            </figure>
+            <blockquote class="testi-featured-quote" id="testiQuote">
+              <i class="fa-solid fa-quote-left testi-quote-icon"></i>
+              <p>
+                "Watch our latest nursing upload on our YouTube channel. More
+                testimonial videos will be added soon."
+              </p>
+            </blockquote>
+          </article>
+
+          <div class="testi-playlist" id="testiPlaylist">
+            <article
+              class="testi-playlist-item active"
+              data-index="0"
+              data-url="https://youtu.be/E1X1RFFt138?si=0TrAngTwP8UsTbqw"
+              data-img="https://img.youtube.com/vi/E1X1RFFt138/maxresdefault.jpg"
+              data-avatar="https://img.youtube.com/vi/E1X1RFFt138/maxresdefault.jpg"
+              data-name="Super notes for Assistant Professor in Nursing"
+              data-sub="Latest Upload &middot; 2025"
+              data-badge="Latest Upload"
+              data-quote="Watch our latest nursing upload on our YouTube channel. More testimonial videos will be added soon."
+            >
+              <figure class="testi-item-thumb">
+                <img
+                  src="https://img.youtube.com/vi/E1X1RFFt138/maxresdefault.jpg"
+                  alt="Super notes for Assistant Professor in Nursing"
+                  loading="lazy"
+                />
+                <div class="testi-item-play">
+                  <i class="fa-solid fa-play"></i>
+                </div>
+              </figure>
+              <div class="testi-item-info">
+                <h3 class="testi-item-name">
+                  Super notes for Assistant Professor in Nursing
+                </h3>
+                <div class="testi-item-role">
+                  <i class="fa-solid fa-location-dot"></i> Latest Upload
+                  &middot; 2025
+                </div>
+                <div class="testi-item-excerpt">
+                  "Watch our latest nursing upload on our YouTube channel. More
+                  testimonial videos will be added soon."
+                </div>
+              </div>
+              <div class="testi-item-number">01</div>
+            </article>
+            <article
+              class="testi-playlist-item"
+              data-index="1"
+              data-url="https://youtu.be/4J_sUv_L5f0?si=eK1eW4HgoQy_c_4v"
+              data-img="https://img.youtube.com/vi/4J_sUv_L5f0/maxresdefault.jpg"
+              data-avatar="https://img.youtube.com/vi/4J_sUv_L5f0/maxresdefault.jpg"
+              data-name="DHS Staff Nurse Exam Preparation 2025"
+              data-sub="Exam Guide &middot; 2025"
+              data-badge="Exam Guide"
+              data-quote="Exam Guide &middot; 2025"
+            >
+              <figure class="testi-item-thumb">
+                <img
+                  src="https://img.youtube.com/vi/4J_sUv_L5f0/maxresdefault.jpg"
+                  alt="DHS Staff Nurse Exam Preparation 2025"
+                  loading="lazy"
+                />
+                <div class="testi-item-play">
+                  <i class="fa-solid fa-play"></i>
+                </div>
+              </figure>
+              <div class="testi-item-info">
+                <h3 class="testi-item-name">
+                  DHS Staff Nurse Exam Preparation 2025
+                </h3>
+                <div class="testi-item-role">
+                  <i class="fa-solid fa-location-dot"></i> Exam Guide &middot;
+                  2025
+                </div>
+                <div class="testi-item-excerpt">"Exam Guide &middot; 2025"</div>
+              </div>
+              <div class="testi-item-number">02</div>
+            </article>
+            <article
+              class="testi-playlist-item"
+              data-index="2"
+              data-url="https://youtu.be/XjogZEgAA2M?si=CMIgkmReFJ203EEp"
+              data-img="https://img.youtube.com/vi/XjogZEgAA2M/maxresdefault.jpg"
+              data-avatar="https://img.youtube.com/vi/XjogZEgAA2M/maxresdefault.jpg"
+              data-name="Mission NORCET 11 | Eduooz Academy"
+              data-sub="NORCET &middot; 2025"
+              data-badge="NORCET"
+              data-quote="NORCET &middot; 2025"
+            >
+              <figure class="testi-item-thumb">
+                <img
+                  src="https://img.youtube.com/vi/XjogZEgAA2M/maxresdefault.jpg"
+                  alt="Mission NORCET 11 | Eduooz Academy"
+                  loading="lazy"
+                />
+                <div class="testi-item-play">
+                  <i class="fa-solid fa-play"></i>
+                </div>
+              </figure>
+              <div class="testi-item-info">
+                <h3 class="testi-item-name">
+                  Mission NORCET 11 | Eduooz Academy
+                </h3>
+                <div class="testi-item-role">
+                  <i class="fa-solid fa-location-dot"></i> NORCET &middot; 2025
+                </div>
+                <div class="testi-item-excerpt">"NORCET &middot; 2025"</div>
+              </div>
+              <div class="testi-item-number">03</div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- GOOGLE REVIEWS SECTION -->
     <section class="greview-section" id="reviews" data-page-type="lab-tech">
       <div class="container">
@@ -1653,6 +2309,546 @@
           <div class="greview-trust-badge">
             <i class="fa-solid fa-circle-check"></i> Mock Exam Platform
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOWNLOAD APP SECTION -->
+    <section class="pas-section" id="download-app">
+      <!-- Ambient background -->
+      <div class="pas-ambient-layer">
+        <div class="pas-blob pas-blob-1"></div>
+        <div class="pas-blob pas-blob-2"></div>
+        <div class="pas-blob pas-blob-3"></div>
+      </div>
+
+      <div class="container">
+        <div class="pas-two-col" id="pasGrid">
+          <!--  LEFT: INTERACTIVE PHONE MOCKUP  -->
+          <div class="pas-phone-col" id="pasPhoneCol">
+            <div class="pas-phone-scene" id="pasPhoneScene">
+              <div class="pas-phone-wrapper" id="pasPhoneWrapper">
+                <div class="pas-phone-frame" id="pasPhoneFrame">
+                  <!-- Gloss sweep -->
+                  <div class="pas-gloss-sweep"></div>
+
+                  <!-- Dynamic island -->
+                  <div class="pas-notch"></div>
+
+                  <!-- Status bar -->
+                  <div class="pas-status-bar">
+                    <span>9:41</span>
+                    <span style="display: flex; gap: 3px; align-items: center">
+                      <i
+                        class="fa-solid fa-signal"
+                        style="font-size: 0.42rem"
+                      ></i>
+                      <i
+                        class="fa-solid fa-wifi"
+                        style="font-size: 0.42rem"
+                      ></i>
+                      <i
+                        class="fa-solid fa-battery-full"
+                        style="font-size: 0.42rem"
+                      ></i>
+                    </span>
+                  </div>
+
+                  <!-- Floating notification -->
+                  <div class="pas-notif-badge" id="pasNotifBadge">
+                    <div class="pas-notif-icon-wrap">
+                      <i class="fa-solid fa-bell" id="pasNotifIcon"></i>
+                    </div>
+                    <div>
+                      <span class="pas-notif-title" id="pasNotifTitle"
+                        >Mock Test Completed!</span
+                      >
+                      <span class="pas-notif-sub" id="pasNotifSub"
+                        >Score: 178/200 · Rank Top 5%</span
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Screen carousel  Figma app screenshots -->
+                  <div class="pas-screen" id="pasScreen">
+                    <!-- SCREEN 1: Home Dashboard -->
+                    <div
+                      class="pas-slide pas-slide-active"
+                      data-screen="dashboard"
+                    >
+                      <img
+                        src="../../../assets/images/Eduooz-App/eduooz-app-image (1).jpeg"
+                        alt="Eduooz Home Dashboard"
+                        class="pas-screen-img"
+                      />
+                    </div>
+
+                    <!-- SCREEN 2: Live & Recorded Classes -->
+                    <div class="pas-slide" data-screen="live">
+                      <img
+                        src="../../../assets/images/Eduooz-App/eduooz-app-image (2).jpeg"
+                        alt="Course Listing"
+                        class="pas-screen-img"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <!-- SCREEN 3: CBT Mock Test -->
+                    <div class="pas-slide" data-screen="cbt">
+                      <img
+                        src="../../../assets/images/Eduooz-App/eduooz-app-image (3).jpeg"
+                        alt="Mock Test Interface"
+                        class="pas-screen-img"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <!-- SCREEN 4: Performance Analytics -->
+                    <div class="pas-slide" data-screen="analytics">
+                      <img
+                        src="../../../assets/images/Eduooz-App/eduooz-app-image (4).jpeg"
+                        alt="Performance Analytics"
+                        class="pas-screen-img"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <!-- SCREEN 5: Study Materials / Practice -->
+                    <div class="pas-slide" data-screen="materials">
+                      <img
+                        src="../../../assets/images/Eduooz-App/eduooz-app-image (5).jpeg"
+                        alt="Practice &amp; Study Materials"
+                        class="pas-screen-img"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <!-- SCREEN 6: Leaderboard -->
+                    <div class="pas-slide" data-screen="leaderboard">
+                      <img
+                        src="../../../assets/images/Eduooz-App/eduooz-app-image (6).jpeg"
+                        alt="Leaderboard"
+                        class="pas-screen-img"
+                        loading="lazy" width="734" height="1600"
+                      />
+                    </div>
+                  </div>
+                  <!-- /pas-screen -->
+
+                  <!-- Home indicator -->
+                  <div class="pas-home-indicator"></div>
+                </div>
+                <!-- /pas-phone-frame -->
+              </div>
+              <!-- /pas-phone-wrapper -->
+
+              <!-- Dynamic shadow -->
+              <div class="pas-shadow-wrap">
+                <div class="pas-phone-shadow" id="pasPhoneShadow"></div>
+              </div>
+            </div>
+            <!-- /pas-phone-scene -->
+          </div>
+          <!-- /pas-phone-col -->
+
+          <!--  RIGHT: CONTENT COLUMN  -->
+          <div class="pas-content-col" id="pasContentCol">
+
+
+            <div class="section-label">
+              <span class="label-dot"></span> Learn On The Go
+            </div>
+
+            <h2 class="pas-heading">
+              Download the <span class="text-gradient">Eduooz App.</span>
+            </h2>
+
+            <p class="pas-desc">
+              Access live classes, mock tests, study materials, and performance
+              analytics anywhere, anytime. The complete DHS MLT preparation
+              ecosystem  always in your pocket.
+            </p>
+
+            <!-- Circular Progress Stats -->
+            <div class="pas-stats-grid" id="pasStatsGrid">
+              <div class="pas-stat-item">
+                <div class="pas-circle-wrap">
+                  <svg class="pas-circle-svg" viewBox="0 0 80 80">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="rgba(6,182,212,0.12)"
+                      stroke-width="5"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="url(#pg1)"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                      stroke-dasharray="207.3"
+                      stroke-dashoffset="207.3"
+                      class="pas-circle-progress"
+                      data-pct="96"
+                      transform="rotate(-90 40 40)"
+                    />
+                    <defs>
+                      <linearGradient
+                        id="pg1"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stop-color="#06b6d4" />
+                        <stop offset="100%" stop-color="#5b21b6" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="pas-circle-center">
+                    <span class="pas-circle-num" data-target="96">0</span
+                    ><span class="pas-circle-suf">%</span>
+                  </div>
+                </div>
+                <div class="pas-stat-label">Pass Rate</div>
+              </div>
+              <div class="pas-stat-item">
+                <div class="pas-circle-wrap">
+                  <svg class="pas-circle-svg" viewBox="0 0 80 80">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="rgba(192,38,211,0.12)"
+                      stroke-width="5"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="url(#pg2)"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                      stroke-dasharray="207.3"
+                      stroke-dashoffset="207.3"
+                      class="pas-circle-progress"
+                      data-pct="92"
+                      transform="rotate(-90 40 40)"
+                    />
+                    <defs>
+                      <linearGradient
+                        id="pg2"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stop-color="#c026d3" />
+                        <stop offset="100%" stop-color="#5b21b6" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="pas-circle-center">
+                    <span class="pas-circle-num" data-target="92">0</span
+                    ><span class="pas-circle-suf">%</span>
+                  </div>
+                </div>
+                <div class="pas-stat-label">Satisfaction</div>
+              </div>
+              <div class="pas-stat-item">
+                <div class="pas-circle-wrap">
+                  <svg class="pas-circle-svg" viewBox="0 0 80 80">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="rgba(16,185,129,0.12)"
+                      stroke-width="5"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="url(#pg3)"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                      stroke-dasharray="207.3"
+                      stroke-dashoffset="207.3"
+                      class="pas-circle-progress"
+                      data-pct="98"
+                      transform="rotate(-90 40 40)"
+                    />
+                    <defs>
+                      <linearGradient
+                        id="pg3"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stop-color="#10b981" />
+                        <stop offset="100%" stop-color="#06b6d4" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="pas-circle-center">
+                    <span class="pas-circle-num" data-target="98">0</span
+                    ><span class="pas-circle-suf">%</span>
+                  </div>
+                </div>
+                <div class="pas-stat-label">App Uptime</div>
+              </div>
+              <div class="pas-stat-item">
+                <div class="pas-circle-wrap">
+                  <svg class="pas-circle-svg" viewBox="0 0 80 80">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="rgba(91,33,182,0.12)"
+                      stroke-width="5"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="33"
+                      fill="none"
+                      stroke="url(#pg4)"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                      stroke-dasharray="207.3"
+                      stroke-dashoffset="207.3"
+                      class="pas-circle-progress"
+                      data-pct="88"
+                      transform="rotate(-90 40 40)"
+                    />
+                    <defs>
+                      <linearGradient
+                        id="pg4"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stop-color="#5b21b6" />
+                        <stop offset="100%" stop-color="#c026d3" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="pas-circle-center">
+                    <span class="pas-circle-num" data-target="88">0</span
+                    ><span class="pas-circle-suf">%</span>
+                  </div>
+                </div>
+                <div class="pas-stat-label">Accuracy Gain</div>
+              </div>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="pas-features" id="pasFeatures">
+              <div class="pas-feature-card" data-screen="live">
+                <div class="pas-feat-icon">
+                  <i class="fa-solid fa-video"></i>
+                </div>
+                <div class="pas-feat-body">
+                  <div class="pas-feat-title">Live &amp; Recorded Classes</div>
+                  <div class="pas-feat-sub">
+                    500+ hours with interactive Q&amp;A sessions
+                  </div>
+                </div>
+                <div class="pas-feat-arrow">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </div>
+              </div>
+              <div class="pas-feature-card" data-screen="cbt">
+                <div
+                  class="pas-feat-icon"
+                  style="background: rgba(192, 38, 211, 0.12); color: #c026d3"
+                >
+                  <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <div class="pas-feat-body">
+                  <div class="pas-feat-title">CBT Mock Tests</div>
+                  <div class="pas-feat-sub">
+                    150+ full-length tests mirroring the actual DHS MLT Exam
+                  </div>
+                </div>
+                <div class="pas-feat-arrow">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </div>
+              </div>
+              <div class="pas-feature-card" data-screen="analytics">
+                <div
+                  class="pas-feat-icon"
+                  style="background: rgba(16, 185, 129, 0.12); color: #10b981"
+                >
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="pas-feat-body">
+                  <div class="pas-feat-title">Performance Tracking</div>
+                  <div class="pas-feat-sub">
+                    Real-time analytics, rank tracking &amp; insights
+                  </div>
+                </div>
+                <div class="pas-feat-arrow">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </div>
+              </div>
+              <div class="pas-feature-card" data-screen="materials">
+                <div
+                  class="pas-feat-icon"
+                  style="background: rgba(245, 158, 11, 0.12); color: #f59e0b"
+                >
+                  <i class="fa-solid fa-book"></i>
+                </div>
+                <div class="pas-feat-body">
+                  <div class="pas-feat-title">Offline Study Materials</div>
+                  <div class="pas-feat-sub">
+                    Download notes, PPTs &amp; videos for offline use
+                  </div>
+                </div>
+                <div class="pas-feat-arrow">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- App Store Buttons -->
+            <div class="pas-cta-row" id="pasCta">
+              <a
+                href="https://play.google.com/store/apps/details?id=co.diy.yleuu&hl=en-US&pli=1"
+                target="_blank"
+                rel="noopener"
+                class="pas-store-btn pas-play-btn"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  style="flex-shrink: 0; display: block"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <clipPath id="gp-clip">
+                      <path
+                        d="M4.5 21.3V2.7a.65.65 0 0 1 1-.55l15 9.3a.65.65 0 0 1 0 1.1l-15 9.3a.65.65 0 0 1-1-.55z"
+                      />
+                    </clipPath>
+                  </defs>
+                  <rect
+                    x="0"
+                    y="0"
+                    width="12"
+                    height="12"
+                    fill="#4285F4"
+                    clip-path="url(#gp-clip)"
+                  />
+                  <rect
+                    x="12"
+                    y="0"
+                    width="12"
+                    height="12"
+                    fill="#FBBC04"
+                    clip-path="url(#gp-clip)"
+                  />
+                  <rect
+                    x="0"
+                    y="12"
+                    width="12"
+                    height="12"
+                    fill="#34A853"
+                    clip-path="url(#gp-clip)"
+                  />
+                  <rect
+                    x="12"
+                    y="12"
+                    width="12"
+                    height="12"
+                    fill="#EA4335"
+                    clip-path="url(#gp-clip)"
+                  />
+                </svg>
+                <div class="pas-store-text">
+                  <span class="pas-store-small">GET IT ON</span>
+                  <span class="pas-store-big">Google Play</span>
+                </div>
+              </a>
+              <a
+                href="https://apps.apple.com/us/app/eduooz/id6758535369"
+                target="_blank"
+                rel="noopener"
+                class="pas-store-btn pas-apple-btn"
+              >
+                <i class="fa-brands fa-apple"></i>
+                <div class="pas-store-text">
+                  <span class="pas-store-small">DOWNLOAD ON THE</span>
+                  <span class="pas-store-big">App Store</span>
+                </div>
+              </a>
+            </div>
+          </div>
+          <!-- /pas-content-col -->
+        </div>
+        <!-- /pas-two-col -->
+      </div>
+      <!-- /container -->
+    </section>
+
+    <!-- RELATED RESOURCES -->
+    <section class="resources-section" id="resources">
+      <div class="container">
+        <div class="text-center">
+          <div class="section-label">
+            <span class="label-dot"></span> Explore More
+          </div>
+          <h2 class="section-title">
+            Related <span class="text-gradient">Resources.</span>
+          </h2>
+        </div>
+        <div class="resources-pills" id="resources-pills">
+          <a href="#syllabus" class="resource-pill">
+            <i class="fa-solid fa-list-check"></i> DHS MLT Exam Syllabus
+          </a>
+          <a href="#papers" class="resource-pill">
+            <i class="fa-solid fa-file-pdf"></i> DHS MLT Previous Year
+            Question Papers
+          </a>
+          <a href="#practice" class="resource-pill">
+            <i class="fa-solid fa-pen-to-square"></i> DHS MLT Practice Tests
+            and Mock Exams
+          </a>
+          <a href="#eligibility" class="resource-pill">
+            <i class="fa-solid fa-user-check"></i> DHS MLT Eligibility
+            Criteria
+          </a>
+          <a href="../central/cre-lab-technician.html" class="resource-pill">
+            <i class="fa-solid fa-vial"></i> CRE Lab Technician Exam
+          </a>
+          <a href="../central/rrb-lab-technician.html" class="resource-pill">
+            <i class="fa-solid fa-vial"></i> RRB Lab Technician Exam
+          </a>
+          <a href="./jla-lab-technician.html" class="resource-pill">
+            <i class="fa-solid fa-vial"></i> JLA Lab Technician Exam
+          </a>
+          <a href="./ims-ayurveda-lab-technician.html" class="resource-pill">
+            <i class="fa-solid fa-vial"></i> IMS Ayurveda Lab Technician Exam
+          </a>
+          <a href="./ims-homeo-lab-technician.html" class="resource-pill">
+            <i class="fa-solid fa-vial"></i> IMS Homeo Lab Technician Exam
+          </a>
+          <a href="./ims-oilpalm-lab-technician.html" class="resource-pill">
+            <i class="fa-solid fa-vial"></i> IMS Oil Palm Lab Technician Exam
+          </a>
         </div>
       </div>
     </section>
@@ -1908,6 +3104,161 @@
               style="margin-left: 5px; font-size: 0.85em"
             ></i
           ></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA / APPLICATION FORM -->
+    <section class="cta-terminal-section" id="enroll">
+      <div class="container cta-grid relative-z">
+        <div class="cta-hook-zone g-cta-reveal">
+          <div class="section-label">
+            <span class="label-dot"></span> Limited Intake
+          </div>
+          <h2 class="cta-title">
+            Your DHS MLT Career <br />
+            <span class="text-gradient-fluid">Starts Here.</span>
+          </h2>
+          <p class="cta-subtitle">
+            Admission to our DHS MLT preparation tracks is curated to ensure
+            maximum personalized mentorship. Secure your seat before the next
+            batch closes.
+          </p>
+          <div class="cta-urgency-box">
+            <div class="urgency-stat">
+              <i class="fa-solid fa-users"></i>
+              <div><strong>10,000+</strong><span>Alumni Placed</span></div>
+            </div>
+            <div class="urgency-stat">
+              <i class="fa-solid fa-fire text-magenta"></i>
+              <div>
+                <strong class="text-magenta">Closing Soon</strong
+                ><span>July 2026 Batch</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-form-zone g-cta-reveal">
+          <div class="glass-terminal-card" id="terminal-card">
+            <div class="terminal-glare"></div>
+            <div class="terminal-header">
+              <h3>Submit Application</h3>
+              <p>Our academic counselors will reach out within 24 hours.</p>
+            </div>
+            <form class="premium-form lead-form" id="course-application-form">
+              <div class="input-group">
+                <input type="text" id="app-name" name="name" required autocomplete="off" />
+                <label for="app-name">Full Legal Name</label>
+                <div class="input-line"></div>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <input
+                    type="tel"
+                    id="app-phone" name="phone"
+                    required
+                    autocomplete="off"
+                  />
+                  <label for="app-phone">Phone Number</label>
+                  <div class="input-line"></div>
+                </div>
+                <div class="input-group">
+                  <input
+                    type="email"
+                    id="app-email" name="email"
+                    autocomplete="off"
+                  />
+                  <label for="app-email">Email Address</label>
+                  <div class="input-line"></div>
+                </div>
+              </div>
+              <div class="input-group select-group">
+                <select id="app-course" name="course" required>
+                  <option value="" disabled>Select Your Course...</option>
+                  <optgroup label="Nursing">
+                    <option value="Nursing - AIIMS NORCET Nursing Officer">AIIMS NORCET Nursing Officer</option>
+                    <option value="Nursing - DSSSB Nursing Officer">DSSSB Nursing Officer</option>
+                    <option value="Nursing - ESIC Nursing Officer">ESIC Nursing Officer</option>
+                    <option value="Nursing - JIPMER Nursing Officer">JIPMER Nursing Officer</option>
+                    <option value="Nursing - Military Nursing Service (MNS)">Military Nursing Service (MNS)</option>
+                    <option value="Nursing - NVS Staff Nurse">NVS Staff Nurse</option>
+                    <option value="Nursing - PGIMER Nursing Officer">PGIMER Nursing Officer</option>
+                    <option value="Nursing - RCC Staff Nurse">RCC Staff Nurse</option>
+                    <option value="Nursing - RML Nursing Officer">RML Nursing Officer</option>
+                    <option value="Nursing - RRB Nursing Superintendent">RRB Nursing Superintendent</option>
+                    <option value="Nursing - SGPGIMS Nursing Officer">SGPGIMS Nursing Officer</option>
+                    <option value="Nursing - Sree Chitra Nursing Officer">Sree Chitra Nursing Officer</option>
+                    <option value="Nursing - SSC Staff Nurse Recruitment">SSC Staff Nurse Recruitment</option>
+                    <option value="Nursing - DHA Nursing Prometric">DHA Nursing Prometric</option>
+                    <option value="Nursing - HAAD DOH Nursing Pearson VUE Licensing">HAAD DOH Nursing Pearson VUE Licensing</option>
+                    <option value="Nursing - Kuwait Nursing Prometric Licensing">Kuwait Nursing Prometric Licensing</option>
+                    <option value="Nursing - Oman Nursing Pearson VUE Licensing">Oman Nursing Pearson VUE Licensing</option>
+                    <option value="Nursing - Qatar Nursing Prometric Licensing">Qatar Nursing Prometric Licensing</option>
+                    <option value="Nursing - Saudi Nursing Prometric Licensing">Saudi Nursing Prometric Licensing</option>
+                    <option value="Nursing - Sharjah Nursing Prometric">Sharjah Nursing Prometric</option>
+                    <option value="Nursing - Kerala PSC Assistant Professor in Nursing">Kerala PSC Assistant Professor in Nursing</option>
+                    <option value="Nursing - Kerala PSC Staff Nurse DHS">Kerala PSC Staff Nurse DHS</option>
+                    <option value="Nursing - Kerala PSC DME Staff Nurse Grade II">Kerala PSC DME Staff Nurse Grade II</option>
+                    <option value="Nursing - Kerala PSC Homoeo Nurse">Kerala PSC Homoeo Nurse</option>
+                    <option value="Nursing - IMS Staff Nurse Kerala PSC">IMS Staff Nurse Kerala PSC</option>
+                    <option value="Nursing - Kerala JPHN DHS">Kerala JPHN DHS</option>
+                    <option value="Nursing - Kerala JPHN DME">Kerala JPHN DME</option>
+                    <option value="Nursing - Kerala PSC LSGD Staff Nurse">Kerala PSC LSGD Staff Nurse</option>
+                    <option value="Nursing - Kerala M.Sc Nursing Entrance">Kerala M.Sc Nursing Entrance</option>
+                    <option value="Nursing - Kerala PSC Nursing Tutor">Kerala PSC Nursing Tutor</option>
+                    <option value="Nursing - Kerala PSC Treatment Organiser">Kerala PSC Treatment Organiser</option>
+                  </optgroup>
+                  <optgroup label="Pharmacy">
+                    <option value="Pharmacy - AIIMS CRE Pharmacist">AIIMS CRE Pharmacist</option>
+                    <option value="Pharmacy - GPAT (Graduate Pharmacy Aptitude Test)">GPAT (Graduate Pharmacy Aptitude Test)</option>
+                    <option value="Pharmacy - RRB Pharmacist">RRB Pharmacist</option>
+                    <option value="Pharmacy - UPSC Drug Inspector">UPSC Drug Inspector</option>
+                    <option value="Pharmacy - VSSC Pharmacist">VSSC Pharmacist</option>
+                    <option value="Pharmacy - Bahrain Pharmacy Prometric Licensing">Bahrain Pharmacy Prometric Licensing</option>
+                    <option value="Pharmacy - DHA Pharmacy Prometric Licensing">DHA Pharmacy Prometric Licensing</option>
+                    <option value="Pharmacy - HAAD Pearson VUE Licensing">HAAD Pearson VUE Licensing</option>
+                    <option value="Pharmacy - MOH Pharmacy Prometric Licensing">MOH Pharmacy Prometric Licensing</option>
+                    <option value="Pharmacy - Oman Pearson VUE Licensing">Oman Pearson VUE Licensing</option>
+                    <option value="Pharmacy - Qatar Pharmacy Prometric Licensing">Qatar Pharmacy Prometric Licensing</option>
+                    <option value="Pharmacy - Saudi Pearson VUE Licensing">Saudi Pearson VUE Licensing</option>
+                    <option value="Pharmacy - Kerala PSC Assistant Professor in Pharmacy">Kerala PSC Assistant Professor in Pharmacy</option>
+                    <option value="Pharmacy - Kerala PSC DHS Pharmacist">Kerala PSC DHS Pharmacist</option>
+                    <option value="Pharmacy - Kerala PSC Drug Analyst Grade III">Kerala PSC Drug Analyst Grade III</option>
+                    <option value="Pharmacy - Kerala PSC Drug Inspector">Kerala PSC Drug Inspector</option>
+                    <option value="Pharmacy - Guruvayoor Devaswom Board Pharmacist">Guruvayoor Devaswom Board Pharmacist</option>
+                    <option value="Pharmacy - Kerala PSC LSGD Pharmacist">Kerala PSC LSGD Pharmacist</option>
+                    <option value="Pharmacy - Kerala PSC Pharmacist (Oil Palm India Ltd)">Kerala PSC Pharmacist (Oil Palm India Ltd)</option>
+                  </optgroup>
+                  <optgroup label="Lab Technician">
+                    <option value="Lab Technician - CRE Lab Technician">CRE Lab Technician</option>
+                    <option value="Lab Technician - RRB Lab Technician">RRB Lab Technician</option>
+                    <option value="Lab Technician - DHS Lab Technician" selected>DHS Lab Technician</option>
+                    <option value="Lab Technician - IMS / Homeo / Ayurveda Lab Technician">IMS / Homeo / Ayurveda Lab Technician</option>
+                    <option value="Lab Technician - JLA Lab Technician">JLA Lab Technician</option>
+                  </optgroup>
+                </select>
+                <i class="fa-solid fa-chevron-down custom-select-icon"></i>
+                <div class="input-line"></div>
+              </div>
+              <div class="input-group">
+                <textarea id="app-message" name="message" rows="3" autocomplete="off"></textarea>
+                <label for="app-message">Your Message</label>
+                <div class="input-line"></div>
+              </div>
+              <button
+                type="submit"
+                class="btn-liquid-purple w-100 mt-4 magnetic-btn"
+                style="justify-content: center"
+              >
+                Submit Enquiry <span class="arrow">↗</span>
+              </button>
+              <div class="form-secure-note">
+                <i class="fa-solid fa-lock"></i> Your information is 256-bit
+                encrypted and strictly confidential.
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </section>

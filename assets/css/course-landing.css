@@ -5156,14 +5156,6 @@ body {
     #f5f6f6;
 }
 
-.snapshot-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 40px;
-  
-}
-
 .snapshot-card {
   background: rgba(255, 255, 255, 0.6);
  
@@ -5235,17 +5227,6 @@ body {
   color: var(--brand-cyan);
   text-decoration: none;
   font-weight: 600;
-}
-
-@media (max-width: 1024px) {
-  .snapshot-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 480px) {
-  .snapshot-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* --- ABOUT EXAM SECTION (Video Carousel + Content) --- */
@@ -12165,7 +12146,6 @@ a.pex-paper-card {
 .journey-roadmap {
   position: relative;
   margin-top: 40px;
-  padding: 0 20px;
   overflow-x: auto;
   scrollbar-width: none;
 }

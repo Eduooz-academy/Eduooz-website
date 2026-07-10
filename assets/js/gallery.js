@@ -33,6 +33,113 @@ document.addEventListener("DOMContentLoaded", () => {
     initLenis();
 
 
+    // --- Gallery Wall: local image data (assets/images/gallary-images/) ---
+    const galleryImages = [
+    { file: "(1).png", w: 1097, h: 620 },
+    { file: "DSC03466.JPG", w: 7008, h: 4672 },
+    { file: "DSC03467.JPG", w: 7008, h: 4672 },
+    { file: "(2).png", w: 1063, h: 623 },
+    { file: "DSC03468.JPG", w: 7008, h: 4672 },
+    { file: "DSC03469.JPG", w: 7008, h: 4672 },
+    { file: "(3).PNG", w: 1637, h: 928 },
+    { file: "DSC03470.JPG", w: 7008, h: 4672 },
+    { file: "DSC03471.JPG", w: 7008, h: 4672 },
+    { file: "DSC03472.JPG", w: 7008, h: 4672 },
+    { file: ".PNG", w: 1589, h: 913 },
+    { file: "DSC03473.JPG", w: 7008, h: 4672 },
+    { file: "DSC03474.JPG", w: 7008, h: 4672 },
+    { file: "1.jpeg", w: 1108, h: 584 },
+    { file: "DSC03475.JPG", w: 7008, h: 4672 },
+    { file: "DSC03476.JPG", w: 7008, h: 4672 },
+    { file: "DSC03477.JPG", w: 7008, h: 4672 },
+    { file: "PNG(2).png", w: 1597, h: 921 },
+    { file: "DSC03478.JPG", w: 7008, h: 4672 },
+    { file: "DSC03479.JPG", w: 7008, h: 4672 },
+    { file: "PNG(3).png", w: 1772, h: 921 },
+    { file: "DSC03480.JPG", w: 7008, h: 4672 },
+    { file: "DSC03481.JPG", w: 7008, h: 4672 },
+    { file: "PNG(5).png", w: 1695, h: 942 },
+    { file: "DSC03482.JPG", w: 7008, h: 4672 },
+    { file: "DSC03483.JPG", w: 7008, h: 4672 },
+    { file: "DSC03494.JPG", w: 7008, h: 4672 },
+    { file: "PNG(7).png", w: 1762, h: 955 },
+    { file: "DSC03495.JPG", w: 7008, h: 4672 },
+    { file: "DSC03496.JPG", w: 7008, h: 4672 },
+    { file: "WhatsApp Image 2026-07-01 at 15.11.12.jpeg", w: 1104, h: 620 },
+    { file: "DSC03497.JPG", w: 7008, h: 4672 },
+    { file: "DSC03498.JPG", w: 7008, h: 4672 },
+    { file: "DSC03499.JPG", w: 7008, h: 4672 },
+    { file: "WhatsApp Image 2026-07-01 at 16.28.20.jpeg", w: 1437, h: 801 },
+    { file: "DSC03500.JPG", w: 7008, h: 4672 },
+    { file: "DSC03501.JPG", w: 7008, h: 4672 },
+    { file: "WhatsApp Image 2026-07-01 at 16.28.21.jpeg", w: 1440, h: 900 },
+    { file: "DSC03502.JPG", w: 7008, h: 4672 },
+    { file: "DSC03503.JPG", w: 7008, h: 4672 },
+    { file: "png(1).png", w: 1102, h: 614 },
+    { file: "DSC03504.JPG", w: 7008, h: 4672 },
+    { file: "DSC03505.JPG", w: 7008, h: 4672 },
+    { file: "DSC03507.JPG", w: 7008, h: 4672 },
+    { file: "png(4).png", w: 1103, h: 557 },
+    { file: "DSC03509.JPG", w: 7008, h: 4672 },
+    { file: "DSC03657.JPG", w: 7008, h: 4672 },
+    { file: "png(6).png", w: 1119, h: 553 },
+    { file: "DSC03658.JPG", w: 7008, h: 4672 },
+    { file: "DSC03662.JPG", w: 7008, h: 4672 },
+    { file: "DSC03665.JPG", w: 7008, h: 4672 },
+    { file: "png.png", w: 1104, h: 566 },
+    { file: "DSC03712.JPG", w: 7008, h: 4672 },
+    { file: "DSC03714.JPG", w: 7008, h: 4672 },
+    { file: "pp.png", w: 979, h: 523 },
+    { file: "DSC03719.JPG", w: 7008, h: 4672 },
+    { file: "DSC03723.JPG", w: 7008, h: 4672 },
+    { file: "DSC03725.JPG", w: 7008, h: 4672 },
+    ];
+
+    function initGalleryWall() {
+        const wrapper = document.getElementById('galleryWallWrapper');
+        const showMoreBtn = document.getElementById('galleryShowMoreBtn');
+        if (!wrapper || !showMoreBtn) return;
+
+        const columns = wrapper.querySelectorAll('.gal-column');
+        const basePath = 'assets/images/gallary-images/';
+        const BATCH_SIZE = 18;
+        let renderedCount = 0;
+
+        function renderBatch() {
+            const next = galleryImages.slice(renderedCount, renderedCount + BATCH_SIZE);
+            next.forEach((item, i) => {
+                const globalIndex = renderedCount + i;
+                const card = document.createElement('div');
+                card.className = 'gal-img-card';
+
+                const img = document.createElement('img');
+                img.src = basePath + encodeURIComponent(item.file);
+                img.alt = 'Eduooz campus gallery photo';
+                img.width = item.w;
+                img.height = item.h;
+                img.loading = globalIndex < 6 ? 'eager' : 'lazy';
+
+                card.appendChild(img);
+                columns[globalIndex % columns.length].appendChild(card);
+            });
+            renderedCount += next.length;
+
+            if (renderedCount >= galleryImages.length) {
+                showMoreBtn.setAttribute('hidden', '');
+            }
+
+            // Recalculate parallax scroll boundaries now that column heights changed
+            if (typeof ScrollTrigger !== 'undefined') {
+                requestAnimationFrame(() => ScrollTrigger.refresh());
+            }
+        }
+
+        showMoreBtn.addEventListener('click', renderBatch);
+
+        renderBatch(); // initial batch
+    }
+    initGalleryWall();
+
 
     // --- 1. GSAP Premium Entrance Reveal ---
         const tl = gsap.timeline();
@@ -117,7 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // --- 3. Magnetic Glass Cursor Logic ---
         const cursor = document.getElementById('gallery-cursor');
         const gallerySection = document.getElementById('gallery-trigger');
-        const cards = document.querySelectorAll('.gal-img-card');
 
         // GSAP quickTo is incredibly performant for mouse tracking
         let xTo = gsap.quickTo(cursor, "x", {duration: 0.2, ease: "power3"});
@@ -139,13 +245,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Make the cursor expand slightly when physically over a card
-        cards.forEach(card => {
-            card.addEventListener("mouseenter", () => {
+        // (delegated on the section so cards added later via "Show More" are covered too)
+        gallerySection.addEventListener("mouseover", (e) => {
+            const card = e.target.closest('.gal-img-card');
+            if (card && !card.contains(e.relatedTarget)) {
                 gsap.to(cursor, { scale: 1.2, duration: 0.3, backgroundColor: "rgba(6, 182, 212, 0.2)", borderColor: "var(--brand-cyan)" });
-            });
-            card.addEventListener("mouseleave", () => {
+            }
+        });
+        gallerySection.addEventListener("mouseout", (e) => {
+            const card = e.target.closest('.gal-img-card');
+            if (card && !card.contains(e.relatedTarget)) {
                 gsap.to(cursor, { scale: 1, duration: 0.3, backgroundColor: "rgba(255, 255, 255, 0.1)", borderColor: "rgba(255, 255, 255, 0.4)" });
-            });
+            }
         });
     });
 
@@ -153,19 +264,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const lightbox = document.getElementById('gallery-lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     const closeBtn = document.getElementById('lightbox-close');
-    const allImages = document.querySelectorAll('.gal-img-card img');
+    const galleryWallWrapper = document.getElementById('galleryWallWrapper');
 
-    // Open Lightbox
-    allImages.forEach(img => {
-        img.addEventListener('click', () => {
-            const highResSrc = img.getAttribute('src'); // You can swap this to a data-highres attribute if you have larger files
+    // Open Lightbox (delegated so images added later via "Show More" work too)
+    if (galleryWallWrapper) {
+        galleryWallWrapper.addEventListener('click', (e) => {
+            const img = e.target.closest('.gal-img-card img');
+            if (!img) return;
+            const highResSrc = img.getAttribute('src');
             lightboxImg.src = highResSrc;
             lightbox.classList.add('active');
-            
+
             // Pause Lenis scrolling while lightbox is open
             if(window.lenis) window.lenis.stop();
         });
-    });
+    }
 
     // Close Lightbox
     const closeLightbox = () => {
