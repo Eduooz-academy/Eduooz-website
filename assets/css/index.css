@@ -514,11 +514,9 @@ body {
 }
 
 @media (max-width: 786px) {
-
   .hero-text-zone {
     margin-top: 3rem;
   }
-
 }
 
 .theme-blend-zone {
@@ -587,7 +585,11 @@ body {
   font-weight: 900;
   line-height: 1;
   margin-bottom: 8px;
-  background: linear-gradient(to right,var(--brand-dark), var(--brand-magenta));
+  background: linear-gradient(
+    to right,
+    var(--brand-dark),
+    var(--brand-magenta)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -801,7 +803,7 @@ body {
   box-shadow: 0 20px 40px rgba(76, 18, 126, 0.08);
 }
 
-.stack-courses-section .course-meta{
+.stack-courses-section .course-meta {
   color: var(--brand-purple);
   font-weight: 700;
   font-size: 1.5rem;
@@ -1264,8 +1266,8 @@ body {
   margin-bottom: 30px;
 }
 
-.btn-course-luxury{
- align-self: flex-start;
+.btn-course-luxury {
+  align-self: flex-start;
 }
 
 .btn-link-dark {
@@ -3086,7 +3088,9 @@ body {
   padding: 8px 16px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: transform 0.2s, background 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s;
 }
 
 .store-badge-btn:hover {

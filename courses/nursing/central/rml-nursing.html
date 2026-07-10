@@ -66,6 +66,33 @@
       }
     </script>
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.eduooz.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Nursing Coaching",
+            "item": "https://www.eduooz.com/courses/nursing.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "RML",
+            "item": "https://www.eduooz.com/courses/nursing/central/rml-nursing.html"
+          }
+        ]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -206,6 +233,13 @@
       <div class="course-bg-overlay"></div>
 
       <div class="container relative-z">
+        <nav class="course-breadcrumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span class="divider">/</span>
+          <a href="https://www.eduooz.com/courses/nursing.html">Nursing Coaching</a>
+          <span class="divider">/</span>
+          <span class="current-course" aria-current="page">RML</span>
+        </nav>
         <div class="course-hero-grid">
           <div class="course-hero-content g-course-reveal">
             <div class="frost-pill-dark mb-4">
@@ -1324,7 +1358,7 @@
                       <div class="mts-q-header">
                         <div class="mts-q-progress-info">
                           <span class="mts-q-counter" id="mts-q-counter">Question 1 of 25</span>
-                          <span class="mts-section-badge" id="mts-section-badge">Section 1</span>
+                          <span class="mts-section-badge" id="mts-section-badge">Test 1</span>
                         </div>
                         <div class="mts-progress-track">
                           <div class="mts-progress-fill" id="mts-progress-fill" style="width: 0%"></div>
@@ -1354,10 +1388,10 @@
                       </div>
                       <div class="mts-section-done mts-hidden" id="mts-section-done">
                         <div class="mts-done-icon"><i class="fa-solid fa-circle-check"></i></div>
-                        <h3 class="mts-done-title" id="mts-done-title">Section 1 Completed!</h3>
+                        <h3 class="mts-done-title" id="mts-done-title">Test 1 Completed!</h3>
                         <div class="mts-done-stats" id="mts-done-stats"></div>
                         <button class="mts-next-section-btn" id="mts-next-section-btn">
-                          Go to Section 2 <i class="fa-solid fa-arrow-right"></i>
+                          Go to Test 2 <i class="fa-solid fa-arrow-right"></i>
                         </button>
                       </div>
                     </div>
@@ -1499,7 +1533,7 @@
                 <div class="card-glare-light"></div>
                 <div class="card-content-3d">
                   <div class="alumni-img-box">
-                    <img src="../../../assets/images/mentors/SHINE.png" alt="Shine Stephen Nursing Mentor and Assistant Professor" />
+                    <img src="../../../assets/images/Mentors/SHINE.png" alt="Shine Stephen Nursing Mentor and Assistant Professor" />
                     <div class="rank-badge">Assistant Professor | PGIMER MSc (N) | PhD Scholar</div>
                     <div class="alumni-text-overlay">
                       <h3>Shine Stephen</h3>

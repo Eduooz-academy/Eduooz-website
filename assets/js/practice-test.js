@@ -275,7 +275,7 @@
                 const scoreEl = answered > 0
                     ? `<span class="mts-tab-score">${answered}/${sec.questions.length}</span>`
                     : '';
-                return `<button class="${cls}" data-sec="${i}"><span>${icon}Section ${i + 1}</span>${scoreEl}</button>`;
+                return `<button class="${cls}" data-sec="${i}"><span>${icon}Test ${i + 1}</span>${scoreEl}</button>`;
             }).join('');
             tabsScroll.querySelectorAll('.mts-tab').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -331,7 +331,7 @@
             if (qNum)     qNum.textContent      = `Q${qi + 1}.`;
             if (qText)    qText.textContent     = q.q;
             if (qCounter) qCounter.textContent  = `Question ${qi + 1} of ${sec.questions.length}`;
-            if (sectionBadge) sectionBadge.textContent = `Topic ${t + 1} · Section ${s + 1}`;
+            if (sectionBadge) sectionBadge.textContent = `Topic ${t + 1} · Test ${s + 1}`;
             if (progressFill) progressFill.style.width = ((qi + (answered ? 1 : 0)) / sec.questions.length * 100) + '%';
 
             // Build options
@@ -413,7 +413,7 @@
                         ? 'View Results <i class="fa-solid fa-flag-checkered"></i>'
                         : isLastSection
                             ? 'Finish Topic <i class="fa-solid fa-check"></i>'
-                            : 'Finish Section <i class="fa-solid fa-check"></i>';
+                            : 'Finish Test <i class="fa-solid fa-check"></i>';
                 } else {
                     nextBtn.innerHTML = 'Next <i class="fa-solid fa-chevron-right"></i>';
                 }
@@ -472,7 +472,7 @@
             const total = TOPICS[t].sections[s].questions.length;
             const pct = total > 0 ? Math.round(r.correct / total * 100) : 0;
 
-            if (doneTitle) doneTitle.textContent = `Section ${s + 1} Completed!`;
+            if (doneTitle) doneTitle.textContent = `Test ${s + 1} Completed!`;
             if (doneStats) {
                 doneStats.innerHTML = `
                     <div class="mts-done-stat"><strong>${r.correct}</strong><span>Correct</span></div>
@@ -481,7 +481,7 @@
                 `;
             }
             if (doneNextBtn) {
-                doneNextBtn.innerHTML = `Go to Section ${s + 2} <i class="fa-solid fa-arrow-right"></i>`;
+                doneNextBtn.innerHTML = `Go to Test ${s + 2} <i class="fa-solid fa-arrow-right"></i>`;
                 doneNextBtn.onclick = () => {
                     const cur = curCursor();
                     cur.section  = s + 1;

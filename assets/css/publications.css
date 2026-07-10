@@ -1,3 +1,7 @@
+html:has(body.publications-page) {
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-main);
   color: var(--text-main);
@@ -26,6 +30,7 @@ body {
   z-index: -1;
   filter: blur(80px);
   opacity: 0.15;
+  overflow: hidden;
 }
 
 .blob {
@@ -103,6 +108,7 @@ body {
 
 .publications-page .publications-archive-inner {
   position: relative;
+  overflow: hidden;
 }
 
 .publications-page .publications-archive-inner::before {

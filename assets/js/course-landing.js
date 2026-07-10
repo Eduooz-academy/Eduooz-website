@@ -3941,7 +3941,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     cardGrid.querySelectorAll(".qp-card").forEach(function (card) {
-      card.addEventListener("click", function () {
+      card.addEventListener("click", function (e) {
+        // Cards contain a real <a href> (added for crawlability) over the
+        // title so search engines can discover the PDF directly; prevent
+        // its default navigation so a human click still opens the in-page
+        // preview exactly as before, instead of leaving the page.
+        e.preventDefault();
         activateCard(card);
       });
       card.addEventListener("keydown", function (e) {

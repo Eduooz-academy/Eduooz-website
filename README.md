@@ -42,8 +42,7 @@ The site is a static HTML/CSS/JavaScript project — there is no build step, bun
 │   ├── header.html           # Shared header fragment (loaded via JS)
 │   ├── footer.html           # Shared footer fragment (loaded via JS)
 │   ├── chat.html              # Chat widget fragment
-│   ├── enquiry-form.html      # Enquiry form fragment
-│   ├── lead-enquiry-form.html # Lead enquiry form fragment
+│   ├── lead-enquiry-form.html # Enquiry/lead-capture form fragment (loaded into #enquiry-form-container on every page)
 │   ├── question-banks/        # Practice-test question bank data files
 │   └── mock-test-questions/   # Mock test question data files
 ├── courses/
@@ -95,7 +94,9 @@ This is a static site — no install or build step is required.
 
 ## Deployment
 
-A `CNAME` file at the repository root maps the site to the custom domain `eduooz.com`, indicating the site is deployed via **GitHub Pages**. No deployment secrets, tokens, or DNS configuration are stored in this repository.
+A `CNAME` file at the repository root maps the site to the custom domain `eduooz.com`, indicating this repo is *intended* to be deployed via **GitHub Pages**. No deployment secrets, tokens, or DNS configuration are stored in this repository.
+
+**Important:** as of the last SEO audit (2026-07-09), the live site at `https://www.eduooz.com/` was still serving the **old WordPress site** (Elementor + Yoast SEO, hosted on Hostinger) — not this repository. This repo is a not-yet-deployed redesign. Legacy-URL redirect stubs in this repo (see Maintenance Notes) are prepared for when this static site actually replaces the WordPress deployment; until then they have no effect on live traffic.
 
 ## SEO and Discovery Files
 
@@ -110,7 +111,10 @@ A `CNAME` file at the repository root maps the site to the custom domain `eduooz
 - Keep canonical (`<link rel="canonical">`) URLs consistent with the page's own `sitemap.xml` entry.
 - Do not add pages under `components/` to `sitemap.xml`, `robots.txt` allow rules, or `llms.txt` — they are partial fragments, not standalone pages.
 - `publications.html` is a real, standalone page (publications gallery with lightbox); its `<head>` previously had leftover `placements.html` metadata (title, canonical, OG/Twitter, JSON-LD), which has been corrected. Its 8 publication card images are currently placeholder Unsplash stock photos, not real Eduooz publication covers — replace them with actual assets when available.
-- `publiations.html` (misspelled, no "c") is a redirect stub to `publications.html`; it is intentionally excluded from `sitemap.xml`.
-- `structure.html` is a `noindex` internal page template and is intentionally excluded from `sitemap.xml`.
 - Only update `<lastmod>` values in `sitemap.xml` when a page's content meaningfully changes.
 - Verify internal links after moving or renaming any page, especially within `courses/`.
+- `courses/mlt/kerala/ims-ayurveda-lab-technician.html` and `courses/mlt/kerala/ims-homeo-lab-technician.html` were byte-identical, orphaned (unlinked) duplicates of `courses/mlt/kerala/ims-homeo-ayurveda-lab-technician.html` (the only one actually linked from navigation). Both are now `noindex` redirect stubs to the real page; excluded from `sitemap.xml`.
+- `courses/mlt/kerala/ims-oilpalm-lab-technician.html` was also a byte-identical orphan duplicate, but "Oil Palm" is a distinct Kerala recruiter (see `courses/pharmacy/kerala/oil-palm-pharmacist.html`) unrelated to the IMS/Homeo/Ayurveda departments, so it was redirected to the `courses/mlt.html` category hub instead of the IMS page. If real Oil Palm Lab Technician content becomes available, restore this as a standalone page instead.
+- Image paths must match the exact case of files on disk — GitHub Pages serves over a case-sensitive filesystem, unlike local Windows checkouts. (`assets/images/Mentors/` was previously referenced as lowercase `mentors/` in 49 course pages, breaking a mentor photo in production; fixed 2026-07-09.)
+- Legacy WordPress URLs still live/indexed on the current site (`/coaching-for-nursing-exams/`, `/coaching-for-nursing-exams/staff-nurse-dme/`, `/online-coaching-for-pharmacist-exams/`, `/drug-inspector/`, `/aiims-nursing-officer-staff-nurse-exam/`) map to `/courses/nursing.html`, `/courses/nursing/kerala/dme-nursing.html`, `/courses/pharmacy.html`, `/courses/pharmacy/kerala/drug-inspector.html`, and `/courses/nursing/central/aiims-norcet.html` respectively (see Deployment note above). No redirect-stub files exist in the repo for these yet — add them (following the pattern in `courses/mlt/kerala/ims-ayurveda-lab-technician.html`) before this site replaces the WordPress deployment, and keep them out of `sitemap.xml` when added. This is not an exhaustive list of every old WordPress URL — only the ones already confirmed; a full crawl of the old site or Google Search Console's legacy URL/404 report would be needed to find others.
+- The "Previous Year Question Papers" cards on individual course pages (`.qp-card` elements in `courses/nursing/` and `courses/pharmacy/`) load PDFs via `data-pdf`/`data-download` attributes and a click handler. As of 2026-07-10, each card with a real PDF also wraps its `.qp-card-title` text in a real `<a href="{same PDF path}" class="qp-card-pdf-link" tabindex="-1">` so search engines can discover the PDF directly. `assets/js/course-landing.js`'s `.qp-card` click handler calls `e.preventDefault()` so clicking that link still opens the in-page preview instead of navigating away — a human click and a crawler both see the same URL, just through different paths. When adding a new question-paper card with a real `data-pdf` value, add the matching `<a href>` wrapper around its title (copy the pattern from an existing card); cards with an empty `data-pdf=""` ("Coming Soon") should stay unwrapped.

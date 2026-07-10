@@ -14078,6 +14078,15 @@ a.pex-paper-card {
   text-overflow: ellipsis;
 }
 
+/* Crawlable link wrapping the card title text (added for PDF discoverability).
+   Neutralizes default browser link styling so it renders identically to the
+   plain text it replaces; the card itself still handles the click/preview. */
+.qp-card-pdf-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: inherit;
+}
+
 /* Category */
 .qp-card-category {
   font-size: 0.74rem;

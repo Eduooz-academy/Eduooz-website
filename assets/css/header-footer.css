@@ -4,7 +4,7 @@
 .glass-header {
   position: fixed;
   top: 10px;
-  left: 55%;
+  left: 48%;
   transform: translateX(-50%);
   width: 78%;
   max-width: 1200px;
@@ -155,7 +155,7 @@
   height: 60%;
   background: radial-gradient(
     ellipse at center,
-    rgba(6, 182, 212, 0.15) 0%, 
+    rgba(6, 182, 212, 0.15) 0%,
     rgba(107, 33, 168, 0.1) 40%,
     transparent 70%
   );
@@ -331,12 +331,7 @@
   background: rgba(221, 42, 123, 0.06);
 }
 .social-instagram:hover {
-  background: linear-gradient(
-    45deg,
-    #f9ce34 0%,
-    #ee2a7b 45%,
-    #6228d7 100%
-  );
+  background: linear-gradient(45deg, #f9ce34 0%, #ee2a7b 45%, #6228d7 100%);
   color: #fff;
   border-color: transparent;
 }
@@ -2286,7 +2281,7 @@ body.chat-is-open .scroll-to-top {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--brand-purple);
+  color: var(--brand-purple) !important;
   margin: 0 0 14px;
   padding-bottom: 9px;
   border-bottom: 1px solid rgba(147, 51, 234, 0.14);
@@ -2474,6 +2469,20 @@ body.chat-is-open .scroll-to-top {
   display: contents;
 }
 
+/* The accordion toggle button (see initMobileAccordion in components.js)
+   wraps the title's icon+text on every viewport, but should only look and
+   act like a button on mobile. Reset it so it inherits the title's exact
+   styling and drops out of layout on desktop; the media query below
+   restores the button chrome for mobile. */
+.course-section-toggle {
+  all: unset;
+  display: contents;
+}
+
+.section-caret {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   /* ---- Level 1: About Us / Courses trigger panels ---- */
   .mega-menu,
@@ -2628,13 +2637,13 @@ body.chat-is-open .scroll-to-top {
     margin-bottom: 0;
   }
 
-  .course-section-title {
+  .mega-menu .course-section-title {
     margin: 0;
     padding: 0;
     border-bottom: none;
     text-transform: none;
     letter-spacing: 0;
-    font-size: 0.86rem;
+    font-size: 1rem;
   }
 
   .course-section-toggle {
