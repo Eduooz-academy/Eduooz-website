@@ -1,3 +1,64 @@
+/* ==================================================================================
+   Course video playlists — one YouTube channel per course, no keyword or
+   exam-slug filtering. To add a new course: add a key here and a matching
+   path check in getCourseKey().
+   ================================================================================== */
+window._eduoozData = {
+  nursing: [
+    { id: "E1X1RFFt138", title: "Super Notes for Assistant Professor in Nursing", tag: "Latest" },
+    { id: "4J_sUv_L5f0", title: "DHS Staff Nurse Exam Preparation 2025", tag: "Popular" },
+    { id: "YglY46sa7oA", title: "POWER PLAN for DHA | MOH | DOH/HAAD | Prometric", tag: "Strategy" },
+    { id: "w76w1arkX7E", title: "NCLEX-RN Animation Class", tag: "Guide" },
+    { id: "tmP81NRePkA", title: "Pearson VUE Nursing Prometric Exam", tag: "Practice" },
+    { id: "dcKOKETcrK4", title: "Nursing Prometric Exam", tag: "Practice" },
+    { id: "XjogZEgAA2M", title: "Mission NORCET 11 | Eduooz Academy", tag: "Trending" },
+    { id: "_iRggg9Y_UQ", title: "Nursing Prometric Exam", tag: "Practice" },
+    { id: "ptIFWQ_cJIQ", title: "Nursing Saudi | Complete Career Details", tag: "Career" },
+    { id: "ftKaRv5WUmk", title: "Nursing Kuwait Prometric Complete Exam Training", tag: "Exam Prep" },
+  ],
+  pharmacy: [
+    { id: "Gab0IJ_-8tQ", title: "Paracetamol Pharmacology in 5 Minutes", tag: "Latest" },
+    { id: "vcEzTp2HEF4", title: "Phenytoin Pharmacology in 5 Minutes", tag: "Popular" },
+    { id: "ugvAoQFZCf8", title: "Sulfonamides in Pharmacology — Explained in 5 Min", tag: "Guide" },
+    { id: "f47-76tui34", title: "Diazepam Pharmacology in 5 Min", tag: "Quick Revision" },
+    { id: "Hp1yBFQ4e2o", title: "Insulin Pharmacology in 5 Min", tag: "Guide" },
+    { id: "-GIBgYF63ko", title: "Pharmacology Quick Revision", tag: "Revision" },
+    { id: "iElZRUtCE14", title: "Pharmacist Exam Strategy", tag: "Strategy" },
+    { id: "dg9FUWQShk0", title: "RRB Pharmacist 2025 — Online Coaching", tag: "Trending" },
+    { id: "lYvPIHaV4O0", title: "Markovnikov's Rule in 5 Min", tag: "Guide" },
+    { id: "ChlT_2r96R4", title: "Metformin Pharmacology in 5 Minutes", tag: "Guide" },
+  ],
+  mlt: [
+    { id: "ZqHuz3kBS-4", title: "Lab Technician DHS Long-Term Course", tag: "Latest" },
+    { id: "l7QKm6WsqBA", title: "Lab Technician DHS Long Term Course", tag: "Popular" },
+    { id: "Er5l3ptq6RM", title: "Kerala PSC Lab Technician: Scientist Nicknames", tag: "Guide" },
+    { id: "8X8A_tso5Dk", title: "Lab Technician DHS Long Term — Calendar of Health", tag: "Guide" },
+    { id: "ElQf1fTFPCw", title: "Mosquito Vector Chart Explained | PSC MLT Exams", tag: "MCQs" },
+    { id: "DXZWVrGW3DI", title: "Lab Technician DHS Long Term Program", tag: "Guide" },
+    { id: "N_aayNO3RmM", title: "Kerala PSC Junior Lab Assistant", tag: "Strategy" },
+    { id: "Oe5m4qBXJYQ", title: "Kerala PSC Junior Lab Assistant | Level & Exam Details", tag: "Exam Prep" },
+    { id: "z0h8iw7-pfc", title: "Lab Technician (DHS Long Term) | Complete Learning Program", tag: "Trending" },
+  ],
+};
+
+// Detects the current course from the page URL. Individual course landing
+// pages live under /courses/<course>/..., which is a reliable signal
+// independent of exam name/slug wording. Falls back to EXAM_CONFIG.examSlug
+// for any page not under the standard /courses/<course>/ path.
+function getCourseKey() {
+  var path = window.location.pathname.toLowerCase();
+  if (path.indexOf("/courses/pharmacy/") !== -1) return "pharmacy";
+  if (path.indexOf("/courses/mlt/") !== -1) return "mlt";
+  if (path.indexOf("/courses/nursing/") !== -1) return "nursing";
+
+  var slug =
+    ((window.EXAM_CONFIG && window.EXAM_CONFIG.examSlug) || "").toLowerCase();
+  if (slug.indexOf("lab-technician") !== -1) return "mlt";
+  if (slug.indexOf("pharma") !== -1 || slug.indexOf("drug") !== -1)
+    return "pharmacy";
+  return "nursing";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // --- 1. Initialize Lenis Smooth Scrolling ---
   function initLenis() {
@@ -716,769 +777,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 7. Curved Playlist Liquid Slider Logic ---
-  const playlistCards = document.querySelectorAll(".playlist-card");
-  const activeVidImg = document.getElementById("active-vid-img");
-  const activeVidTitle = document.getElementById("active-vid-title");
-  const activeVidDesc = document.getElementById("active-vid-desc");
-  const playlistTrack = document.querySelector(".playlist-track");
-
-  let autoSlideInterval;
-  let isAnimating = false;
-  let lastDragDist = 0;
-
-  // (Initialization is handled dynamically by renderPlaylistCards after data is loaded)
-
-  // --- 7. YouTube Data API v3 Dynamic Fetcher ---
-  const YOUTUBE_API_KEY = ""; // PASTE YOUR YOUTUBE DATA API V3 KEY HERE
-
-  const extractYTId = (url) => {
-    const match = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : null;
-  };
-
-  const formatViews = (views) => {
-    if (views >= 1000000)
-      return (views / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
-    if (views >= 1000)
-      return (views / 1000).toFixed(1).replace(/\.0$/, "") + "K";
-    return views;
-  };
-
-  const formatDuration = (pt) => {
-    const match = pt.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    if (!match) return "00:00";
-    const h = parseInt(match[1]) || 0;
-    const m = parseInt(match[2]) || 0;
-    const s = parseInt(match[3]) || 0;
-    let str = "";
-    if (h > 0) str += h + ":";
-    str += (m < 10 && h > 0 ? "0" : "") + m + ":";
-    str += (s < 10 ? "0" : "") + s;
-    return str;
-  };
-
-  const fetchYTMetadataRealtime = async (card) => {
-    if (!YOUTUBE_API_KEY) return; // Silent fallback to static HTML attributes if no key is provided
-
-    const ytUrl = card.getAttribute("data-url");
-    const videoId = extractYTId(ytUrl);
-    if (!videoId) return;
-
-    try {
-      const apiEndpoint = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${YOUTUBE_API_KEY}`;
-      const response = await fetch(apiEndpoint);
-      const data = await response.json();
-
-      if (data.items && data.items.length > 0) {
-        const vid = data.items[0];
-        const cleanTitle = vid.snippet.title;
-        const viewsStr = `${formatViews(vid.statistics.viewCount)} views`;
-
-        const publishedAt = new Date(vid.snippet.publishedAt);
-        const monthsAgo = Math.floor(
-          (new Date() - publishedAt) / (1000 * 60 * 60 * 24 * 30),
-        );
-        let dateStr =
-          monthsAgo > 11
-            ? `${Math.floor(monthsAgo / 12)} years ago`
-            : `${monthsAgo} months ago`;
-        if (monthsAgo === 0) dateStr = "recently";
-
-        const statsStr = `${viewsStr} â€¢ ${dateStr}`;
-        const rawDesc =
-          vid.snippet.description.split("\n")[0].substring(0, 80) + "...";
-        const durationStr = formatDuration(vid.contentDetails.duration);
-
-        card.setAttribute("data-title", cleanTitle);
-        card.setAttribute("data-desc", rawDesc);
-        card.setAttribute("data-stats", statsStr);
-
-        const durEl = card.querySelector(".playlist-duration");
-        if (durEl) durEl.innerText = durationStr;
-
-        if (card.classList.contains("active")) {
-          const activeVidTitle = document.getElementById("active-vid-title");
-          const activeVidDesc = document.getElementById("active-vid-desc");
-          const activeVidStats = document.getElementById("active-vid-stats");
-
-          if (activeVidTitle) activeVidTitle.innerText = cleanTitle;
-          if (activeVidDesc) activeVidDesc.innerText = rawDesc;
-          if (activeVidStats) activeVidStats.innerText = statsStr;
-        }
-      }
-    } catch (error) {
-      console.warn("YouTube API Fetch Failed: ", error); // Fails gracefully
-    }
-  };
-
-  // Helper to center the active card (index 2) in the viewport
-  const getCenterOffset = () => {
-    if (!playlistTrack || !playlistTrack.children[2]) return 0;
-    const viewport = document.querySelector(".playlist-viewport");
-    if (!viewport) return 0;
-    const viewportWidth = viewport.offsetWidth;
-    const card = playlistTrack.children[2];
-    const cardWidth = card.offsetWidth;
-    const gap = parseInt(window.getComputedStyle(playlistTrack).gap) || 0;
-    const card2Center = (cardWidth + gap) * 2 + cardWidth / 2;
-    return viewportWidth / 2 - card2Center;
-  };
-
-  // Initial positioning
-  if (playlistTrack) {
-    gsap.set(playlistTrack, { x: getCenterOffset() });
-    window.addEventListener("resize", () => {
-      gsap.set(playlistTrack, { x: getCenterOffset() });
-    });
-  }
-
-  // Trigger background fetch for all localized cards on load
-  playlistCards.forEach((card) => fetchYTMetadataRealtime(card));
-
-  let mainPortalSyncTL = null;
-
-  const syncMainPortal = (card) => {
-    if (!card) return;
-
-    // Enforce DOM level Active CSS swapping (use LIVE children, not stale NodeList)
-    Array.from(playlistTrack.children).forEach((c) =>
-      c.classList.remove("active"),
-    );
-    card.classList.add("active");
-
-    const newImg = card.getAttribute("data-img");
-    const newTitle = card.getAttribute("data-title");
-    const newDesc = card.getAttribute("data-desc");
-    const newStats = card.getAttribute("data-stats");
-    const newUrl = card.getAttribute("data-url");
-
-    // Prevent GSAP timeline collision if swiping incredibly fast
-    if (mainPortalSyncTL) mainPortalSyncTL.kill();
-
-    mainPortalSyncTL = gsap.timeline();
-    mainPortalSyncTL
-      .to([activeVidImg, ".active-video-meta"], {
-        opacity: 0,
-        filter: "blur(15px)",
-        scale: 1.05,
-        duration: 0.25,
-        ease: "power2.in",
-        onComplete: () => {
-          // Destroy iframe to stop audio
-          const existingIframe = document.querySelector(
-            ".main-video-portal iframe",
-          );
-          if (existingIframe) existingIframe.remove();
-          const playCursor = document.querySelector(
-            ".main-video-portal .magnetic-play-cursor",
-          );
-          if (playCursor) playCursor.style.display = "";
-
-          if (activeVidImg) activeVidImg.src = newImg;
-          if (activeVidTitle) activeVidTitle.innerText = newTitle;
-          if (activeVidDesc) activeVidDesc.innerText = newDesc;
-          const statsEl = document.getElementById("active-vid-stats");
-          if (statsEl && newStats) statsEl.innerText = newStats;
-          const linkEl = document.querySelector(".yt-badge");
-          if (linkEl && newUrl) linkEl.href = newUrl;
-        },
-      })
-      .to([activeVidImg, ".active-video-meta"], {
-        opacity: 1,
-        filter: "blur(0px)",
-        scale: 1,
-        duration: 0.35,
-        ease: "power3.out",
-      });
-  };
-
-  // (Click handlers are attached dynamically by renderPlaylistCards)
-
-  // --- 7.5 Inline YouTube Iframe Player ---
-  const playerPortal = document.getElementById("main-portal");
-  if (playerPortal) {
-    playerPortal.addEventListener("click", (e) => {
-      if (e.target.closest(".yt-badge")) return;
-
-      const linkEl = document.querySelector(".yt-badge");
-      if (!linkEl) return;
-
-      const ytUrl = linkEl.href;
-      const match = ytUrl.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        const videoId = match[1];
-        const frameContainer = playerPortal.querySelector(".video-glass-frame");
-
-        if (!frameContainer.querySelector("iframe")) {
-          const iframe = document.createElement("iframe");
-          iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-          iframe.setAttribute("frameborder", "0");
-          iframe.setAttribute(
-            "allow",
-            "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
-          );
-          iframe.setAttribute("allowfullscreen", "true");
-          iframe.style.position = "absolute";
-          iframe.style.top = "0";
-          iframe.style.left = "0";
-          iframe.style.width = "100%";
-          iframe.style.height = "100%";
-          iframe.style.zIndex = "15";
-          iframe.style.borderRadius = "inherit";
-          frameContainer.appendChild(iframe);
-
-          const cursor = playerPortal.querySelector(".magnetic-play-cursor");
-          if (cursor) cursor.style.display = "none";
-          if (autoSlideInterval) clearInterval(autoSlideInterval);
-        }
-      }
-    });
-  }
-
-  const startAutoSlide = () => {
-    if (!playlistTrack) return;
-    autoSlideInterval = setInterval(() => {
-      if (isAnimating) return;
-      const rightCard = playlistTrack.children[3];
-      if (rightCard) rightCard.click();
-    }, 3000);
-  };
-
-  // --- YOUTUBE CATEGORY DATA STORE ---
-  // The user can edit these URLs later to populate each tab!
-  // --- Category-Specific YouTube Playlists ---
-  // --- Category-Specific YouTube Playlists (Real Titles) ---
-  const nursingPlaylist = [
-    {
-      img: "https://img.youtube.com/vi/E1X1RFFt138/maxresdefault.jpg",
-      url: "https://youtu.be/E1X1RFFt138?si=0TrAngTwP8UsTbqw",
-      title: "Super notes for Assistant Professor in Nursing",
-      desc: "Eduooz International Academy | Nursing Exam Guide",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "08:53",
-    },
-    {
-      img: "https://img.youtube.com/vi/4J_sUv_L5f0/maxresdefault.jpg",
-      url: "https://youtu.be/4J_sUv_L5f0?si=eK1eW4HgoQy_c_4v",
-      title: "DHS Staff Nurse Exam Preparation 2025",
-      desc: "How to Crack DHS Exam Fast | Eduooz Results & Strategy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "13:17",
-    },
-    {
-      img: "https://img.youtube.com/vi/YglY46sa7oA/maxresdefault.jpg",
-      url: "https://youtu.be/YglY46sa7oA?si=9NVPLSGX5_PXlb3f",
-      title: "POWER PLAN for DHA | MOH | DOH/HAAD | Prometric",
-      desc: "Pearson VUE | Study Strategy by Eduooz Academy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "14:49",
-    },
-    {
-      img: "https://img.youtube.com/vi/w76w1arkX7E/maxresdefault.jpg",
-      url: "https://youtu.be/w76w1arkX7E?si=AkVPt67Hjx39jZ2o",
-      title: "NCLEX-RN Animation Class",
-      desc: "Eduooz Academy | Free Power Pack for Score Boosting",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "15:08",
-    },
-    {
-      img: "https://img.youtube.com/vi/tmP81NRePkA/maxresdefault.jpg",
-      url: "https://youtu.be/tmP81NRePkA?si=6Bvjk8TS63e6Lq0X",
-      title: "Pearson VUE Nursing Prometric Exam",
-      desc: "Important Questions Discussion & Practice Session",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "14:46",
-    },
-    {
-      img: "https://img.youtube.com/vi/dcKOKETcrK4/maxresdefault.jpg",
-      url: "https://youtu.be/dcKOKETcrK4?si=_bCrpIn0Ei5463Lc",
-      title: "Nursing Prometric Exam",
-      desc: "Important Questions Discussion and Practice Session",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "15:39",
-    },
-    {
-      img: "https://img.youtube.com/vi/XjogZEgAA2M/maxresdefault.jpg",
-      url: "https://youtu.be/XjogZEgAA2M?si=CMIgkmReFJ203EEp",
-      title: "Mission NORCET 11 | Eduooz Academy",
-      desc: "Let's Start Today!",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "05:26",
-    },
-    {
-      img: "https://img.youtube.com/vi/_iRggg9Y_UQ/maxresdefault.jpg",
-      url: "https://youtu.be/_iRggg9Y_UQ?si=igzGt6bHNU1yPDE0",
-      title: "Nursing Prometric Exam",
-      desc: "Important Question Discussion & Practice Session",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "09:40",
-    },
-    {
-      img: "https://img.youtube.com/vi/ptIFWQ_cJIQ/maxresdefault.jpg",
-      url: "https://youtu.be/ptIFWQ_cJIQ?si=lUJVrBOF0iteUge-",
-      title: "Nursing Saudi | Complete Career Details",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "09:53",
-    },
-    {
-      img: "https://img.youtube.com/vi/ftKaRv5WUmk/maxresdefault.jpg",
-      url: "https://youtu.be/ftKaRv5WUmk?si=4pybFeukOVsPX4UN",
-      title: "Nursing Kuwait Prometric Complete Exam Training",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "18:24",
-    },
-  ];
-
-  const pharmacistPlaylist = [
-    {
-      img: "https://img.youtube.com/vi/Gab0IJ_-8tQ/maxresdefault.jpg",
-      url: "https://youtu.be/Gab0IJ_-8tQ?si=ly1hZz50CT5Cm1sJ",
-      title: "Paracetamol Pharmacology in 5 Minutes",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "07:00",
-    },
-    {
-      img: "https://img.youtube.com/vi/vcEzTp2HEF4/maxresdefault.jpg",
-      url: "https://youtu.be/vcEzTp2HEF4?si=H_dShvotFAtU6U2-",
-      title: "Phenytoin Pharmacology in 5 Minutes",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "07:44",
-    },
-    {
-      img: "https://img.youtube.com/vi/ugvAoQFZCf8/maxresdefault.jpg",
-      url: "https://youtu.be/ugvAoQFZCf8?si=Xve9l2gbIS4zsc2K",
-      title: "Sulfonamides in Pharmacology \u2014 Explained in 5 Min",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "17:06",
-    },
-    {
-      img: "https://img.youtube.com/vi/f47-76tui34/maxresdefault.jpg",
-      url: "https://youtu.be/f47-76tui34?si=1UUWegNs946ZP4t8",
-      title: "Kerala PSC Pharmacist | Diazepam Pharmacology in 5 Min",
-      desc: "Quick Revision",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "15:24",
-    },
-    {
-      img: "https://img.youtube.com/vi/Hp1yBFQ4e2o/maxresdefault.jpg",
-      url: "https://youtu.be/Hp1yBFQ4e2o?si=Mi8KCpsul_oVHqiT",
-      title: "Kerala PSC Pharmacist | Insulin Pharmacology in 5 Min",
-      desc: "Eduooz Academy",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "15:00",
-    },
-    {
-      img: "https://img.youtube.com/vi/-GIBgYF63ko/maxresdefault.jpg",
-      url: "https://youtu.be/-GIBgYF63ko?si=GfJ_gzwzcpvDli6J",
-      title: "Pharmacology Quick Revision | Eduooz Academy",
-      desc: "Kerala PSC Pharmacist Exam Preparation",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "48:58",
-    },
-    {
-      img: "https://img.youtube.com/vi/iElZRUtCE14/maxresdefault.jpg",
-      url: "https://youtu.be/iElZRUtCE14?si=9FDSi7s8xRxsFSQr",
-      title: "Pharmacist Exam Strategy | Eduooz Academy",
-      desc: "Kerala PSC Pharmacist Coaching",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "71:47",
-    },
-    {
-      img: "https://img.youtube.com/vi/dg9FUWQShk0/maxresdefault.jpg",
-      url: "https://youtu.be/dg9FUWQShk0?si=iWu2KspQkvf3mtT0",
-      title: "RRB Pharmacist 2025 | Online Coaching with Eduooz",
-      desc: "Complete Exam Preparation",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "11:19",
-    },
-    {
-      img: "https://img.youtube.com/vi/lYvPIHaV4O0/maxresdefault.jpg",
-      url: "https://youtu.be/lYvPIHaV4O0?si=pTA9wdsYlzegwduT",
-      title: "Kerala PSC Pharmacist | Markovnikov\u2019s Rule in 5 Min",
-      desc: "Eduooz Academy",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "12:10",
-    },
-    {
-      img: "https://img.youtube.com/vi/ChlT_2r96R4/maxresdefault.jpg",
-      url: "https://youtu.be/ChlT_2r96R4?si=KWiv-uVkglAWMq6S",
-      title: "Metformin Pharmacology: A 5-Minute Simplified Explanation",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz Academy - Pharmacist PSC Coaching",
-      duration: "11:55",
-    },
-  ];
-
-  const labTechPlaylist = [
-    {
-      img: "https://img.youtube.com/vi/ZqHuz3kBS-4/maxresdefault.jpg",
-      url: "https://youtu.be/ZqHuz3kBS-4?si=8KR8BPVrxqIx5LVT",
-      title: "Lab Technician DHS Long-Term Course",
-      desc: "Simple Learning with Eduooz Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "16:01",
-    },
-    {
-      img: "https://img.youtube.com/vi/l7QKm6WsqBA/maxresdefault.jpg",
-      url: "https://youtu.be/l7QKm6WsqBA?si=jmsu-g3UkIC-IqZQ",
-      title: "Lab Technician DHS Long Term Course",
-      desc: "Simple & Easy Learning \u2013 Eduooz International Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "10:40",
-    },
-    {
-      img: "https://img.youtube.com/vi/Er5l3ptq6RM/maxresdefault.jpg",
-      url: "https://youtu.be/Er5l3ptq6RM?si=DiKVQ33nqlKuXhex",
-      title: "Kerala PSC Lab Technician: Scientist Nicknames",
-      desc: "Eduooz Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "04:26",
-    },
-    {
-      img: "https://img.youtube.com/vi/8X8A_tso5Dk/maxresdefault.jpg",
-      url: "https://youtu.be/8X8A_tso5Dk?si=7aX5tb0U5DeAga-2",
-      title: "Lab Technician DHS Long Term \u2013 Calendar of Health",
-      desc: "Eduooz International Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "07:21",
-    },
-    {
-      img: "https://img.youtube.com/vi/ElQf1fTFPCw/maxresdefault.jpg",
-      url: "https://youtu.be/ElQf1fTFPCw?si=TnNxZ7tqCTR7nsXE",
-      title: "Mosquito Vector Chart Explained | PSC MLT Exams",
-      desc: "Lab Technician Long Term | Eduooz",
-      stats: "Eduooz MLT Academy",
-      duration: "06:41",
-    },
-    {
-      img: "https://img.youtube.com/vi/DXZWVrGW3DI/maxresdefault.jpg",
-      url: "https://youtu.be/DXZWVrGW3DI?si=mpHvYaC3dNYBUhRv",
-      title: "Lab Technician DHS Long Term Program",
-      desc: "Smart & Easy Learning \u2013 Eduooz International Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "03:44",
-    },
-    {
-      img: "https://img.youtube.com/vi/N_aayNO3RmM/maxresdefault.jpg",
-      url: "https://youtu.be/N_aayNO3RmM?si=BT8VPPUEBMK0vQzA",
-      title: "Kerala PSC Junior Lab Assistant",
-      desc: "Easy Preparation Strategy | Eduooz Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "03:00",
-    },
-    {
-      img: "https://img.youtube.com/vi/Oe5m4qBXJYQ/maxresdefault.jpg",
-      url: "https://youtu.be/Oe5m4qBXJYQ?si=IOlZCURaYBrgGv5W",
-      title: "Kerala PSC Junior Lab Assistant | Level & Exam Details",
-      desc: "Eduooz Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "06:39",
-    },
-    {
-      img: "https://img.youtube.com/vi/N_aayNO3RmM/maxresdefault.jpg",
-      url: "https://youtu.be/N_aayNO3RmM?si=pgjy3DlrD2sH0Klx",
-      title: "Kerala PSC Junior Lab Assistant",
-      desc: "Easy Preparation Strategy | Eduooz Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "03:00",
-    },
-    {
-      img: "https://img.youtube.com/vi/z0h8iw7-pfc/maxresdefault.jpg",
-      url: "https://youtu.be/z0h8iw7-pfc?si=fB0eZoo2A-vVvc9L",
-      title: "Lab Technician (DHS Long Term) | Complete Learning Program",
-      desc: "Eduooz Academy",
-      stats: "Eduooz MLT Academy",
-      duration: "02:22",
-    },
-  ];
-
-  const germanPlaylist = [
-    {
-      img: "https://img.youtube.com/vi/yHO54z55JkA/maxresdefault.jpg",
-      url: "https://youtu.be/yHO54z55JkA?si=KRMANjBEh_WBdrRO",
-      title: "German Alphabets A\u2013D | Learn German for Beginners",
-      desc: "Malayalam / English Explanation | Eduooz Academy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "10:38",
-    },
-    {
-      img: "https://img.youtube.com/vi/s3SfINGk5Bw/maxresdefault.jpg",
-      url: "https://youtu.be/s3SfINGk5Bw?si=b89VxYNgY9UhZtS8",
-      title: "German Alphabets E\u2013H | Learn German for Beginners",
-      desc: "Malayalam / English Explanation | Eduooz Academy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "07:14",
-    },
-    {
-      img: "https://img.youtube.com/vi/0b8vw2bJ6g8/maxresdefault.jpg",
-      url: "https://youtu.be/0b8vw2bJ6g8?si=ZLmGg8tTIg26ItCw",
-      title: "Learn German Alphabets I\u2013O",
-      desc: "Easy Explanation in Malayalam & English | Eduooz Academy",
-      stats: "Eduooz - Nurses Learning Hub",
-      duration: "11:25",
-    },
-  ];
-
-  // "All" tab shows a curated mix from every category (interleaved dynamically)
-  const allPlaylist = [];
-  const maxLen = Math.max(
-    nursingPlaylist.length,
-    pharmacistPlaylist.length,
-    labTechPlaylist.length,
-    germanPlaylist.length,
-  );
-  for (let i = 0; i < maxLen; i++) {
-    if (nursingPlaylist[i]) allPlaylist.push(nursingPlaylist[i]);
-    if (pharmacistPlaylist[i]) allPlaylist.push(pharmacistPlaylist[i]);
-    if (labTechPlaylist[i]) allPlaylist.push(labTechPlaylist[i]);
-    if (germanPlaylist[i]) allPlaylist.push(germanPlaylist[i]);
-  }
-
-  const ytCategoryData = {
-    All: allPlaylist,
-    Nursing: nursingPlaylist,
-    Pharmacist: pharmacistPlaylist,
-    "Lab Technician": labTechPlaylist,
-    "German Language": germanPlaylist,
-  };
-
-  // --- Dynamic Playlist Card Renderer ---
-  function renderPlaylistCards(playlist) {
-    if (!playlistTrack) return;
-
-    // Clear existing cards
-    playlistTrack.innerHTML = "";
-
-    // Generate card elements from data
-    playlist.forEach((item, index) => {
-      const card = document.createElement("div");
-      card.className = "playlist-card";
-      card.setAttribute("data-img", item.img);
-      card.setAttribute("data-url", item.url);
-      card.setAttribute("data-title", item.title);
-      card.setAttribute("data-desc", item.desc);
-      card.setAttribute("data-stats", item.stats);
-
-      card.innerHTML = `
-                <div class="playlist-duration">${item.duration}</div>
-                <img src="${item.img}" alt="${item.title}">
-                <div class="play-icon-sm"><i class="fa-solid fa-play"></i></div>
-            `;
-
-      playlistTrack.appendChild(card);
-    });
-
-    // Mark the 3rd card (index 2) as active
-    if (playlistTrack.children.length > 2) {
-      playlistTrack.children[2].classList.add("active");
-    }
-
-    // Attach click handlers to new cards
-    Array.from(playlistTrack.children).forEach((card) => {
-      card.addEventListener("click", (e) => {
-        if (e.isTrusted && lastDragDist > 10) {
-          e.preventDefault();
-          return;
-        }
-        if (isAnimating) return;
-
-        const index = Array.from(playlistTrack.children).indexOf(card);
-        if (index === 2 && card.classList.contains("active")) return;
-
-        syncMainPortal(card);
-
-        const currentCardWidth =
-          playlistTrack.children[0].offsetWidth +
-          (parseInt(window.getComputedStyle(playlistTrack).gap) || 0);
-        const offset = getCenterOffset();
-
-        const dist = index - 2;
-        if (dist !== 0) {
-          isAnimating = true;
-          if (dist > 0) {
-            gsap.to(playlistTrack, {
-              x: offset - currentCardWidth * dist,
-              duration: 0.5,
-              ease: "power2.out",
-              onComplete: () => {
-                for (let i = 0; i < dist; i++)
-                  playlistTrack.appendChild(playlistTrack.firstElementChild);
-                gsap.set(playlistTrack, { x: offset });
-                isAnimating = false;
-              },
-            });
-          } else {
-            const absDist = Math.abs(dist);
-            for (let i = 0; i < absDist; i++)
-              playlistTrack.prepend(playlistTrack.lastElementChild);
-            gsap.set(playlistTrack, { x: offset - currentCardWidth * absDist });
-            gsap.to(playlistTrack, {
-              x: offset,
-              duration: 0.5,
-              ease: "power2.out",
-              onComplete: () => (isAnimating = false),
-            });
-          }
-        }
-      });
-    });
-
-    // Re-center and sync portal
-    gsap.set(playlistTrack, { x: getCenterOffset() });
-    const centerCard = playlistTrack.children[2];
-    if (centerCard) syncMainPortal(centerCard);
-  }
-
-  // Initial render with "All" playlist
-  renderPlaylistCards(allPlaylist);
-
-  // Expose for youtube-filter.js (nursing page-specific video filtering)
-  window._eduoozData = { nursing: nursingPlaylist, category: ytCategoryData };
-  window._renderPlaylistCards = renderPlaylistCards;
-
-  // YouTube Category Tabs Logic
-  const ytTabs = document.querySelectorAll(".yt-tab");
-  if (ytTabs.length > 0) {
-    ytTabs.forEach((tab) => {
-      tab.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (tab.classList.contains("active")) return;
-
-        ytTabs.forEach((t) => t.classList.remove("active"));
-        tab.classList.add("active");
-
-        const category = tab.innerText.trim();
-        const playlistData = ytCategoryData[category];
-
-        if (playlistData && playlistTrack) {
-          gsap.to(playlistTrack, {
-            opacity: 0,
-            duration: 0.2,
-            onComplete: () => {
-              renderPlaylistCards(playlistData);
-              gsap.to(playlistTrack, { opacity: 1, duration: 0.3 });
-            },
-          });
-        }
-      });
-    });
-  }
-
-  // --- 8. Seamless Infinite Grab & Swipe Logic ---
-  let isDragging = false;
-  let startX = 0;
-
-  // Dynamic width calculation helper
-  const getCardWidth = () => {
-    if (!playlistTrack || !playlistTrack.children[0]) return 280;
-    const gap = parseInt(window.getComputedStyle(playlistTrack).gap) || 0;
-    return playlistTrack.children[0].offsetWidth + gap;
-  };
-  let cachedCenterOffset = 0;
-  const pointerDown = (e) => {
-    if (isAnimating || !playlistTrack) return;
-    isDragging = true;
-    lastDragDist = 0;
-    startX = e.type.includes("mouse") ? e.pageX : e.touches[0].clientX;
-    playlistTrack.style.cursor = "grabbing";
-    if (autoSlideInterval) clearInterval(autoSlideInterval);
-
-    cachedCenterOffset = getCenterOffset();
-  };
-
-  const pointerMove = (e) => {
-    if (!isDragging || isAnimating) return;
-    const x = e.type.includes("mouse") ? e.pageX : e.touches[0].clientX;
-    let walk = x - startX;
-
-    // True infinite loop DOM manipulation during active Drag
-    const currentWidth = getCardWidth();
-    if (walk <= -currentWidth) {
-      playlistTrack.appendChild(playlistTrack.firstElementChild);
-      startX -= currentWidth;
-      walk += currentWidth;
-      syncMainPortal(playlistTrack.children[2]);
-    } else if (walk >= currentWidth) {
-      playlistTrack.prepend(playlistTrack.lastElementChild);
-      startX += currentWidth;
-      walk -= currentWidth;
-      syncMainPortal(playlistTrack.children[2]);
-    }
-
-    lastDragDist += Math.abs(walk); // Ensure clicks disable gracefully
-    gsap.set(playlistTrack, { x: cachedCenterOffset + walk });
-  };
-
-  const pointerUp = (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    playlistTrack.style.cursor = "grab";
-
-    const endX = e.type.includes("mouse")
-      ? e.pageX
-      : e.changedTouches
-        ? e.changedTouches[0].clientX
-        : startX;
-    const walk = endX - startX;
-    const currentWidth = getCardWidth();
-    const offset = getCenterOffset();
-
-    if (walk < -50 && !isAnimating) {
-      isAnimating = true;
-      gsap.to(playlistTrack, {
-        x: offset - currentWidth,
-        duration: 0.35,
-        ease: "power2.out",
-        onComplete: () => {
-          playlistTrack.appendChild(playlistTrack.firstElementChild);
-          gsap.set(playlistTrack, { x: offset });
-          syncMainPortal(playlistTrack.children[2]);
-          isAnimating = false;
-        },
-      });
-    } else if (walk > 50 && !isAnimating) {
-      isAnimating = true;
-      gsap.to(playlistTrack, {
-        x: offset + currentWidth,
-        duration: 0.35,
-        ease: "power2.out",
-        onComplete: () => {
-          playlistTrack.prepend(playlistTrack.lastElementChild);
-          gsap.set(playlistTrack, { x: offset });
-          syncMainPortal(playlistTrack.children[2]);
-          isAnimating = false;
-        },
-      });
-    } else {
-      // Snap back to precise center if lazy swipe
-      gsap.to(playlistTrack, { x: offset, duration: 0.3, ease: "power2.out" });
-    }
-    startAutoSlide();
-  };
-
-  if (playlistTrack) {
-    playlistTrack.style.cursor = "grab";
-    playlistTrack.addEventListener("mousedown", pointerDown);
-    playlistTrack.addEventListener("mousemove", pointerMove);
-    window.addEventListener("mouseup", pointerUp);
-
-    playlistTrack.addEventListener("touchstart", pointerDown, {
-      passive: true,
-    });
-    playlistTrack.addEventListener("touchmove", pointerMove, { passive: true });
-    window.addEventListener("touchend", pointerUp);
-  }
-
-  // Removed ecosystem hover pause functionality at user request
-
-  startAutoSlide();
-
   // --- 11. GSAP Testimonials Reveal ---
   gsap.set(".g-test-reveal", { autoAlpha: 1 });
   gsap.from(".g-test-reveal", {
@@ -1810,49 +1108,160 @@ document.querySelectorAll(".faq-q").forEach((q) => {
   });
 });
 
-// --- Video Testimonials Logic ---
+// --- Video Testimonials Logic (light landing-page theme) ---
+// Ports the working 23-video / playlist / pagination behavior from
+// courses.js onto the existing light testimonial markup. Safe no-op on
+// pages without a #testiPlaylist section.
 (function () {
-  const playlistItems = document.querySelectorAll(".testi-playlist-item");
+  const testiPlaylist = document.getElementById("testiPlaylist");
+  const testiFeatured = document.getElementById("testiFeatured");
+  if (!testiPlaylist || !testiFeatured) return;
+
+  // Same 23 YouTube Shorts as the main courses.html testimonials section.
+  const TESTI_VIDEO_IDS = [
+    "r1wSiAmjMcA",
+    "oeJcpXOwWnw",
+    "ltbkEbdV4fU",
+    "OQhRZWuG664",
+    "NYpUjEJiqHQ",
+    "KzH05e2b1vE",
+    "BzHwBxq78M4",
+    "J2p7BVRiTho",
+    "ihz7PxJr9ts",
+    "QNQJaa76VOo",
+    "RFrX_Rut6UA",
+    "INU_90s4UxI",
+    "3S5HbF6sCDY",
+    "sNVG7mmMWsU",
+    "78xAMnUJLco",
+    "vpkzal8K4KY",
+    "GGombj0VRYE",
+    "6amewOeC2oY",
+    "-YyLEigHEC8",
+    "E9hW6In9ZOI",
+    "Kh8_nSzEuFg",
+    "hQDioIUOKRc",
+    "lX94AzT_hrw",
+  ];
+
+  // Rebuild the playlist with all 23 videos so every landing page has the
+  // same working data set as courses.html (replaces any placeholder items).
+  testiPlaylist.innerHTML = TESTI_VIDEO_IDS.map((id, i) => {
+    const n = String(i + 1).padStart(2, "0");
+    const thumb = "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg";
+    return (
+      '<div class="testi-playlist-item' +
+      (i === 0 ? " active" : "") +
+      '" data-index="' +
+      i +
+      '" data-url="https://www.youtube.com/watch?v=' +
+      id +
+      '" data-img="' +
+      thumb +
+      '" data-avatar="' +
+      thumb +
+      '" data-name="Testimonial Video ' +
+      n +
+      '" data-sub="YouTube Shorts" data-badge="Shorts">' +
+      '<div class="testi-item-thumb"><img src="' +
+      thumb +
+      '" alt="Testimonial ' +
+      n +
+      '" loading="lazy"><div class="testi-item-play"><i class="fa-solid fa-play"></i></div></div>' +
+      '<div class="testi-item-info"><h3 class="testi-item-name">Testimonial Video ' +
+      n +
+      '</h3><div class="testi-item-role"><i class="fa-solid fa-location-dot"></i> YouTube Shorts</div></div>' +
+      '<div class="testi-item-number">' +
+      n +
+      "</div></div>"
+    );
+  }).join("");
+
+  // Ensure the playlist + pagination dots share one grid column (wraps the
+  // playlist exactly like courses.html's .testi-playlist-wrap).
+  let wrap = testiPlaylist.closest(".testi-playlist-wrap");
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.className = "testi-playlist-wrap";
+    testiPlaylist.parentNode.insertBefore(wrap, testiPlaylist);
+    wrap.appendChild(testiPlaylist);
+  }
+  let testiDots = document.getElementById("testiDots");
+  if (!testiDots) {
+    testiDots = document.createElement("div");
+    testiDots.id = "testiDots";
+    testiDots.className = "testi-dots";
+    testiDots.setAttribute("aria-hidden", "false");
+    wrap.appendChild(testiDots);
+  }
+
+  const playlistItems = testiPlaylist.querySelectorAll(".testi-playlist-item");
   const featuredImg = document.getElementById("testiFeaturedImg");
   const avatarImg = document.getElementById("testiAvatarImg");
   const nameEl = document.getElementById("testiName");
   const subEl = document.getElementById("testiSub");
   const badgeEl = document.getElementById("testiBadge");
   const quoteEl = document.getElementById("testiQuote");
+  const playBtn = document.getElementById("testiPlayBtn");
 
   if (!playlistItems.length) return;
 
   let currentIndex = 0;
   let autoPlayInterval;
+  let currentUrl = playlistItems[0].dataset.url || "";
 
-  function updateFeatured(index) {
-    // Remove active class from all
-    playlistItems.forEach((item) => item.classList.remove("active"));
-
-    // Add active class to current
-    const currentItem = playlistItems[index];
-    currentItem.classList.add("active");
-
-    // Animate transition using GSAP
-    gsap.to(".testi-featured", {
-      opacity: 0,
-      duration: 0.2,
-      onComplete: () => {
-        // Update content
-        featuredImg.src = currentItem.dataset.img;
-        avatarImg.src = currentItem.dataset.avatar;
-        nameEl.textContent = currentItem.dataset.name;
-        subEl.textContent = currentItem.dataset.sub;
-        badgeEl.innerHTML =
-          '<i class="fa-solid fa-check"></i> ' + currentItem.dataset.badge;
+  function applyFeaturedContent(currentItem) {
+    if (featuredImg) featuredImg.src = currentItem.dataset.img;
+    if (avatarImg) avatarImg.src = currentItem.dataset.avatar;
+    if (nameEl) nameEl.textContent = currentItem.dataset.name;
+    if (subEl) subEl.textContent = currentItem.dataset.sub;
+    if (badgeEl)
+      badgeEl.innerHTML =
+        '<i class="fa-solid fa-check"></i> ' + currentItem.dataset.badge;
+    if (quoteEl) {
+      if (currentItem.dataset.quote && currentItem.dataset.quote.trim()) {
+        quoteEl.style.display = "";
         quoteEl.innerHTML =
           '<i class="fa-solid fa-quote-left testi-quote-icon"></i> <p>' +
           currentItem.dataset.quote +
           "</p>";
+      } else {
+        quoteEl.style.display = "none";
+        quoteEl.innerHTML = "";
+      }
+    }
+    currentUrl = currentItem.dataset.url || currentUrl;
+  }
 
-        // Fade back in
-        gsap.to(".testi-featured", { opacity: 1, duration: 0.3 });
-      },
+  function updateFeatured(index, immediate) {
+    playlistItems.forEach((item) => item.classList.remove("active"));
+    const currentItem = playlistItems[index];
+    if (!currentItem) return;
+    currentItem.classList.add("active");
+
+    if (immediate || typeof gsap === "undefined") {
+      applyFeaturedContent(currentItem);
+    } else {
+      gsap.to(testiFeatured, {
+        opacity: 0,
+        duration: 0.2,
+        onComplete: () => {
+          applyFeaturedContent(currentItem);
+          gsap.to(testiFeatured, { opacity: 1, duration: 0.3 });
+        },
+      });
+    }
+
+    try {
+      updateActiveDotForIndex(index);
+    } catch (e) {
+      /* pagination not ready yet */
+    }
+  }
+
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      if (currentUrl) window.open(currentUrl, "_blank", "noopener");
     });
   }
 
@@ -1862,7 +1271,6 @@ document.querySelectorAll(".faq-q").forEach((q) => {
   }
 
   function startAutoPlay() {
-    // Clear any existing before starting to prevent multiple intervals
     clearInterval(autoPlayInterval);
     autoPlayInterval = setInterval(nextItem, 2000);
   }
@@ -1871,29 +1279,191 @@ document.querySelectorAll(".faq-q").forEach((q) => {
     clearInterval(autoPlayInterval);
   }
 
-  // Click handling
-  playlistItems.forEach((item, index) => {
-    item.addEventListener("click", () => {
-      currentIndex = index;
-      updateFeatured(currentIndex);
-      stopAutoPlay();
-      // Resume after 5 seconds of inactivity
-      setTimeout(startAutoPlay, 5000);
-    });
+  // Event delegation: survives the innerHTML rebuild above and any future
+  // re-renders without needing per-item listeners.
+  testiPlaylist.addEventListener("click", (e) => {
+    const item = e.target.closest(".testi-playlist-item");
+    if (!item || !testiPlaylist.contains(item)) return;
+    const idxAttr = item.getAttribute("data-index");
+    let index = idxAttr !== null ? parseInt(idxAttr, 10) : -1;
+    if (isNaN(index) || index < 0) {
+      index = Array.from(playlistItems).indexOf(item);
+    }
+    if (index < 0) return;
+    currentIndex = index;
+    updateFeatured(currentIndex);
+    stopAutoPlay();
+    setTimeout(startAutoPlay, 5000);
   });
 
-  // Pause autoplay on hover over featured section or playlist
-  const featuredSection = document.getElementById("testiFeatured");
-  const playlistSection = document.getElementById("testiPlaylist");
+  // --- Pagination dots: ~2 videos per dot ---
+  const itemsPerDot = 2;
+  const totalDots = Math.ceil(playlistItems.length / itemsPerDot);
 
-  if (featuredSection && playlistSection) {
-    featuredSection.addEventListener("mouseenter", stopAutoPlay);
-    featuredSection.addEventListener("mouseleave", startAutoPlay);
-    playlistSection.addEventListener("mouseenter", stopAutoPlay);
-    playlistSection.addEventListener("mouseleave", startAutoPlay);
+  function buildDots() {
+    testiDots.innerHTML = "";
+    for (let d = 0; d < totalDots; d++) {
+      const btn = document.createElement("button");
+      btn.className = "testi-dot" + (d === 0 ? " active" : "");
+      btn.setAttribute("aria-label", "Go to group " + (d + 1));
+      btn.addEventListener("click", () => {
+        const itemIndex = d * itemsPerDot;
+        try {
+          const cs = window.getComputedStyle(testiPlaylist);
+          const playlistVisible =
+            testiPlaylist.clientHeight > 0 && cs.display !== "none";
+          const target = playlistItems[itemIndex];
+          if (playlistVisible) {
+            // Desktop/tablet: dot click scrolls the playlist only.
+            if (target)
+              testiPlaylist.scrollTo({
+                top: target.offsetTop,
+                behavior: "smooth",
+              });
+          } else {
+            // Mobile (playlist hidden): dot click selects the featured video.
+            updateFeatured(itemIndex);
+          }
+        } catch (e) {}
+      });
+      testiDots.appendChild(btn);
+    }
   }
 
-  // Start Autoplay
+  function updateActiveDotForIndex(itemIndex) {
+    const dotIndex = Math.floor(itemIndex / itemsPerDot);
+    testiDots
+      .querySelectorAll(".testi-dot")
+      .forEach((d, i) => d.classList.toggle("active", i === dotIndex));
+  }
+
+  // Sync active dot on manual scroll (mouse wheel, trackpad, touch, scrollbar drag).
+  let scrollSyncTimer = null;
+  testiPlaylist.addEventListener("scroll", () => {
+    if (scrollSyncTimer) clearTimeout(scrollSyncTimer);
+    scrollSyncTimer = setTimeout(() => {
+      let firstVisible = 0;
+      const parentRect = testiPlaylist.getBoundingClientRect();
+      for (let i = 0; i < playlistItems.length; i++) {
+        const rect = playlistItems[i].getBoundingClientRect();
+        if (rect.top >= parentRect.top - 4) {
+          firstVisible = i;
+          break;
+        }
+      }
+      updateActiveDotForIndex(firstVisible);
+    }, 120);
+  });
+
+  // --- Single thin scroll indicator (discoverability, light theme) ---
+  let indicator = wrap.querySelector(".testi-scroll-indicator");
+  if (!indicator) {
+    indicator = document.createElement("div");
+    indicator.className = "testi-scroll-indicator";
+    indicator.innerHTML = '<div class="track"><div class="thumb"></div></div>';
+    wrap.appendChild(indicator);
+  }
+  const indicatorThumb = indicator.querySelector(".thumb");
+  function updateIndicator() {
+    const sh = testiPlaylist.scrollHeight;
+    const ch = testiPlaylist.clientHeight;
+    if (!indicator || !indicatorThumb) return;
+    if (sh <= ch) {
+      indicator.style.display = "none";
+      return;
+    }
+    indicator.style.display = "block";
+    const trackHeight = indicator.getBoundingClientRect().height;
+    const thumbHeight = Math.max(24, (ch / sh) * trackHeight);
+    const maxTop = Math.max(0, trackHeight - thumbHeight);
+    const top = (testiPlaylist.scrollTop / Math.max(1, sh - ch)) * maxTop;
+    indicatorThumb.style.height = thumbHeight + "px";
+    indicatorThumb.style.transform = "translateY(" + top + "px)";
+  }
+  testiPlaylist.addEventListener("scroll", updateIndicator, { passive: true });
+  window.addEventListener("resize", updateIndicator);
+
+  buildDots();
+  testiPlaylist.scrollTop = 0;
+  updateFeatured(0, true);
+  updateIndicator();
+
+  // Pause autoplay while interacting with the featured card or playlist.
+  const playlistSection = testiPlaylist;
+  testiFeatured.addEventListener("mouseenter", stopAutoPlay);
+  testiFeatured.addEventListener("mouseleave", startAutoPlay);
+  playlistSection.addEventListener("mouseenter", stopAutoPlay);
+  playlistSection.addEventListener("mouseleave", startAutoPlay);
+
+  // Let native scrolling work inside the playlist without the global
+  // smooth-scroller (Lenis) hijacking wheel/touch input.
+  playlistSection.addEventListener("mouseenter", () => {
+    try {
+      if (window.lenis && typeof window.lenis.stop === "function")
+        window.lenis.stop();
+    } catch (e) {}
+  });
+  playlistSection.addEventListener("mouseleave", () => {
+    try {
+      if (window.lenis && typeof window.lenis.start === "function")
+        window.lenis.start();
+    } catch (e) {}
+  });
+  playlistSection.addEventListener(
+    "touchstart",
+    () => {
+      try {
+        if (window.lenis && typeof window.lenis.stop === "function")
+          window.lenis.stop();
+      } catch (e) {}
+    },
+    { passive: true },
+  );
+  playlistSection.addEventListener("touchend", () => {
+    try {
+      if (window.lenis && typeof window.lenis.start === "function")
+        window.lenis.start();
+    } catch (e) {}
+  });
+  playlistSection.addEventListener(
+    "wheel",
+    (e) => {
+      try {
+        const delta = e.deltaY;
+        const atTop = playlistSection.scrollTop === 0;
+        const atBottom =
+          Math.ceil(playlistSection.scrollTop + playlistSection.clientHeight) >=
+          playlistSection.scrollHeight;
+        if ((delta > 0 && !atBottom) || (delta < 0 && !atTop)) {
+          e.stopPropagation();
+        }
+      } catch (err) {}
+    },
+    { passive: true },
+  );
+
+  // Fallback: if a global smooth-scroller captures wheel events at the
+  // document level, still let the playlist scroll natively.
+  document.addEventListener(
+    "wheel",
+    function (e) {
+      try {
+        if (!testiPlaylist.contains(e.target)) return;
+        const delta = e.deltaY;
+        const atTop = testiPlaylist.scrollTop === 0;
+        const atBottom =
+          Math.ceil(testiPlaylist.scrollTop + testiPlaylist.clientHeight) >=
+          testiPlaylist.scrollHeight;
+        if ((delta > 0 && !atBottom) || (delta < 0 && !atTop)) {
+          e.preventDefault();
+          e.stopPropagation();
+          testiPlaylist.scrollTop += delta;
+        }
+      } catch (err) {}
+    },
+    { passive: false, capture: true },
+  );
+
   startAutoPlay();
 })();
 
@@ -2165,59 +1735,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!track) return;
 
-    // This section is shared by every course landing page (nursing AND
-    // pharmacy). Pick videos that actually match the subject instead of
-    // always showing the NORCET (nursing officer exam) set. (Kept
-    // self-contained here rather than referencing the nursing/pharmacist
-    // playlists defined in courses.js — those live in a separate
-    // DOMContentLoaded closure and aren't in scope for this one.)
-    var isPharmacyPage = /\/pharmacy\//.test(window.location.pathname);
-
-    var videos = isPharmacyPage
-      ? [
-          {
-            id: "Gab0IJ_-8tQ",
-            title: "Paracetamol Pharmacology in 5 Minutes",
-            tag: "Latest",
-          },
-          {
-            id: "vcEzTp2HEF4",
-            title: "Phenytoin Pharmacology in 5 Minutes",
-            tag: "Popular",
-          },
-          {
-            id: "dg9FUWQShk0",
-            title: "RRB Pharmacist 2025 — Online Coaching",
-            tag: "Strategy",
-          },
-          {
-            id: "iElZRUtCE14",
-            title: "Pharmacist Exam Strategy",
-            tag: "Trending",
-          },
-        ]
-      : [
-          {
-            id: "d5xoc5zvWyQ",
-            title: "NORCET 11 — All You Need to Know",
-            tag: "Latest",
-          },
-          {
-            id: "qEBQcfAy5e4",
-            title: "NORCET 10 — Nursing Officer Exam Details",
-            tag: "Popular",
-          },
-          {
-            id: "h9NjqU6IyzE",
-            title: "Best NORCET Preparation Strategy",
-            tag: "Strategy",
-          },
-          {
-            id: "u6EAh2w3bPo",
-            title: "NORCET 9 — Must-Know Exam Questions",
-            tag: "MCQs",
-          },
-        ];
+    // Videos are grouped by course (nursing / pharmacy / mlt) in
+    // window._eduoozData, defined at the top of this file — each course now
+    // has its own YouTube channel, so no keyword or exam-slug matching is
+    // needed. getCourseKey() detects the course from the page URL.
+    var videos = (window._eduoozData && window._eduoozData[getCourseKey()]) || [];
+    if (!videos.length) return;
 
     var current = 0;
     var isHovered = false;
@@ -5672,7 +5195,7 @@ const facultyPool = [
     role: "Distinction Holder | Kerala & Central Exam Ranker",
     badge: "M.Pharm Pharmacology | GPAT Rank Holder",
     icon: '<i class="fa-solid fa-award"></i>',
-    img: "/assets/images/Mentors/optimized/nayana-shaji.jpg",
+    img: "/assets/images/Mentors/nayana-shaji.jpg",
     quals: [
       "M.Pharm Pharmacology",
       "Distinction Holder",
@@ -5685,7 +5208,7 @@ const facultyPool = [
     role: "NCLEX RN Passed",
     badge: "MSc Nursing (Orthopedic)",
     icon: '<i class="fa-solid fa-stethoscope"></i>',
-    img: "/assets/images/Mentors/optimized/vidhu-r-vijayan.jpg",
+    img: "/assets/images/Mentors/vidhu-r-vijayan.jpg",
     quals: ["MSc. Nursing (Orthopedic)", "NCLEX RN Passed"],
   },
   // Batch 2
@@ -5694,7 +5217,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Molecular Biology | Distinction Holder",
     icon: '<i class="fa-solid fa-flask"></i>',
-    img: "/assets/images/Mentors/optimized/honey-mol-pv.jpg",
+    img: "/assets/images/Mentors/honey-mol-pv.jpg",
     quals: [
       "MSc Molecular Biology",
       "Distinction Holder",
@@ -5706,7 +5229,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Microbiology | 2nd Rank Holder",
     icon: '<i class="fa-solid fa-microscope"></i>',
-    img: "/assets/images/Mentors/optimized/sreelakshmi-em.jpg",
+    img: "/assets/images/Mentors/sreelakshmi-em.jpg",
     quals: ["MSc Microbiology", "2nd Rank Holder", "Kerala PSC Rank Holder"],
   },
   {
@@ -5714,7 +5237,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Nursing (Pediatrics) – KUHS",
     icon: '<i class="fa-solid fa-child"></i>',
-    img: "/assets/images/Mentors/optimized/arathy-surendran.jpg",
+    img: "/assets/images/Mentors/arathy-surendran.jpg",
     quals: ["MSc Nursing (Pediatrics) – KUHS", "Kerala PSC Rank Holder"],
   },
   // Batch 3
@@ -5723,7 +5246,7 @@ const facultyPool = [
     role: "GPAT Kerala Rank Holder | Research Conclave Winner",
     badge: "M.Pharm Pharmaceutical Chemistry | GPAT Kerala Rank Holder",
     icon: '<i class="fa-solid fa-flask-vial"></i>',
-    img: "/assets/images/Mentors/optimized/sai-kiran-tc.jpg",
+    img: "/assets/images/Mentors/sai-kiran-tc.jpg",
     quals: [
       "Senior Pharmacy Faculty",
       "M.Pharm – Pharmaceutical Chemistry",
@@ -5749,7 +5272,7 @@ const facultyPool = [
     role: "German A1–B2 Qualified | Nursing Background",
     badge: "German B1–B2 Certified | BSc Nursing",
     icon: '<i class="fa-solid fa-language"></i>',
-    img: "/assets/images/Mentors/optimized/jesna-prasad.jpg",
+    img: "/assets/images/Mentors/jesna-prasad.jpg",
     quals: ["BSc Nursing", "German A1-A2 Certified", "German B1-B2 Certified"],
   },
   // Batch 4
@@ -5758,7 +5281,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Nursing (Pediatric)",
     icon: '<i class="fa-solid fa-heart-pulse"></i>',
-    img: "/assets/images/Mentors/optimized/jeethu-paul.jpg",
+    img: "/assets/images/Mentors/jeethu-paul.jpg",
     quals: ["MSc Nursing (Pediatric)", "Kerala PSC Rank Holder"],
   },
   {
@@ -5779,7 +5302,7 @@ const facultyPool = [
     role: "Oncology Nursing Specialist",
     badge: "BSc Nursing (Oncology Nursing)",
     icon: '<i class="fa-solid fa-ribbon"></i>',
-    img: "/assets/images/Mentors/optimized/revathy-bc.jpg",
+    img: "/assets/images/Mentors/revathy-bc.jpg",
     quals: ["BSc Nursing", "Speciality in Oncology Nursing"],
   },
   // Batch 5
@@ -5811,7 +5334,7 @@ const facultyPool = [
     role: "Distinction Holder | Kerala & Central Exam Ranker",
     badge: "M.Pharm Pharmacology | GPAT Rank Holder",
     icon: '<i class="fa-solid fa-award"></i>',
-    img: "/assets/images/Mentors/optimized/nayana-shaji.jpg",
+    img: "/assets/images/Mentors/nayana-shaji.jpg",
     quals: [
       "M.Pharm Pharmacology",
       "Distinction Holder",

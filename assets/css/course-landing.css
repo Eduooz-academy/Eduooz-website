@@ -1595,12 +1595,12 @@ body {
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  /* box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08); */
 }
 
 .testi-featured-thumb {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 11 / 7;
   overflow: hidden;
   background: #0f0f0f;
 }
@@ -1612,6 +1612,8 @@ body {
   object-fit: cover;
   display: block;
 }
+
+
 
 .testi-featured-overlay {
   position: absolute;
@@ -1629,31 +1631,45 @@ body {
   opacity: 1;
 }
 
-.testi-play-btn {
-  position: relative;
-  width: 88px;
-  height: 88px;
-  border: none;
-  border-radius: 50%;
-  background: #ff0000;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.9rem;
-  box-shadow: 0 16px 40px rgba(255, 0, 0, 0.38);
-  cursor: pointer;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    background 0.3s ease;
+/* Scoped to the #testiPlayBtn id (not the bare .testi-play-btn class): an
+   unrelated "SUCCESS STORIES HUB" component further down this file reuses
+   the same .testi-play-btn / .testi-play-sm class names for a dark glass
+   button, and a later same-specificity class rule was overriding this
+   button's color to white. The id selector's higher specificity keeps this
+   button red regardless of source order, without touching that unrelated
+   component. */
+#testiPlayBtn.testi-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 88px;
+    height: 88px;
+    border: none;
+    border-radius: 50%;
+    background: #ff0000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 16px 40px rgba(255, 0, 0, .38);
+    transition: .3s ease;
+    z-index: 10;
+    padding: 0;
 }
 
-.testi-play-btn:hover {
-  transform: scale(1.06);
-  box-shadow: 0 20px 48px rgba(255, 0, 0, 0.46);
+#testiPlayBtn.testi-play-btn i {
+    font-size: 2rem;
+    line-height: 1;
+    margin: 0;
+    transform: translateX(2px); /* optical centering for play icon */
 }
 
+#testiPlayBtn.testi-play-btn:hover {
+    transform: translate(-50%, -50%) scale(1.06);
+    box-shadow: 0 20px 48px rgba(255, 0, 0, .46);
+}
 .testi-play-ripple {
   position: absolute;
   inset: 0;
@@ -1772,10 +1788,10 @@ body {
   gap: 14px;
   align-items: center;
   padding: 12px;
-  background: #fff;
+  background: #ffffff;
   border-radius: 22px;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+  /* box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05); */
   cursor: pointer;
   transition:
     transform 0.3s ease,
@@ -1785,15 +1801,20 @@ body {
 }
 
 .testi-playlist-item.active {
-  border-color: rgba(91, 33, 182, 0.22);
-  box-shadow: 0 18px 42px rgba(91, 33, 182, 0.1);
+
+  border-color: rgba(139, 92, 246, 0.25);
+  transform: translateY(-4px);
+
+  /* box-shadow: 0 18px 42px rgba(91, 33, 182, 0.1); */
   transform: translateY(-2px);
 }
 
 .testi-playlist-item:hover {
+  border-color: rgba(139, 92, 246, 0.25);
   transform: translateY(-4px);
-  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+  background-color:rgba(138, 92, 246, 0.078);
 }
+
 
 .testi-item-thumb {
   position: relative;
@@ -1931,6 +1952,131 @@ body {
     align-self: center;
     justify-self: end;
     margin-top: 4px;
+  }
+}
+
+/* ---- Right playlist: scrollable viewport (~5 cards), light theme ---- */
+.testimonials-section .testi-playlist-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+}
+
+.testimonials-section .testi-playlist {
+  max-height: 425px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-right: 8px;
+  /* Breathing room so hover/active translateY + box-shadow on the first and
+     last cards aren't clipped by this scroll container's own edges. */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  align-content: start;
+  grid-auto-rows: minmax(120px, auto);
+  /* Native scrollbar hidden — the .testi-scroll-indicator thumb below is
+     the single visible scroll cue. Wheel/trackpad/touch scrolling still works. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.testimonials-section .testi-playlist::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+  background: transparent;
+}
+
+/* Thin scroll indicator on the right edge of the playlist */
+.testimonials-section .testi-scroll-indicator {
+  position: absolute;
+  right: 0;
+  top: 12px;
+  bottom: 38px;
+  width: 0px;
+  pointer-events: none;
+  display: block;
+}
+
+.testimonials-section .testi-scroll-indicator .track {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 4px;
+}
+
+.testimonials-section .testi-scroll-indicator .thumb {
+  position: absolute;
+  left: 1px;
+  width: 4px;
+  background: linear-gradient(180deg, var(--brand-cyan), var(--brand-purple));
+  border-radius: 3px;
+  transform-origin: top left;
+}
+
+/* ---- Pagination dots (light theme) ---- */
+.testimonials-section .testi-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  /* overflow-x:auto forces overflow-y to an implicit "auto" clip box too
+     (CSS overflow spec) — equal padding keeps the scaled .active dot inside it. */
+  padding: 6px 4px 6px 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.testimonials-section .testi-dots::-webkit-scrollbar {
+  display: none;
+}
+
+.testimonials-section .testi-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(91, 33, 182, 0.15);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+  flex-shrink: 0;
+}
+
+.testimonials-section .testi-dot.active {
+  background: var(--brand-purple);
+  transform: scale(1.2);
+}
+
+/* ---- Mobile: hide the right playlist entirely, keep featured card + dots ---- */
+@media (max-width: 767px) {
+  .testimonials-section .testi-playlist {
+    display: none !important;
+    max-height: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .testimonials-section .testi-scroll-indicator {
+    display: none !important;
+  }
+
+  .testimonials-section .testi-playlist-wrap {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .testimonials-section .testi-dots {
+    display: flex !important;
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -9158,6 +9304,27 @@ a.pex-paper-card {
 .pex-empty p {
   font-size: 0.95rem;
   font-weight: 600;
+}
+
+/* ── Generic "Coming Soon" placeholder (used where section inner content is pending) ── */
+.coming-soon-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 24px;
+  color: rgba(255, 255, 255, 0.32);
+  text-align: center;
+}
+.coming-soon-block i {
+  font-size: 2.4rem;
+  opacity: 0.5;
+}
+.coming-soon-block span {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 /* ── RESPONSIVE ── */

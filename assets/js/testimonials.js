@@ -213,53 +213,128 @@ document.addEventListener("DOMContentLoaded", () => {
         // --- 1. Reveal Animations ---
         gsap.set(".g-theater-reveal", { autoAlpha: 1 });
         gsap.from(".g-theater-reveal", {
-            scrollTrigger: { trigger: ".swipe-theater-section", start: "top 80%" },
+            scrollTrigger: { trigger: ".shorts-gallery-section", start: "top 80%" },
             y: 40, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power3.out"
         });
-    
-        // --- 2. Desktop Navigation Arrows Logic ---
-        const track = document.getElementById('video-track');
-        const btnPrev = document.getElementById('btn-prev');
-        const btnNext = document.getElementById('btn-next');
-    
-        if (track && btnPrev && btnNext) {
-            btnNext.addEventListener('click', () => {
-                // Scroll right by the width of one card + gap
-                const cardWidth = track.querySelector('.theater-card').offsetWidth;
-                track.scrollBy({ left: cardWidth + 40, behavior: 'smooth' });
-            });
-    
-            btnPrev.addEventListener('click', () => {
-                const cardWidth = track.querySelector('.theater-card').offsetWidth;
-                track.scrollBy({ left: -(cardWidth + 40), behavior: 'smooth' });
-            });
+
+        // --- 2. YouTube Shorts Masonry Gallery ---
+        const SHORTS_URLS = [
+            "https://youtube.com/shorts/r1wSiAmjMcA",
+            "https://youtube.com/shorts/oeJcpXOwWnw",
+            "https://youtube.com/shorts/ltbkEbdV4fU",
+            "https://youtube.com/shorts/OQhRZWuG664",
+            "https://youtube.com/shorts/NYpUjEJiqHQ",
+            "https://youtube.com/shorts/KzH05e2b1vE",
+            "https://youtube.com/shorts/BzHwBxq78M4",
+            "https://youtube.com/shorts/J2p7BVRiTho",
+            "https://youtube.com/shorts/ihz7PxJr9ts",
+            "https://youtube.com/shorts/QNQJaa76VOo",
+            "https://youtube.com/shorts/RFrX_Rut6UA",
+            "https://youtube.com/shorts/INU_90s4UxI",
+            "https://youtube.com/shorts/3S5HbF6sCDY",
+            "https://youtube.com/shorts/sNVG7mmMWsU",
+            "https://youtube.com/shorts/78xAMnUJLco",
+            "https://youtube.com/shorts/vpkzal8K4KY",
+            "https://youtube.com/shorts/GGombj0VRYE",
+            "https://youtube.com/shorts/6amewOeC2oY",
+            "https://youtube.com/shorts/-YyLEigHEC8",
+            "https://youtube.com/shorts/E9hW6In9ZOI",
+            "https://youtube.com/shorts/Kh8_nSzEuFg",
+            "https://youtube.com/shorts/hQDioIUOKRc",
+            "https://youtube.com/shorts/lX94AzT_hrw",
+        ];
+
+        function extractShortsId(url) {
+            const match = url.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+            return match ? match[1] : null;
         }
-    
-        // --- 3. Video Modal Logic ---
-        const videoContainers = document.querySelectorAll('.video-container');
+
+        const shortsIds = SHORTS_URLS.map(extractShortsId).filter(Boolean);
+
+        const grid = document.getElementById('shortsGrid');
+        const loadMoreWrap = document.getElementById('loadMoreWrap');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const BATCH_SIZE = 12;
+        let renderedCount = 0;
+
+        function renderNextBatch() {
+            if (!grid) return;
+            const nextIds = shortsIds.slice(renderedCount, renderedCount + BATCH_SIZE);
+            const fragment = document.createDocumentFragment();
+
+            nextIds.forEach((id) => {
+                const card = document.createElement('div');
+                card.className = 'shorts-card';
+                card.dataset.videoId = id;
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', 'Play student testimonial video');
+                card.innerHTML = `
+                    <img class="shorts-thumb" src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="Student testimonial video thumbnail" loading="lazy" />
+                    <div class="play-overlay">
+                        <div class="glass-play-btn">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+
+            grid.appendChild(fragment);
+            renderedCount += nextIds.length;
+
+            if (loadMoreWrap) {
+                loadMoreWrap.classList.toggle('is-hidden', renderedCount >= shortsIds.length);
+            }
+        }
+
+        if (grid) {
+            renderNextBatch();
+        }
+
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', renderNextBatch);
+        }
+
+        // --- 3. Video Modal Logic (event delegation for dynamically loaded cards) ---
         const modal = document.getElementById('videoModal');
         const modalIframe = document.getElementById('modalIframe');
         const closeModal = document.getElementById('closeVideoModal');
-    
-        videoContainers.forEach(container => {
-            container.addEventListener('click', function() {
-                const card = this.closest('.theater-card');
-                const ytId = card.getAttribute('data-yt-id');
-                
-                modalIframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
-                modal.classList.add('active');
-            });
-        });
+
+        function openVideo(ytId) {
+            if (!ytId || !modal || !modalIframe) return;
+            modalIframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+            modal.classList.add('active');
+        }
 
         function closeVideo() {
             modal.classList.remove('active');
             setTimeout(() => { modalIframe.src = ""; }, 400); // Wait for fade out to stop audio
         }
 
+        if (grid) {
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.shorts-card');
+                if (!card) return;
+                openVideo(card.dataset.videoId);
+            });
+
+            grid.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const card = e.target.closest('.shorts-card');
+                if (!card) return;
+                e.preventDefault();
+                openVideo(card.dataset.videoId);
+            });
+        }
+
         if (closeModal) closeModal.addEventListener('click', closeVideo);
         if (modal) {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeVideo();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) closeVideo();
             });
         }
 

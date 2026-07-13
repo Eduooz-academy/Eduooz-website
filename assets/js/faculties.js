@@ -49,7 +49,7 @@
     {
       name: "Nayana Shaji",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/nayana-shaji.jpg",
+      img: "assets/images/Mentors/nayana-shaji.jpg",
       imgAlt: "Nayana Shaji – Pharmacology Faculty",
       icon: "fa-solid fa-pills",
       qual: ["M.Pharm Pharmacology"],
@@ -62,7 +62,7 @@
     {
       name: "Vidhu R Vijayan",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/vidhu-r-vijayan.jpg",
+      img: "assets/images/Mentors/vidhu-r-vijayan.jpg",
       imgAlt: "Vidhu R Vijayan – Orthopedic Nursing Faculty",
       icon: "fa-solid fa-stethoscope",
       qual: ["MSc. Nursing (Orthopedic)"],
@@ -71,7 +71,7 @@
     {
       name: "Honey Mol P.V",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/honey-mol-pv.jpg",
+      img: "assets/images/Mentors/honey-mol-pv.jpg",
       imgAlt: "Honey Mol P.V – Molecular Biology Faculty",
       icon: "fa-solid fa-flask",
       qual: ["MSc Molecular Biology"],
@@ -80,7 +80,7 @@
     {
       name: "Sreelakshmi E.M",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/sreelakshmi-em.jpg",
+      img: "assets/images/Mentors/sreelakshmi-em.jpg",
       imgAlt: "Sreelakshmi E.M – Microbiology Faculty",
       icon: "fa-solid fa-microscope",
       qual: ["MSc Microbiology"],
@@ -89,7 +89,7 @@
     {
       name: "Arathy Surendran",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/arathy-surendran.jpg",
+      img: "assets/images/Mentors/arathy-surendran.jpg",
       imgAlt: "Arathy Surendran – Pediatric Nursing Faculty",
       icon: "fa-solid fa-child",
       qual: ["MSc Nursing (Pediatrics) – KUHS"],
@@ -98,7 +98,7 @@
     {
       name: "Sai Kiran T C",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/sai-kiran-tc.jpg",
+      img: "assets/images/Mentors/sai-kiran-tc.jpg",
       imgAlt: "Sai Kiran T C – Senior Pharmacy Faculty",
       icon: "fa-solid fa-flask-vial",
       qual: ["Senior Pharmacy Faculty", "M.Pharm – Pharmaceutical Chemistry"],
@@ -120,7 +120,7 @@
     {
       name: "Jesna Prasad",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/jesna-prasad.jpg",
+      img: "assets/images/Mentors/jesna-prasad.jpg",
       imgAlt: "Jesna Prasad – BSc Nursing & German Language",
       icon: "fa-solid fa-language",
       qual: ["BSc Nursing"],
@@ -129,7 +129,7 @@
     {
       name: "Jeethu Paul",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/jeethu-paul.jpg",
+      img: "assets/images/Mentors/jeethu-paul.jpg",
       imgAlt: "Jeethu Paul – Pediatric Nursing Faculty",
       icon: "fa-solid fa-heart-pulse",
       qual: ["MSc Nursing (Pediatric)"],
@@ -151,7 +151,7 @@
     {
       name: "Revathy B C",
       accent: "cyan",
-      img: "assets/images/Mentors/optimized/revathy-bc.jpg",
+      img: "assets/images/Mentors/revathy-bc.jpg",
       imgAlt: "Revathy B C – Oncology Nursing Faculty",
       icon: "fa-solid fa-ribbon",
       qual: ["BSc Nursing", "Speciality in Oncology Nursing"],

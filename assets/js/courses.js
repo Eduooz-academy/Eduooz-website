@@ -1653,16 +1653,29 @@ document.querySelectorAll(".faq-q").forEach((q) => {
         subEl.textContent = currentItem.dataset.sub;
         badgeEl.innerHTML =
           '<i class="fa-solid fa-check"></i> ' + currentItem.dataset.badge;
-        quoteEl.innerHTML =
-          '<i class="fa-solid fa-quote-left testi-quote-icon"></i> <p>' +
-          currentItem.dataset.quote +
-          "</p>";
+        // Only set the quote if the item provides one; otherwise hide the quote box
+        if (currentItem.dataset.quote && currentItem.dataset.quote.trim()) {
+          quoteEl.style.display = "block";
+          quoteEl.innerHTML =
+            '<i class="fa-solid fa-quote-left testi-quote-icon"></i> <p>' +
+            currentItem.dataset.quote +
+            "</p>";
+        } else {
+          quoteEl.style.display = "none";
+          quoteEl.innerHTML = "";
+        }
         currentUrl = currentItem.dataset.url || currentUrl;
 
         // Fade back in
         gsap.to(".testi-featured", { opacity: 1, duration: 0.3 });
       },
     });
+    // update pagination dot to reflect selected index
+    try {
+      updateActiveDotForIndex(index);
+    } catch (e) {
+      /* ignore if pagination not initialized */
+    }
   }
 
   if (playBtn) {
@@ -1676,6 +1689,9 @@ document.querySelectorAll(".faq-q").forEach((q) => {
     updateFeatured(currentIndex);
   }
 
+  const testiPlaylist = document.getElementById("testiPlaylist");
+  const testiDots = document.getElementById("testiDots");
+
   function startAutoPlay() {
     // Clear any existing before starting to prevent multiple intervals
     clearInterval(autoPlayInterval);
@@ -1686,16 +1702,139 @@ document.querySelectorAll(".faq-q").forEach((q) => {
     clearInterval(autoPlayInterval);
   }
 
-  // Click handling
-  playlistItems.forEach((item, index) => {
-    item.addEventListener("click", () => {
+  // Click handling: use event delegation on the stable playlist container
+  // This avoids stale NodeList issues and ensures clicks on nested elements bubble correctly.
+  if (testiPlaylist) {
+    testiPlaylist.addEventListener("click", (e) => {
+      const item = e.target.closest(".testi-playlist-item");
+      if (!item || !testiPlaylist.contains(item)) return;
+      const idxAttr = item.getAttribute("data-index");
+      let index = -1;
+      if (idxAttr !== null) index = parseInt(idxAttr, 10);
+      if (isNaN(index) || index < 0) {
+        // fallback to index lookup
+        index = Array.from(playlistItems).indexOf(item);
+      }
+      if (index < 0) return;
       currentIndex = index;
       updateFeatured(currentIndex);
       stopAutoPlay();
-      // Resume after 5 seconds of inactivity
       setTimeout(startAutoPlay, 5000);
     });
-  });
+  }
+  const itemsPerDot = 2;
+  const totalItems = playlistItems.length;
+  const totalDots = Math.ceil(totalItems / itemsPerDot);
+
+  function buildDots() {
+    if (!testiDots) return;
+    testiDots.innerHTML = "";
+    for (let d = 0; d < totalDots; d++) {
+      const btn = document.createElement("button");
+      btn.className = "testi-dot" + (d === 0 ? " active" : "");
+      btn.setAttribute("aria-label", "Go to group " + (d + 1));
+      btn.addEventListener("click", () => {
+        const itemIndex = d * itemsPerDot;
+        try {
+          const cs = testiPlaylist
+            ? window.getComputedStyle(testiPlaylist)
+            : null;
+          const playlistVisible =
+            testiPlaylist &&
+            testiPlaylist.clientHeight > 0 &&
+            cs &&
+            cs.display !== "none";
+          const target = playlistItems[itemIndex];
+          if (playlistVisible) {
+            // Desktop/tablet: dot click scrolls the playlist only
+            if (target)
+              testiPlaylist.scrollTo({
+                top: target.offsetTop,
+                behavior: "smooth",
+              });
+          } else {
+            // Mobile (playlist hidden): make dots useful by selecting the featured item
+            try {
+              updateFeatured(itemIndex);
+            } catch (e) {}
+          }
+        } catch (e) {}
+      });
+      testiDots.appendChild(btn);
+    }
+  }
+
+  function updateActiveDotForIndex(itemIndex) {
+    if (!testiDots) return;
+    const dotIndex = Math.floor(itemIndex / itemsPerDot);
+    const dots = testiDots.querySelectorAll(".testi-dot");
+    dots.forEach((d, i) => d.classList.toggle("active", i === dotIndex));
+  }
+
+  // sync dots on scroll (throttled)
+  if (testiPlaylist && testiDots) {
+    let st = null;
+    testiPlaylist.addEventListener("scroll", () => {
+      if (st) clearTimeout(st);
+      st = setTimeout(() => {
+        let firstVisible = 0;
+        const parentRect = testiPlaylist.getBoundingClientRect();
+        for (let i = 0; i < playlistItems.length; i++) {
+          const rect = playlistItems[i].getBoundingClientRect();
+          if (rect.top >= parentRect.top - 4) {
+            firstVisible = i;
+            break;
+          }
+        }
+        updateActiveDotForIndex(firstVisible);
+      }, 120);
+    });
+
+    // Create a thin scroll indicator (thumb) for discoverability
+    try {
+      const wrap = testiPlaylist.parentElement;
+      const computed = window.getComputedStyle(wrap);
+      if (computed.position === "static") wrap.style.position = "relative";
+      let indicator = wrap.querySelector(".testi-scroll-indicator");
+      if (!indicator) {
+        indicator = document.createElement("div");
+        indicator.className = "testi-scroll-indicator";
+        indicator.innerHTML =
+          '<div class="track"><div class="thumb"></div></div>';
+        wrap.appendChild(indicator);
+      }
+      const thumb = indicator.querySelector(".thumb");
+      function updateIndicator() {
+        const sh = testiPlaylist.scrollHeight;
+        const ch = testiPlaylist.clientHeight;
+        if (!indicator || !thumb) return;
+        if (sh <= ch) {
+          indicator.style.display = "none";
+          return;
+        } else {
+          indicator.style.display = "block";
+        }
+        const trackRect = indicator.getBoundingClientRect();
+        const trackHeight = trackRect.height;
+        const thumbHeight = Math.max(24, (ch / sh) * trackHeight);
+        const maxTop = Math.max(0, trackHeight - thumbHeight);
+        const top = (testiPlaylist.scrollTop / Math.max(1, sh - ch)) * maxTop;
+        thumb.style.height = thumbHeight + "px";
+        thumb.style.transform = "translateY(" + top + "px)";
+      }
+      testiPlaylist.addEventListener("scroll", updateIndicator, {
+        passive: true,
+      });
+      window.addEventListener("resize", updateIndicator);
+      updateIndicator();
+    } catch (e) {}
+  }
+
+  // build dots after DOM ready
+  buildDots();
+  // ensure playlist starts at top and first dot active
+  if (testiPlaylist) testiPlaylist.scrollTop = 0;
+  updateActiveDotForIndex(0);
 
   // Pause autoplay on hover over featured section or playlist
   const featuredSection = document.getElementById("testiFeatured");
@@ -1707,6 +1846,86 @@ document.querySelectorAll(".faq-q").forEach((q) => {
     playlistSection.addEventListener("mouseenter", stopAutoPlay);
     playlistSection.addEventListener("mouseleave", startAutoPlay);
   }
+
+  // Allow native scrolling inside the playlist when the pointer is over it.
+  // Stop propagation so global smooth-scroller (Lenis) doesn't intercept the wheel
+  // but do NOT call preventDefault so native scrolling still happens.
+  if (playlistSection) {
+    // Pause Lenis smooth-scrolling while interacting with the playlist so
+    // the native scroll behavior works naturally inside this element.
+    playlistSection.addEventListener("mouseenter", () => {
+      try {
+        if (window.lenis && typeof window.lenis.stop === "function")
+          window.lenis.stop();
+      } catch (e) {}
+    });
+    playlistSection.addEventListener("mouseleave", () => {
+      try {
+        if (window.lenis && typeof window.lenis.start === "function")
+          window.lenis.start();
+      } catch (e) {}
+    });
+    // Also handle touch interactions
+    playlistSection.addEventListener(
+      "touchstart",
+      () => {
+        try {
+          if (window.lenis && typeof window.lenis.stop === "function")
+            window.lenis.stop();
+        } catch (e) {}
+      },
+      { passive: true },
+    );
+    playlistSection.addEventListener("touchend", () => {
+      try {
+        if (window.lenis && typeof window.lenis.start === "function")
+          window.lenis.start();
+      } catch (e) {}
+    });
+    playlistSection.addEventListener(
+      "wheel",
+      (e) => {
+        try {
+          const delta = e.deltaY;
+          const atTop = playlistSection.scrollTop === 0;
+          const atBottom =
+            Math.ceil(
+              playlistSection.scrollTop + playlistSection.clientHeight,
+            ) >= playlistSection.scrollHeight;
+          if ((delta > 0 && !atBottom) || (delta < 0 && !atTop)) {
+            e.stopPropagation();
+          }
+        } catch (err) {
+          // swallow errors — do not break page
+        }
+      },
+      { passive: true },
+    );
+  }
+
+  // As a fallback when global smooth-scroller captures wheel events,
+  // intercept wheel at capture phase and perform native scrolling on the
+  // playlist when appropriate. This preserves page scroll at playlist edges.
+  document.addEventListener(
+    "wheel",
+    function (e) {
+      try {
+        const el = document.getElementById("testiPlaylist");
+        if (!el) return;
+        if (!el.contains(e.target)) return;
+        const delta = e.deltaY;
+        const atTop = el.scrollTop === 0;
+        const atBottom =
+          Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
+        if ((delta > 0 && !atBottom) || (delta < 0 && !atTop)) {
+          e.preventDefault();
+          e.stopPropagation();
+          el.scrollTop += delta;
+        }
+      } catch (err) {}
+    },
+    { passive: false, capture: true },
+  );
 
   // Start Autoplay
   startAutoPlay();

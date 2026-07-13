@@ -107,9 +107,9 @@ Nursing  = 11 + 13 + 7 = 31
 
 Pharmacy = 7 + 5 + 4 + 3 = 19
 
-MLT = 3 + 2 = 5
+MLT = 5 + 2 = 7
 
-Total  = 55
+Total  = 57
 
 
 

@@ -30,7 +30,7 @@
 
 body {
   font-family: var(--font-main);
-  background-color: var(--bg-light);
+  background:  #d400fe0c;
   /* Changed to light to support fixed light mesh */
   color: var(--text-main);
   overflow-x: clip;
@@ -42,6 +42,7 @@ body {
   min-height: 100vh;
   background: #0a0514d6;
   /* NO overflow: hidden here, allowing seamless blending */
+  padding-bottom:60px;
 }
 
 /* --- 1. Architectural Animated Grid Background --- */
@@ -50,7 +51,8 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: auto;
+  bottom: 0;
   z-index: 1;
   overflow: hidden;
   background: radial-gradient(circle at 0% 81%, #5b2698 0%, #b82bd3 100%);
@@ -169,7 +171,8 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: auto;
+  bottom: 0;
   z-index: 3;
   pointer-events: none;
   /* Soft dark wash behind the text */
@@ -183,18 +186,6 @@ body {
   /* Fades the blur out perfectly right before it touches the 3D phone */
   /* mask-image: linear-gradient(to right, black 35%, transparent 100%); */
   /* -webkit-mask-image: linear-gradient(to right, black 35%, transparent 100%); */
-}
-
-/* On mobile the hero content (text + mockup + download buttons) stacks
-   taller than 100vh, so the fixed-height backgrounds above stop short and
-   expose the flat .hero-wrapper base color behind the phone mockup. Stretch
-   them to the wrapper's actual height so the same background continues. */
-@media (max-width: 768px) {
-  .hero-grid-architecture,
-  .hero-blur-overlay {
-    height: auto;
-    bottom: 0;
-  }
 }
 
 .btn-liquid-primary {
@@ -381,7 +372,7 @@ body {
 /* --- Right Visual: Multi-Layer Glass --- */
 .hero-visual-zone {
   position: relative;
-  min-height: 650px;
+  /* min-height: 650px; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -522,14 +513,9 @@ body {
 .theme-blend-zone {
   position: relative;
   z-index: 20;
-  padding: 100px 0 50px 0;
-  margin-top: -60px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #614f81fa 60px,
-    rgba(248, 250, 252, 0) 120px
-  );
+  margin-top:0px;
+  padding-top:0px;
+  
   pointer-events: none;
   /* Let clicks pass through the gradient */
 }
@@ -539,11 +525,13 @@ body {
   pointer-events: auto;
   position: relative;
   max-width: 1250px;
-  margin: -30px auto 0; /* Pulls slightly into the hero gradient for depth */
+   top:-75px;
+    margin:0 auto;
+  margin: 0px auto 0; /* Pulls slightly into the hero gradient for depth */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(85, 0, 255, 0.079); /* Premium Dark Glass */
+  background: rgba(85, 0, 255, 0.079);  /* Premium Dark Glass */
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -704,16 +692,55 @@ body {
   }
 }
 
+/* --- Desktop-only Hero -> Statistics transition fix ---
+   .hero-grid-architecture/.hero-blur-overlay already stretch to the
+   wrapper's real height at all widths (see their base rules above), so
+   this block only holds the desktop-specific refinements: the
+   theme-blend-zone gradient is redrawn as a pure opacity wash straight
+   to the page's own light background -- rather than the flat/dark
+   mid-tone stop used below 1025px -- so the Hero's own vivid gradient
+   shows through and fades directly into the page instead of hitting a
+   mismatched color band. The panel shadow is softened so the card
+   blends into that fade. The final gradient stop uses var(--bg-light)
+   so it always matches the page background the Achievers section
+   below sits on.
+   hero-premium gets extra padding-bottom so the download-app buttons
+   get breathing room below them even on short viewports (previously
+   ~0-15px at 768px-tall viewports); the panel's negative margin is
+   then increased to pull it up into that new buffer for a ~50px
+   overlap into the Hero, premium-landing-page style. Both values are
+   independent: padding-bottom only adds space after the centered Hero
+   content (content-box sizing keeps min-height:100vh separate from
+   padding, so the heading/image never move), and the panel's own
+   margin-top controls how far it rises into that space. */
+@media (min-width: 1025px) {
+  .hero-premium {
+    padding-bottom: 60px;
+  }
+
+  .theme-blend-zone {
+    padding: 95px 0 50px 0;
+  }
+
+  .trust-glass-panel {
+    margin-top: -85px;
+    box-shadow:
+      0 25px 60px rgba(10, 5, 20, 0.28),
+      inset 0 2px 20px rgba(255, 255, 255, 0.05);
+  }
+}
+
 .color-mesh {
   position: fixed;
-  top: 0;
-  left: 0;
+    inset: 0;
+    height: 140vh;
   width: 100%;
-  height: 100vh;
+  /* height: 100vh; */
   z-index: -2;
   filter: blur(80px);
   opacity: 0.1;
 }
+
 
 .blob {
   position: absolute;
@@ -2927,11 +2954,19 @@ body {
    ========================================= */
 .hero-visual-zone {
   position: relative;
-  height: 650px;
+  /* height: 650px; */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+}
+.app-download-buttons{
+display: flex; 
+gap: 15px; 
+z-index: 30; 
+opacity: 0; 
+transform: translateY(20px);
+/* padding-bottom: 100px; */
 }
 
 .orbit-container {
@@ -3228,7 +3263,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(80%) brightness(0.7);
+  filter: none;
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   pointer-events: none; /* Stops the browser from dragging the image file */
 }
@@ -3307,7 +3342,7 @@ body {
 .faculty-card:hover .fac-portrait,
 .faculty-card:active .fac-portrait,
 .faculty-card.mobile-active .fac-portrait {
-  filter: grayscale(0%) brightness(1);
+  filter: none;
   transform: scale(1.05);
 }
 .faculty-card:hover .fac-glass-panel,
@@ -4148,7 +4183,8 @@ body {
 
 @media (min-width: 1024px) {
   .achievers-spotlight-section {
-    padding: 0 1.5rem;
+    padding: 0 1.5rem; 
+    margin-top: -22px;
   }
   .achiever-slider-container {
     border-radius: 20px;
@@ -4258,7 +4294,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  .achievers-spotlight-section {
+  .achievers-spotlight-section { 
     margin: 0;
   }
   .achiever-slide {
@@ -4380,7 +4416,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   /* Glassmorphism Base */
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px) saturate(180%);
