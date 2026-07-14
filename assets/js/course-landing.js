@@ -1203,6 +1203,7 @@ document.querySelectorAll(".faq-q").forEach((q) => {
   const badgeEl = document.getElementById("testiBadge");
   const quoteEl = document.getElementById("testiQuote");
   const playBtn = document.getElementById("testiPlayBtn");
+  const featuredThumb = testiFeatured.querySelector(".testi-featured-thumb");
 
   if (!playlistItems.length) return;
 
@@ -1211,6 +1212,10 @@ document.querySelectorAll(".faq-q").forEach((q) => {
   let currentUrl = playlistItems[0].dataset.url || "";
 
   function applyFeaturedContent(currentItem) {
+    // Switching the featured selection stops whatever was playing in it —
+    // the user picks a new video, they don't get two playing at once.
+    if (featuredThumb && window.EduoozInlinePlayer)
+      window.EduoozInlinePlayer.stopIfBox(featuredThumb);
     if (featuredImg) featuredImg.src = currentItem.dataset.img;
     if (avatarImg) avatarImg.src = currentItem.dataset.avatar;
     if (nameEl) nameEl.textContent = currentItem.dataset.name;
@@ -1261,7 +1266,8 @@ document.querySelectorAll(".faq-q").forEach((q) => {
 
   if (playBtn) {
     playBtn.addEventListener("click", () => {
-      if (currentUrl) window.open(currentUrl, "_blank", "noopener");
+      if (currentUrl && featuredThumb && window.EduoozInlinePlayer)
+        window.EduoozInlinePlayer.play(featuredThumb, currentUrl);
     });
   }
 
@@ -1868,6 +1874,14 @@ document.addEventListener("DOMContentLoaded", () => {
         startAuto();
       });
 
+    /* ── Play inline inside the card instead of navigating/opening a modal ── */
+    track.addEventListener("click", function (e) {
+      var card = e.target.closest(".aev-card");
+      if (!card) return;
+      e.preventDefault();
+      if (window.EduoozInlinePlayer) window.EduoozInlinePlayer.play(card, card.href);
+    });
+
     /* ── Hover pause ── */
     var carousel = document.getElementById("aev-carousel");
     if (carousel) {
@@ -1948,11 +1962,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- 3. RENDER ELIGIBILITY CARDS (from window.courseEligibility.qualification) ---
+  // Cards are now pre-rendered as static HTML for SEO; this only backfills
+  // the track if a page hasn't been migrated to static markup yet.
   function renderEligibilityCards() {
     const track = document.getElementById("elig-col-track");
     const cfg = window.courseEligibility;
-    if (!track || !cfg || !cfg.qualification || !cfg.qualification.length)
-      return;
+    if (!track || track.children.length) return;
+    if (!cfg || !cfg.qualification || !cfg.qualification.length) return;
 
     track.innerHTML = cfg.qualification
       .map(
@@ -1970,10 +1986,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- 4. RENDER AGE RULES (from window.courseEligibility.ageRules) ---
+  // Cards are now pre-rendered as static HTML for SEO; this only backfills
+  // the track if a page hasn't been migrated to static markup yet.
+  // initAgeExplorer() still runs separately (see PREMIUM INTERACTIONS below)
+  // to bind the accordion toggle to the static cards.
   function renderAgeRules() {
     const track = document.getElementById("age-col-track");
     const cfg = window.courseEligibility;
-    if (!track || !cfg || !cfg.ageRules || !cfg.ageRules.length) return;
+    if (!track || track.children.length) return;
+    if (!cfg || !cfg.ageRules || !cfg.ageRules.length) return;
 
     track.innerHTML = cfg.ageRules
       .map(

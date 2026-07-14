@@ -296,27 +296,19 @@ document.addEventListener("DOMContentLoaded", () => {
             loadMoreBtn.addEventListener('click', renderNextBatch);
         }
 
-        // --- 3. Video Modal Logic (event delegation for dynamically loaded cards) ---
-        const modal = document.getElementById('videoModal');
-        const modalIframe = document.getElementById('modalIframe');
-        const closeModal = document.getElementById('closeVideoModal');
-
-        function openVideo(ytId) {
-            if (!ytId || !modal || !modalIframe) return;
-            modalIframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
-            modal.classList.add('active');
-        }
-
-        function closeVideo() {
-            modal.classList.remove('active');
-            setTimeout(() => { modalIframe.src = ""; }, 400); // Wait for fade out to stop audio
+        // --- 3. Inline Video Player Logic (event delegation for dynamically loaded cards) ---
+        // Uses the site-wide shared player (assets/js/components.js) so a shorts
+        // card plays inline inside itself, same as every other page's video cards.
+        function playCard(card) {
+            if (!card || !window.EduoozInlinePlayer) return;
+            window.EduoozInlinePlayer.play(card, card.dataset.videoId);
         }
 
         if (grid) {
             grid.addEventListener('click', (e) => {
                 const card = e.target.closest('.shorts-card');
                 if (!card) return;
-                openVideo(card.dataset.videoId);
+                playCard(card);
             });
 
             grid.addEventListener('keydown', (e) => {
@@ -324,17 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const card = e.target.closest('.shorts-card');
                 if (!card) return;
                 e.preventDefault();
-                openVideo(card.dataset.videoId);
-            });
-        }
-
-        if (closeModal) closeModal.addEventListener('click', closeVideo);
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeVideo();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('active')) closeVideo();
+                playCard(card);
             });
         }
 

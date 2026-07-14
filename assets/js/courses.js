@@ -1624,6 +1624,7 @@ document.querySelectorAll(".faq-q").forEach((q) => {
   const badgeEl = document.getElementById("testiBadge");
   const quoteEl = document.getElementById("testiQuote");
   const playBtn = document.getElementById("testiPlayBtn");
+  const featuredThumb = document.querySelector(".testi-featured-thumb");
 
   if (!playlistItems.length) return;
 
@@ -1640,6 +1641,11 @@ document.querySelectorAll(".faq-q").forEach((q) => {
     // Add active class to current
     const currentItem = playlistItems[index];
     currentItem.classList.add("active");
+
+    // Switching the featured selection stops whatever was playing in it —
+    // the user picks a new video, they don't get two playing at once.
+    if (featuredThumb && window.EduoozInlinePlayer)
+      window.EduoozInlinePlayer.stopIfBox(featuredThumb);
 
     // Animate transition using GSAP
     gsap.to(".testi-featured", {
@@ -1680,7 +1686,8 @@ document.querySelectorAll(".faq-q").forEach((q) => {
 
   if (playBtn) {
     playBtn.addEventListener("click", () => {
-      window.open(currentUrl, "_blank", "noopener");
+      if (featuredThumb && window.EduoozInlinePlayer)
+        window.EduoozInlinePlayer.play(featuredThumb, currentUrl);
     });
   }
 
@@ -1989,6 +1996,17 @@ document.querySelectorAll(".faq-q").forEach((q) => {
 
   prevBtn.addEventListener("click", () => goTo(currentIndex - 1));
   nextBtn.addEventListener("click", () => goTo(currentIndex + 1));
+
+  // Play the mentor video inline inside its own thumbnail instead of
+  // navigating to youtube.com or opening a modal.
+  track.addEventListener("click", (e) => {
+    const card = e.target.closest(".yt-card");
+    if (!card) return;
+    e.preventDefault();
+    const mediaBox = card.querySelector(".yt-thumb-wrapper");
+    if (mediaBox && window.EduoozInlinePlayer)
+      window.EduoozInlinePlayer.play(mediaBox, card.href);
+  });
 
   buildDots();
   goTo(0);

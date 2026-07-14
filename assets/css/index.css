@@ -679,6 +679,7 @@ body {
   }
 }
 
+
 @media (max-width: 768px) {
   .stat-number {
     font-size: 2.2rem;
@@ -688,7 +689,11 @@ body {
   }
 
   .trust-glass-panel {
-    padding: 30px 10px;
+    padding: 25px 10px;
+    box-shadow:none;
+  }
+  .theme-blend-zone {
+    padding: 40px 0 0px 0;
   }
 }
 
@@ -4191,6 +4196,18 @@ transform: translateY(20px);
   } /* Rounded premium look only on desktop */
 }
 
+@media (min-width: 768px) {
+  .achievers-spotlight-section {
+    padding: 0; 
+    margin-top:-22px;
+  }
+  .achiever-slider-container {
+   padding: 0;
+   margin: 0;
+  } 
+}
+
+
 .achiever-track {
   display: flex;
   width: 100%;
@@ -4215,6 +4232,10 @@ transform: translateY(20px);
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
+}
+
+.achiever-bg-img-mobile {
+  display: none;
 }
 
 .image-gradient-overlay {
@@ -4307,6 +4328,12 @@ transform: translateY(20px);
   .achiever-bg-img {
     object-fit: contain;
     object-position: center center;
+  }
+  .achiever-bg-img-desktop {
+    display: none;
+  }
+  .achiever-bg-img-mobile {
+    display: block;
   }
   .achiever-text-overlay {
     padding: 3rem 1rem;

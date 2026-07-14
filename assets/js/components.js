@@ -35,6 +35,135 @@
     document.head.appendChild(link);
   }
 
+  /**
+   * Shared Inline YouTube Video Player
+   * ---------------------------------------------------------------------
+   * A single reusable player used across the whole site so that clicking a
+   * video thumbnail/card/button never navigates away to youtube.com and
+   * never opens a popup or fullscreen modal. Instead the iframe is inserted
+   * directly inside the clicked video's own box (mediaBox) — that box
+   * already owns its size, border-radius, shadow and overflow:hidden via
+   * the page's existing CSS, so the iframe just fills it and inherits all
+   * of that for free. Only one video plays at a time: starting a new one
+   * tears down whichever box was previously playing.
+   */
+  let evmCurrentlyPlaying = null; // { mediaBox, iframe }
+
+  function extractYouTubeId(input) {
+    if (!input) return null;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    ];
+    for (const re of patterns) {
+      const match = input.match(re);
+      if (match) return match[1];
+    }
+    return null;
+  }
+
+  function ensureInlinePlayerStylesheet() {
+    if (document.querySelector('link[href*="inline-video-player.css"]'))
+      return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = basePath + "assets/css/inline-video-player.css";
+    document.head.appendChild(link);
+  }
+
+  function stopInlineVideo() {
+    if (!evmCurrentlyPlaying) return;
+    const { mediaBox, iframe } = evmCurrentlyPlaying;
+    if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    const watchBtn = mediaBox.querySelector(":scope > .evm-inline-watch");
+    if (watchBtn) watchBtn.remove();
+    mediaBox.classList.remove("evm-inline-active");
+    evmCurrentlyPlaying = null;
+  }
+
+  // Stops playback only if the given box is the one currently playing —
+  // used when a page swaps which video a "featured" box represents
+  // (e.g. clicking a playlist thumbnail) without itself starting playback.
+  function stopInlineVideoIn(mediaBox) {
+    if (evmCurrentlyPlaying && evmCurrentlyPlaying.mediaBox === mediaBox) {
+      stopInlineVideo();
+    }
+  }
+
+  function playInlineVideo(mediaBox, idOrUrl) {
+    if (!mediaBox) return;
+    const videoId = extractYouTubeId(idOrUrl);
+    if (!videoId) return;
+
+    if (evmCurrentlyPlaying && evmCurrentlyPlaying.mediaBox !== mediaBox) {
+      stopInlineVideo();
+    }
+
+    ensureInlinePlayerStylesheet();
+    mediaBox.classList.add("evm-inline-active");
+
+    let iframe = mediaBox.querySelector(":scope > .evm-inline-iframe");
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.className = "evm-inline-iframe";
+      iframe.title = "YouTube video player";
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute(
+        "allow",
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+      );
+      iframe.setAttribute("allowfullscreen", "");
+      mediaBox.appendChild(iframe);
+    }
+    iframe.src =
+      "https://www.youtube.com/embed/" +
+      videoId +
+      "?autoplay=1&rel=0&modestbranding=1";
+
+    let watchBtn = mediaBox.querySelector(":scope > .evm-inline-watch");
+    if (!watchBtn) {
+      watchBtn = document.createElement("a");
+      watchBtn.className = "evm-inline-watch";
+      watchBtn.target = "_blank";
+      watchBtn.rel = "noopener noreferrer";
+      watchBtn.innerHTML =
+        '<i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch on YouTube';
+      mediaBox.appendChild(watchBtn);
+    }
+    watchBtn.href = /^https?:\/\//.test(idOrUrl)
+      ? idOrUrl
+      : "https://www.youtube.com/watch?v=" + videoId;
+
+    evmCurrentlyPlaying = { mediaBox, iframe };
+  }
+
+  window.EduoozInlinePlayer = {
+    play: playInlineVideo,
+    stop: stopInlineVideo,
+    stopIfBox: stopInlineVideoIn,
+  };
+
+  // Opt-in safety net: any element anywhere on the site can trigger inline
+  // playback of itself just by carrying one of these data attributes
+  // (it must already be a position:relative, sized, overflow:hidden box),
+  // without needing its own JS wiring.
+  document.addEventListener("click", (e) => {
+    const trigger = e.target.closest(
+      "[data-yt-video], [data-youtube], [data-video-url]",
+    );
+    if (!trigger) return;
+    const raw =
+      trigger.getAttribute("data-yt-video") ||
+      trigger.getAttribute("data-youtube") ||
+      trigger.getAttribute("data-video-url");
+    if (!extractYouTubeId(raw)) return;
+    e.preventDefault();
+    playInlineVideo(trigger, raw);
+  });
+
   // Component paths - automatically adjusted for subdirectories
   const components = {
     header: basePath + "components/header.html",

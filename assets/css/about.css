@@ -765,12 +765,17 @@ body {
 .visual-card {
   grid-column: span 1; /* Takes up 1 of the 3 columns */
   min-height: 400px;
+  position: relative;
 }
 
 .bento-img {
+  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .visual-card:hover .bento-img {
@@ -1061,9 +1066,11 @@ body {
   transition: opacity 0.8s ease;
 }
 .pillar-bg-img img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transform: scale(1.1);
   transition: transform 0.8s ease;
 }
@@ -1557,9 +1564,13 @@ body {
 }
 
 .card-img-zone img {
+  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   filter: grayscale(10%) brightness(1.02);
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }

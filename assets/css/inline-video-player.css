@@ -1,0 +1,69 @@
+/* ==========================================================================
+   Shared Inline YouTube Video Player
+   Injected on every page via assets/js/components.js. The iframe (and
+   optional "Watch on YouTube" pill) are appended directly inside the
+   clicked video's own box — that box supplies its own size, border-radius,
+   shadow and overflow:hidden via the page's existing CSS, so this file only
+   needs to style the injected iframe/button themselves.
+   ========================================================================== */
+
+.evm-inline-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  z-index: 5;
+  background: #000;
+}
+
+.evm-inline-watch {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.25s ease, transform 0.25s ease, color 0.25s ease;
+}
+
+.evm-inline-watch:hover,
+.evm-inline-watch:focus-visible {
+  background: var(--brand-cyan, #06b6d4);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.evm-inline-watch i {
+  color: #ff0000;
+  font-size: 0.85rem;
+  transition: color 0.25s ease;
+}
+
+.evm-inline-watch:hover i,
+.evm-inline-watch:focus-visible i {
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .evm-inline-watch {
+    font-size: 0.66rem;
+    padding: 5px 10px;
+    bottom: 8px;
+    right: 8px;
+  }
+}

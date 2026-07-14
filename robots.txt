@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /components/
+Disallow: /components/mock-test-questions/
+Disallow: /components/question-banks/
 
 Sitemap: https://www.eduooz.com/sitemap.xml

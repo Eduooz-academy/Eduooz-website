@@ -33,98 +33,24 @@ document.addEventListener("DOMContentLoaded", () => {
     initLenis();
 
 
-    // --- Gallery Wall: local image data (assets/images/gallary-images/) ---
-    const galleryImages = [
-    { file: "(1).png", w: 1097, h: 620 },
-    { file: "DSC03466.JPG", w: 7008, h: 4672 },
-    { file: "DSC03467.JPG", w: 7008, h: 4672 },
-    { file: "(2).png", w: 1063, h: 623 },
-    { file: "DSC03468.JPG", w: 7008, h: 4672 },
-    { file: "DSC03469.JPG", w: 7008, h: 4672 },
-    { file: "(3).PNG", w: 1637, h: 928 },
-    { file: "DSC03470.JPG", w: 7008, h: 4672 },
-    { file: "DSC03471.JPG", w: 7008, h: 4672 },
-    { file: "DSC03472.JPG", w: 7008, h: 4672 },
-    { file: ".PNG", w: 1589, h: 913 },
-    { file: "DSC03473.JPG", w: 7008, h: 4672 },
-    { file: "DSC03474.JPG", w: 7008, h: 4672 },
-    { file: "1.jpeg", w: 1108, h: 584 },
-    { file: "DSC03475.JPG", w: 7008, h: 4672 },
-    { file: "DSC03476.JPG", w: 7008, h: 4672 },
-    { file: "DSC03477.JPG", w: 7008, h: 4672 },
-    { file: "PNG(2).png", w: 1597, h: 921 },
-    { file: "DSC03478.JPG", w: 7008, h: 4672 },
-    { file: "DSC03479.JPG", w: 7008, h: 4672 },
-    { file: "PNG(3).png", w: 1772, h: 921 },
-    { file: "DSC03480.JPG", w: 7008, h: 4672 },
-    { file: "DSC03481.JPG", w: 7008, h: 4672 },
-    { file: "PNG(5).png", w: 1695, h: 942 },
-    { file: "DSC03482.JPG", w: 7008, h: 4672 },
-    { file: "DSC03483.JPG", w: 7008, h: 4672 },
-    { file: "DSC03494.JPG", w: 7008, h: 4672 },
-    { file: "PNG(7).png", w: 1762, h: 955 },
-    { file: "DSC03495.JPG", w: 7008, h: 4672 },
-    { file: "DSC03496.JPG", w: 7008, h: 4672 },
-    { file: "WhatsApp Image 2026-07-01 at 15.11.12.jpeg", w: 1104, h: 620 },
-    { file: "DSC03497.JPG", w: 7008, h: 4672 },
-    { file: "DSC03498.JPG", w: 7008, h: 4672 },
-    { file: "DSC03499.JPG", w: 7008, h: 4672 },
-    { file: "WhatsApp Image 2026-07-01 at 16.28.20.jpeg", w: 1437, h: 801 },
-    { file: "DSC03500.JPG", w: 7008, h: 4672 },
-    { file: "DSC03501.JPG", w: 7008, h: 4672 },
-    { file: "WhatsApp Image 2026-07-01 at 16.28.21.jpeg", w: 1440, h: 900 },
-    { file: "DSC03502.JPG", w: 7008, h: 4672 },
-    { file: "DSC03503.JPG", w: 7008, h: 4672 },
-    { file: "png(1).png", w: 1102, h: 614 },
-    { file: "DSC03504.JPG", w: 7008, h: 4672 },
-    { file: "DSC03505.JPG", w: 7008, h: 4672 },
-    { file: "DSC03507.JPG", w: 7008, h: 4672 },
-    { file: "png(4).png", w: 1103, h: 557 },
-    { file: "DSC03509.JPG", w: 7008, h: 4672 },
-    { file: "DSC03657.JPG", w: 7008, h: 4672 },
-    { file: "png(6).png", w: 1119, h: 553 },
-    { file: "DSC03658.JPG", w: 7008, h: 4672 },
-    { file: "DSC03662.JPG", w: 7008, h: 4672 },
-    { file: "DSC03665.JPG", w: 7008, h: 4672 },
-    { file: "png.png", w: 1104, h: 566 },
-    { file: "DSC03712.JPG", w: 7008, h: 4672 },
-    { file: "DSC03714.JPG", w: 7008, h: 4672 },
-    { file: "pp.png", w: 979, h: 523 },
-    { file: "DSC03719.JPG", w: 7008, h: 4672 },
-    { file: "DSC03723.JPG", w: 7008, h: 4672 },
-    { file: "DSC03725.JPG", w: 7008, h: 4672 },
-    ];
-
+    // --- Gallery Wall: reveals the statically rendered .gal-img-card elements ---
     function initGalleryWall() {
         const wrapper = document.getElementById('galleryWallWrapper');
         const showMoreBtn = document.getElementById('galleryShowMoreBtn');
         if (!wrapper || !showMoreBtn) return;
 
-        const columns = wrapper.querySelectorAll('.gal-column');
-        const basePath = 'assets/images/gallary-images/';
         const BATCH_SIZE = 18;
-        let renderedCount = 0;
 
-        function renderBatch() {
-            const next = galleryImages.slice(renderedCount, renderedCount + BATCH_SIZE);
-            next.forEach((item, i) => {
-                const globalIndex = renderedCount + i;
-                const card = document.createElement('div');
-                card.className = 'gal-img-card';
+        function hiddenCardsByIndex() {
+            return Array.from(wrapper.querySelectorAll('.gal-img-card[hidden]'))
+                .sort((a, b) => Number(a.dataset.index) - Number(b.dataset.index));
+        }
 
-                const img = document.createElement('img');
-                img.src = basePath + encodeURIComponent(item.file);
-                img.alt = 'Eduooz campus gallery photo';
-                img.width = item.w;
-                img.height = item.h;
-                img.loading = globalIndex < 6 ? 'eager' : 'lazy';
+        function revealBatch() {
+            const remaining = hiddenCardsByIndex();
+            remaining.slice(0, BATCH_SIZE).forEach((card) => card.removeAttribute('hidden'));
 
-                card.appendChild(img);
-                columns[globalIndex % columns.length].appendChild(card);
-            });
-            renderedCount += next.length;
-
-            if (renderedCount >= galleryImages.length) {
+            if (remaining.length <= BATCH_SIZE) {
                 showMoreBtn.setAttribute('hidden', '');
             }
 
@@ -134,9 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        showMoreBtn.addEventListener('click', renderBatch);
+        if (hiddenCardsByIndex().length === 0) {
+            showMoreBtn.setAttribute('hidden', '');
+        }
 
-        renderBatch(); // initial batch
+        showMoreBtn.addEventListener('click', revealBatch);
     }
     initGalleryWall();
 
@@ -187,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Fast Column (Moves Up Faster)
         gsap.to(".col-fast", {
-            yPercent: -40, 
+            y: -120,
             ease: "none",
             scrollTrigger: {
                 trigger: ".gallery-wall-section",
@@ -199,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Slow Column (Moves Up Slower)
         gsap.to(".col-slow", {
-            yPercent: -15, 
+            y: -50,
             ease: "none",
             scrollTrigger: {
                 trigger: ".gallery-wall-section",
@@ -211,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Medium Column (Moves Up Normal)
         gsap.to(".col-medium", {
-            yPercent: -25, 
+            y: -85,
             ease: "none",
             scrollTrigger: {
                 trigger: ".gallery-wall-section",
@@ -261,48 +189,164 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- 4. Cinematic Lightbox Logic ---
-    const lightbox = document.getElementById('gallery-lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const closeBtn = document.getElementById('lightbox-close');
-    const galleryWallWrapper = document.getElementById('galleryWallWrapper');
+    function initLightbox() {
+        const lightbox = document.getElementById('gallery-lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const closeBtn = document.getElementById('lightbox-close');
+        const prevBtn = document.getElementById('lightbox-prev');
+        const nextBtn = document.getElementById('lightbox-next');
+        const wrapper = document.getElementById('galleryWallWrapper');
+        if (!lightbox || !lightboxImg || !closeBtn || !prevBtn || !nextBtn || !wrapper) return;
 
-    // Open Lightbox (delegated so images added later via "Show More" work too)
-    if (galleryWallWrapper) {
-        galleryWallWrapper.addEventListener('click', (e) => {
-            const img = e.target.closest('.gal-img-card img');
+        // Full, ordered list of gallery cards (matches visual left-to-right, row-by-row order)
+        // so Prev/Next can walk through every gallery image, including ones still hidden
+        // behind "Show More".
+        const cards = Array.from(wrapper.querySelectorAll('.gal-img-card'))
+            .sort((a, b) => Number(a.dataset.index) - Number(b.dataset.index));
+
+        cards.forEach((card) => {
+            const img = card.querySelector('img');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', `View image: ${(img && img.alt) || 'gallery photo'}`);
+        });
+
+        let currentIndex = -1;
+        let lastFocusedEl = null;
+
+        function renderCurrent() {
+            const card = cards[currentIndex];
+            const img = card.querySelector('img');
             if (!img) return;
-            const highResSrc = img.getAttribute('src');
-            lightboxImg.src = highResSrc;
-            lightbox.classList.add('active');
+            lightboxImg.src = img.getAttribute('src');
+            lightboxImg.alt = img.getAttribute('alt') || '';
+        }
 
-            // Pause Lenis scrolling while lightbox is open
-            if(window.lenis) window.lenis.stop();
+        function showNext() {
+            if (currentIndex === -1) return;
+            currentIndex = (currentIndex + 1) % cards.length;
+            renderCurrent();
+        }
+
+        function showPrev() {
+            if (currentIndex === -1) return;
+            currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+            renderCurrent();
+        }
+
+        function trapFocus(e) {
+            const focusable = [closeBtn, prevBtn, nextBtn];
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            } else if (e.key === 'ArrowRight') {
+                showNext();
+            } else if (e.key === 'ArrowLeft') {
+                showPrev();
+            } else if (e.key === 'Tab') {
+                trapFocus(e);
+            }
+        }
+
+        function preventWheel(e) {
+            e.preventDefault();
+        }
+
+        let touchStartX = 0;
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].clientX;
+        }
+        function handleTouchEnd(e) {
+            const delta = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(delta) > 50) {
+                if (delta < 0) showNext(); else showPrev();
+            }
+        }
+
+        function openLightbox(index) {
+            currentIndex = index;
+            lastFocusedEl = document.activeElement;
+            renderCurrent();
+
+            lightbox.classList.add('active');
+            lightbox.setAttribute('aria-hidden', 'false');
+
+            // Pause Lenis smooth-scroll and native wheel scrolling while lightbox is open
+            if (window.lenis) window.lenis.stop();
+            document.body.style.overflow = 'hidden';
+
+            document.addEventListener('keydown', handleKeydown);
+            lightbox.addEventListener('wheel', preventWheel, { passive: false });
+            lightbox.addEventListener('touchstart', handleTouchStart, { passive: true });
+            lightbox.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+            closeBtn.focus();
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lightbox.setAttribute('aria-hidden', 'true');
+
+            // Resume Lenis scrolling
+            if (window.lenis) window.lenis.start();
+            document.body.style.overflow = '';
+
+            document.removeEventListener('keydown', handleKeydown);
+            lightbox.removeEventListener('wheel', preventWheel);
+            lightbox.removeEventListener('touchstart', handleTouchStart);
+            lightbox.removeEventListener('touchend', handleTouchEnd);
+
+            setTimeout(() => { lightboxImg.src = ""; }, 400); // Clear image after fade out
+
+            if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
+                lastFocusedEl.focus();
+            }
+            currentIndex = -1;
+        }
+
+        // Open Lightbox (delegated so cards revealed later via "Show More" still work)
+        wrapper.addEventListener('click', (e) => {
+            const card = e.target.closest('.gal-img-card');
+            if (!card) return;
+            const index = cards.indexOf(card);
+            if (index === -1) return;
+            openLightbox(index);
+        });
+
+        // Keyboard activation (Enter / Space) for focused gallery cards
+        wrapper.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const card = e.target.closest('.gal-img-card');
+            if (!card) return;
+            e.preventDefault();
+            const index = cards.indexOf(card);
+            if (index === -1) return;
+            openLightbox(index);
+        });
+
+        closeBtn.addEventListener('click', closeLightbox);
+        prevBtn.addEventListener('click', showPrev);
+        nextBtn.addEventListener('click', showNext);
+
+        lightbox.addEventListener('click', (e) => {
+            // Close if clicking outside the image
+            if (e.target === lightbox || e.target.classList.contains('lightbox-content')) {
+                closeLightbox();
+            }
         });
     }
-
-    // Close Lightbox
-    const closeLightbox = () => {
-        lightbox.classList.remove('active');
-        setTimeout(() => { lightboxImg.src = ""; }, 400); // Clear image after fade out
-        
-        // Resume Lenis scrolling
-        if(window.lenis) window.lenis.start();
-    };
-
-    closeBtn.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-        // Close if clicking outside the image
-        if(e.target === lightbox || e.target.classList.contains('lightbox-content')) {
-            closeLightbox();
-        }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape' && lightbox.classList.contains('active')) {
-            closeLightbox();
-        }
-    });
+    initLightbox();
 
     function initFooterAnimation() {
         let mmFooter = gsap.matchMedia();

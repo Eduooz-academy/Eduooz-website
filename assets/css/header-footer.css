@@ -771,10 +771,12 @@
 }
 
 @media (max-width: 1024px) {
-  .glass-header {
+  .glass-header,
+  .glass-header.container {
     left: 0;
     top: 0;
     width: 100%;
+    max-width: 100%;
     border-radius: 0;
     padding: 10px 20px;
     height: 70px;
@@ -797,7 +799,7 @@
     -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
     justify-content: flex-start;
-    align-items: stretch;
+    align-items: center;
     gap: 0;
     z-index: 1000;
     transform: translateX(-100%);
@@ -817,11 +819,11 @@
     font-size: 1.02rem;
     font-weight: 600;
     color: var(--brand-dark) !important;
-    text-align: left;
+    text-align: center;
   }
 
   /* Every top-level entry (plain link or dropdown trigger) shares one
-     alignment system: a full-width, left-aligned, equal-height row. */
+     alignment system: a full-width, centered, equal-height row. */
   .nav-links > a,
   .nav-links > .nav-item.dropdown {
     display: block;
@@ -832,7 +834,7 @@
   .nav-item.dropdown > a {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 12px;
     width: 100%;
     min-height: 52px;
