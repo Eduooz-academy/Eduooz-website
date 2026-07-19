@@ -747,6 +747,9 @@ body {
 
 /* Tablet / small desktop: stack to single column */
 @media (max-width: 1024px) {
+  .course-hero-content{
+    margin-top:10px;
+  }
   .course-hero-section {
     padding: 90px 0 70px;
   }
@@ -6442,60 +6445,105 @@ body {
   border-radius: 50px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  scrollbar-width: thin;
-  scrollbar-color: var(--brand-purple, #5b21b6) rgba(91, 33, 182, 0.18);
+  /* Native scrollbar is fully hidden — the floating progress indicator
+     below the tab row (.syl-scroll-progress) replaces it entirely. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.syllabus-tabs-nav:hover {
-  scrollbar-color: var(--brand-cyan, #06b6d4) rgba(6, 182, 212, 0.18);
+.syllabus-tabs-nav::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .syllabus-tabs-nav.is-overflowing {
   justify-content: flex-start;
-}
-
-.syllabus-tabs-nav::-webkit-scrollbar {
-  height: 2px;
-}
-
-.syllabus-tabs-nav::-webkit-scrollbar-track {
-  background: linear-gradient(
-    90deg,
-    rgba(91, 33, 182, 0.12) 0%,
-    rgba(6, 182, 212, 0.1) 100%
+  /* Edge fade masks: hint that more tabs exist off-screen instead of a scrollbar. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
   );
-  border-radius: 999px;
-  margin: 0 64px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
 }
 
-.syllabus-tabs-nav::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #5b21b6 0%, #06b6d4 100%);
+/* --- Floating scroll progress indicator ---
+   A small centered pill below the tab row, standing in for the browser
+   scrollbar. Its width/position (set inline by JS) reflect how much of the
+   tab strip is visible and how far the user has scrolled through it. */
+.syl-scroll-progress {
+  display: flex;
+  justify-content: center;
+  height: 4px;
+  margin: 10px auto 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.syl-scroll-progress.is-visible {
+  opacity: 1;
+  /* Only the track/thumb re-enable pointer-events (below); the rest of the
+     row stays click-through so it never blocks anything underneath it. */
+}
+
+.syl-scroll-progress-track {
+  position: relative;
+  display: block;
+  width: 160px;
+  height: 4px;
   border-radius: 999px;
-  border: none;
-  background-clip: padding-box;
-  box-shadow: 0 0 6px rgba(91, 33, 182, 0.35);
+  background: rgba(109, 40, 217, 0.08);
+}
+
+.syl-scroll-progress.is-visible .syl-scroll-progress-track {
+  pointer-events: auto;
+}
+
+.syl-scroll-progress-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 100%);
+  box-shadow:
+    0 0 8px rgba(139, 92, 246, 0.55),
+    0 1px 3px rgba(109, 40, 217, 0.35);
   transition:
-    box-shadow 0.3s ease,
-    filter 0.3s ease;
+    transform 0.2s ease-out,
+    width 0.25s ease;
+  cursor: grab;
 }
 
-.syllabus-tabs-nav:hover::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    135deg,
-    var(--brand-cyan, #06b6d4) 0%,
-    rgba(6, 182, 212, 0.85) 100%
-  );
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.35);
+/* Larger invisible hit area so the 4px-tall thumb is easy to grab with a
+   mouse, without changing its visible size. */
+.syl-scroll-progress-thumb::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: 0;
+  right: 0;
 }
 
-.syllabus-tabs-nav:hover::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    45deg,
-    var(--brand-cyan, #06b6d4) 0%,
-    rgba(6, 182, 212, 0.9) 100%
-  );
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-  filter: brightness(1.08);
+.syl-scroll-progress.is-dragging .syl-scroll-progress-thumb {
+  cursor: grabbing;
+  transition: none;
+}
+
+.syllabus-tabs-nav.syl-scroll-no-smooth {
+  scroll-behavior: auto;
 }
 
 /* --- Individual tab button --- */
@@ -9322,9 +9370,10 @@ a.pex-paper-card {
   opacity: 0.5;
 }
 .coming-soon-block span {
-  font-size: 1rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  color: black;
 }
 
 /* ── RESPONSIVE ── */
@@ -9785,7 +9834,7 @@ a.pex-paper-card {
 }
 .mts-topic-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   width: 100%;
   padding: 8px 10px;
@@ -9827,9 +9876,11 @@ a.pex-paper-card {
   font-size: 0.83rem;
   font-weight: 700;
   color: #475569;
-  white-space: nowrap;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .mts-topic-item-bar {
   display: block;
@@ -15841,4 +15892,388 @@ body.qp-modal-open {
 }
 .ps-mat-dl {
   color: #8b5cf6;
+}
+
+/* ===========================================
+   SYLLABUS COMPONENT — single shared stylesheet
+   Used by every course landing page's Syllabus section.
+   Structure: Level 1 tabs -> Level 2 accordion -> optional Level 3 accordion.
+   Visual language matches the site's existing syllabus tab/panel design
+   (pill tab nav, frosted panel card, accent border) so every page reads
+   as one consistent system.
+   Paired with assets/js/syllabus.js
+   =========================================== */
+
+.syllabus-tabs {
+  width: 100%;
+}
+
+/* ---- Level 1: Tabs (pill nav, matches .syllabus-tabs-nav elsewhere on the site) ----
+   Single row, horizontally scrollable — matches the rest of the site's syllabus
+   tab strips instead of wrapping onto multiple lines. */
+.syllabus-tablist {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+  padding: 12px;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  background: rgba(91, 33, 182, 0.06);
+  border: 1px solid rgba(91, 33, 182, 0.12);
+  border-radius: 50px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  /* Native scrollbar is hidden — the floating progress indicator below
+     the tab row (.syllabus-scroll-progress) replaces it. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.syllabus-tablist::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.syllabus-tablist.is-overflowing {
+  justify-content: flex-start;
+  /* Edge fade masks: hint that more tabs exist off-screen instead of a scrollbar. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+}
+
+.syllabus-tablist.syllabus-scroll-no-smooth {
+  scroll-behavior: auto;
+}
+
+/* --- Floating scroll progress indicator ---
+   A small centered pill below the tab row, standing in for the browser
+   scrollbar. Its width/position (set inline by JS) reflect how much of the
+   tab strip is visible and how far the user has scrolled through it. */
+.syllabus-scroll-progress {
+  display: flex;
+  justify-content: center;
+  height: 4px;
+  margin: 10px auto 28px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.syllabus-scroll-progress.is-visible {
+  opacity: 1;
+}
+
+.syllabus-scroll-progress-track {
+  position: relative;
+  display: block;
+  width: 160px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(109, 40, 217, 0.08);
+}
+
+.syllabus-scroll-progress.is-visible .syllabus-scroll-progress-track {
+  pointer-events: auto;
+}
+
+.syllabus-scroll-progress-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 100%);
+  box-shadow:
+    0 0 8px rgba(139, 92, 246, 0.55),
+    0 1px 3px rgba(109, 40, 217, 0.35);
+  transition:
+    transform 0.2s ease-out,
+    width 0.25s ease;
+  cursor: grab;
+}
+
+.syllabus-scroll-progress-thumb::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+}
+
+.syllabus-scroll-progress.is-dragging .syllabus-scroll-progress-thumb {
+  cursor: grabbing;
+  transition: none;
+}
+
+.syllabus-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 15px;
+  border: 0;
+  border-radius: 45px;
+  background: transparent;
+  color: #64748b;
+  font-family: var(--font-main, "Plus Jakarta Sans", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.syllabus-tab:hover {
+  color: var(--brand-purple, #5b21b6);
+  background: rgba(91, 33, 182, 0.06);
+}
+
+.syllabus-tab.active {
+  background: var(--brand-purple, #5b21b6);
+  color: #fff;
+  box-shadow:
+    0 2px 12px rgba(91, 33, 182, 0.16),
+    0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.syllabus-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 40px;
+  color: var(--brand-purple, #5b21b6);
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.syllabus-tab.active .syllabus-tab-icon {
+  color: #fff;
+}
+
+/* ---- Panels (frosted card, matches .syl-panel-inner elsewhere) ---- */
+.syllabus-panels {
+  position: relative;
+}
+
+.syllabus-panel {
+  display: none;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(91, 33, 182, 0.08);
+  border-top: 3px solid var(--brand-cyan, #06b6d4);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.05);
+  padding: 32px 36px;
+}
+
+.syllabus-panel.active {
+  display: block;
+  animation: syllabus-panel-in 0.38s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes syllabus-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Level 2 / Level 3: Accordion (same styling at every level) ---- */
+.syllabus-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.syllabus-accordion-item {
+  border-bottom: 1px solid rgba(91, 33, 182, 0.1);
+}
+
+.syllabus-accordion-item h3,
+.syllabus-accordion-item h4 {
+  margin: 0;
+}
+
+.syllabus-accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 4px;
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-family: var(--font-main, "Plus Jakarta Sans", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.syllabus-accordion-trigger:hover {
+  color: var(--brand-purple, #5b21b6);
+}
+
+.syllabus-accordion-icon {
+  flex-shrink: 0;
+  color: #0f172a;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.syllabus-accordion-trigger:hover .syllabus-accordion-icon {
+  color: var(--brand-purple, #5b21b6);
+}
+
+.syllabus-accordion-item.is-open > h3 > .syllabus-accordion-trigger
+  .syllabus-accordion-icon,
+.syllabus-accordion-item.is-open > h4 > .syllabus-accordion-trigger
+  .syllabus-accordion-icon,
+.syllabus-accordion-item.is-open > .syllabus-accordion-trigger
+  .syllabus-accordion-icon {
+  transform: rotate(180deg);
+}
+
+.syllabus-accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.2s ease;
+}
+
+.syllabus-accordion-item.is-open > .syllabus-accordion-content {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.syllabus-accordion-inner {
+  overflow: hidden;
+  padding: 0 4px 18px;
+}
+
+/* Nested (level 3) accordion sits inside a level-2 accordion-inner —
+   same component, indented via a left border so depth reads visually
+   without needing per-level style forks. */
+.syllabus-accordion-inner .syllabus-accordion {
+  margin-top: 4px;
+  padding-left: 18px;
+  border-left: 2px solid rgba(91, 33, 182, 0.12);
+}
+
+/* ---- List content (leaf level) ---- */
+.syllabus-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.syllabus-list-item {
+  padding: 14px 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #64748b;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
+}
+
+.syllabus-list-item:hover {
+  padding-left: 4px;
+}
+
+.syllabus-list-item:last-child {
+  border-bottom: none;
+}
+
+.syllabus-list-item i {
+  color: var(--brand-cyan, #06b6d4);
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  margin-top: 7px;
+  transition: color 0.2s ease;
+}
+
+/* ---- Note banner + CTA (unchanged look, kept in the same stylesheet) ---- */
+.syllabus-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 28px 0 0;
+  padding: 18px 24px;
+  background: rgba(6, 182, 212, 0.07);
+  border-left: 4px solid var(--brand-cyan, #06b6d4);
+  border-radius: 0 10px 10px 0;
+}
+
+.syllabus-note i {
+  color: var(--brand-cyan, #06b6d4);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.syllabus-note p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.97rem;
+  line-height: 1.65;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .syllabus-tablist {
+    padding: 8px;
+  }
+
+  .syllabus-tab {
+    padding: 8px 14px;
+    font-size: 0.88rem;
+  }
+
+  .syllabus-panel {
+    padding: 24px 20px;
+    border-radius: 24px;
+  }
+
+  .syllabus-accordion-inner {
+    padding: 0 0 16px;
+  }
 }

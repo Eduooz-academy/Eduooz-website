@@ -3436,6 +3436,33 @@ transform: translateY(20px);
 }
 
 /* --- Infinite Typographic River (Light Silver) --- */
+.faculty-banner-wrapper {
+  width: 100%;
+  margin: 0 auto;
+}
+.faculty-banner-img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+.faculty-banner-mobile {
+  display: none;
+}
+.faculty-banner-desktop {
+  display: block;
+}
+@media (max-width: 768px) {
+  .faculty-banner-mobile {
+    display: block;
+  }
+  .faculty-banner-desktop {
+    display: none;
+  }
+}
+.fac-banner-cta {
+  margin-top: 32px;
+}
+
 .marquee-wrapper {
   position: absolute;
   top: 25%;
@@ -4211,6 +4238,7 @@ transform: translateY(20px);
 .achiever-track {
   display: flex;
   width: 100%;
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .achiever-slide {
@@ -4218,6 +4246,38 @@ transform: translateY(20px);
   position: relative;
   aspect-ratio: 16 / 7;
   min-height: 450px;
+}
+
+.achiever-dots {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.achiever-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(91, 33, 182, 0.25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.achiever-dot.active {
+  width: 28px;
+  border-radius: 6px;
+  background: var(--brand-purple);
+}
+
+@media (max-width: 768px) {
+  .achiever-dots {
+    margin-top: 12px;
+  }
 }
 
 .slide-image-wrapper {

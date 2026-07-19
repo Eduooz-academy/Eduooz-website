@@ -172,35 +172,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     },
   });
-
-  // --- Rank Holder Filter Tabs ---
-  const rankSection = document.querySelector(".placement-other-rank");
-  if (rankSection) {
-    const rankTabs = rankSection.querySelectorAll(
-      ".rank-filter-tabs .filter-tab",
-    );
-    const rankCards = rankSection.querySelectorAll(".rank-img-card");
-
-    function updateRankFilter(filterValue) {
-      rankTabs.forEach((tab) => {
-        tab.classList.toggle("active", tab.dataset.filter === filterValue);
-      });
-
-      rankCards.forEach((card) => {
-        const cardTopic = card.dataset.filterTopic;
-        const shouldShow = filterValue === "all" || cardTopic === filterValue;
-        card.classList.toggle("is-hidden", !shouldShow);
-      });
-    }
-
-    rankTabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const selectedFilter = tab.dataset.filter;
-        if (!selectedFilter) return;
-        updateRankFilter(selectedFilter);
-      });
-    });
-
-    updateRankFilter("all");
-  }
 });

@@ -99,8 +99,9 @@ JLA
 CRE
 RRB
 
+# german #
 
-
+german language
 
 
 Nursing  = 11 + 13 + 7 = 31
@@ -109,7 +110,9 @@ Pharmacy = 7 + 5 + 4 + 3 = 19
 
 MLT = 5 + 2 = 7
 
-Total  = 57
+german = 1
+
+Total  = 58
 
 
 
@@ -143,7 +146,17 @@ google-reviews.js script tag injected after course-landing.js
 
 
 
+Future updates
 
+When a new Previous Question Paper PDF is added:
+
+1. Upload the PDF to the existing `assets/Prev.Qn.papers/` folder.
+2. Update the corresponding `.qp-card`:
+   - Set `data-pdf` to the PDF path.
+   - Set `data-download` to the same PDF path.
+3. Change the badge text from `Coming Soon` to `Preview Available`.
+4. Ensure the preview and download work correctly.
+5. Do not modify any CSS or JavaScript. Reuse the existing implementation and logic.
 
 
 

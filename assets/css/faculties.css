@@ -76,10 +76,52 @@ body {
 /* =========================================
    HERO SECTION
    ========================================= */
+
+
+   /* --- 1. Hero Section --- */
+.fac-hero {
+  position: relative;
+  min-height: 100vh;
+  background-image: url('../images/optimized/faculty-banner-landscap.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding-top: 100px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .fac-hero {
+    background-image: url('../images/optimized/faculty-banner-portrait.png');
+    background-position: top center;
+  }
+}
+
+/* Ensure the mesh isn't too tall or overlapping */
+.fac-hero .gradient-mesh-bg {
+  height: 100vh;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.hero-title {
+  font-size: clamp(3.5rem, 6vw, 6rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+  letter-spacing: -2px;
+}
+
 .fac-hero {
   position: relative;
   padding: 180px 0 100px;
-  text-align: center;
+  text-align: left;
   z-index: 10;
   overflow: hidden;
 }
@@ -176,7 +218,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
-  margin-top: 16px;
+  margin-top: 56px;
 }
 
 /* =========================================

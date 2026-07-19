@@ -770,7 +770,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.addEventListener("DOMContentLoaded", () => {
+  (() => {
     // --- 1. GSAP Scroll Trigger for Section Entrance ---
     gsap.registerPlugin(ScrollTrigger);
 
@@ -1036,7 +1036,7 @@ document.addEventListener("DOMContentLoaded", () => {
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
-  });
+  })();
 
   // --- 6. GSAP Hybrid About Section Reveal ---
 
@@ -3355,4 +3355,49 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
+
+  // Achievers spotlight: horizontal image carousel with dots
+  (function initAchieverCarousel() {
+    var track = document.getElementById("achieverTrack");
+    var dotsEl = document.getElementById("achieverDots");
+    if (!track || !dotsEl) return;
+
+    var slides = track.querySelectorAll(".achiever-slide");
+    if (slides.length < 2) return;
+
+    var current = 0;
+    var autoplayTimer = null;
+
+    slides.forEach(function (_, i) {
+      var dot = document.createElement("button");
+      dot.className = "achiever-dot" + (i === 0 ? " active" : "");
+      dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+      dot.addEventListener("click", function () {
+        goToSlide(i);
+        restartAutoplay();
+      });
+      dotsEl.appendChild(dot);
+    });
+
+    var dots = dotsEl.querySelectorAll(".achiever-dot");
+
+    function goToSlide(index) {
+      current = index;
+      track.style.transform = "translateX(-" + current * 100 + "%)";
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle("active", i === current);
+      });
+    }
+
+    function nextSlide() {
+      goToSlide((current + 1) % slides.length);
+    }
+
+    function restartAutoplay() {
+      if (autoplayTimer) window.clearInterval(autoplayTimer);
+      autoplayTimer = window.setInterval(nextSlide, 4500);
+    }
+
+    restartAutoplay();
+  })();
 });

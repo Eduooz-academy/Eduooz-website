@@ -57,4 +57,28 @@ document.addEventListener("DOMContentLoaded", () => {
       closeLightbox();
     }
   });
+
+  // --- Scroll to Top Button ---
+  const scrollTopBtn = document.getElementById("scrollTopBtn");
+  if (scrollTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 500) {
+        scrollTopBtn.classList.add("visible");
+      } else {
+        scrollTopBtn.classList.remove("visible");
+      }
+    });
+
+    scrollTopBtn.addEventListener("click", () => {
+      // Use Lenis smooth scroll if available, otherwise native
+      if (window.lenis) {
+        window.lenis.scrollTo(0, {
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+  }
 });

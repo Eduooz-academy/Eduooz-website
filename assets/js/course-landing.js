@@ -2540,502 +2540,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  // --- 10. RENDER PREVIOUS PAPERS (PDF EXPLORER) ---
-  // Loads from /question-papers/papers.json; falls back to CONFIG.previousPapers
-  function renderPapers() {
-    var grid = document.getElementById("pex-paper-grid");
-    if (!grid) return;
-
-    var examSlug = CONFIG.examSlug || "aiims-norcet";
-
-    /* ── Resolve papers.json URL relative to current page ── */
-    var jsonPath = (function () {
-      var depth = window.location.pathname.split("/").filter(Boolean).length;
-      var prefix = "";
-      for (var i = 0; i < depth; i++) prefix += "../";
-      return prefix + "question-papers/papers.json";
-    })();
-
-    fetch(jsonPath)
-      .then(function (r) {
-        if (!r.ok) throw new Error("fetch failed");
-        return r.json();
-      })
-      .then(function (data) {
-        var allPapers = (data.papers || []).filter(function (p) {
-          return p.examSlug === examSlug;
-        });
-        // Enrich with meta field for display if missing
-        allPapers.forEach(function (p) {
-          if (!p.meta) {
-            var parts = [];
-            if (p.questionCount) parts.push(p.questionCount + " MCQs");
-            if (p.duration) parts.push(p.duration);
-            p.meta = parts.join(" · ");
-          }
-        });
-        initPaperExplorer(allPapers);
-      })
-      .catch(function () {
-        // Graceful fallback to EXAM_CONFIG inline data
-        var fallback = CONFIG.previousPapers || [];
-        initPaperExplorer(fallback);
-      });
-
-    function initPaperExplorer(papers) {
-      var emptyEl = document.getElementById("pex-empty");
-      var iframe = document.getElementById("pex-iframe");
-      var skeleton = document.getElementById("pex-skeleton");
-      var locked = document.getElementById("pex-locked-state");
-      var infoYear = document.getElementById("pex-info-year");
-      var infoTitle = document.getElementById("pex-info-title");
-      var dlBtn = document.getElementById("pex-download-btn");
-      var zoomLbl = document.getElementById("pex-zoom-label");
-      var tabsEl = document.getElementById("pex-tabs");
-
-      var activePaper = null;
-      var currentZoom = 100;
-      var activeYear = "all";
-      var searchQuery = "";
-
-      /* ── Auto-generate year filter tabs from data ── */
-      if (tabsEl) {
-        var years = papers
-          .map(function (p) {
-            return p.year;
-          })
-          .filter(function (y, i, a) {
-            return a.indexOf(y) === i;
-          })
-          .sort()
-          .reverse();
-
-        tabsEl.innerHTML =
-          '<button class="pex-tab active" data-year="all">All Years</button>' +
-          years
-            .map(function (y) {
-              return (
-                '<button class="pex-tab" data-year="' +
-                y +
-                '">' +
-                y +
-                "</button>"
-              );
-            })
-            .join("");
-      }
-
-      /* ── Zoom ── */
-      function setZoom(z) {
-        currentZoom = Math.max(60, Math.min(200, z));
-        if (iframe) {
-          iframe.style.transform = "scale(" + currentZoom / 100 + ")";
-          iframe.style.transformOrigin = "top center";
-        }
-        if (zoomLbl) zoomLbl.textContent = currentZoom + "%";
-      }
-      var zIn = document.getElementById("pex-zoom-in");
-      var zOut = document.getElementById("pex-zoom-out");
-      if (zIn)
-        zIn.addEventListener("click", function () {
-          setZoom(currentZoom + 20);
-        });
-      if (zOut)
-        zOut.addEventListener("click", function () {
-          setZoom(currentZoom - 20);
-        });
-
-      /* ── Fullscreen ── */
-      var fsBtn = document.getElementById("pex-fullscreen-btn");
-      if (fsBtn) {
-        fsBtn.addEventListener("click", function () {
-          var card = document.getElementById("pex-preview-card");
-          if (!card) return;
-          if (document.fullscreenElement) {
-            document.exitFullscreen();
-            fsBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-          } else {
-            if (card.requestFullscreen) card.requestFullscreen();
-            fsBtn.innerHTML = '<i class="fa-solid fa-compress"></i>';
-          }
-        });
-      }
-
-      /* ── Load PDF preview ── */
-      function loadPreview(paper) {
-        if (!skeleton || !locked || !iframe) return;
-        locked.classList.remove("pex-show");
-        iframe.classList.remove("pex-loaded");
-        skeleton.classList.remove("pex-hidden");
-
-        if (!paper.pdfUrl) {
-          setTimeout(function () {
-            skeleton.classList.add("pex-hidden");
-            var locTitle = document.getElementById("pex-locked-title");
-            var locSub = document.getElementById("pex-locked-sub");
-            if (locTitle)
-              locTitle.textContent = paper.shortTitle || paper.title;
-            if (locSub)
-              locSub.textContent = "Enroll to access and download this paper.";
-            locked.classList.add("pex-show");
-          }, 480);
-          return;
-        }
-
-        iframe.src = "";
-        setTimeout(function () {
-          iframe.onload = function () {
-            skeleton.classList.add("pex-hidden");
-            iframe.classList.add("pex-loaded");
-          };
-          iframe.src = paper.pdfUrl;
-        }, 100);
-      }
-
-      /* ── Select paper ── */
-      function selectPaper(paper) {
-        activePaper = paper;
-        if (infoYear)
-          infoYear.textContent =
-            paper.year + (paper.shift ? " · " + paper.shift : "");
-        if (infoTitle) infoTitle.textContent = paper.shortTitle || paper.title;
-
-        grid.querySelectorAll(".pex-paper-card").forEach(function (c) {
-          c.classList.toggle("pex-active", c.dataset.id === paper.id);
-        });
-
-        if (dlBtn) {
-          if (paper.pdfUrl) {
-            dlBtn.href = paper.pdfUrl;
-            dlBtn.setAttribute("target", "_blank");
-            dlBtn.style.opacity = "";
-            dlBtn.style.pointerEvents = "";
-          } else {
-            dlBtn.href = "#";
-            dlBtn.removeAttribute("target");
-            dlBtn.style.opacity = "0.38";
-            dlBtn.style.pointerEvents = "none";
-          }
-        }
-
-        // Update URL to paper SEO page using history API (shareable, crawlable)
-        if (paper.slug && window.history && window.history.pushState) {
-          var paperUrl = "/question-papers/" + paper.slug + "/";
-          window.history.replaceState(
-            { paperId: paper.id },
-            paper.title,
-            paperUrl,
-          );
-        }
-
-        loadPreview(paper);
-      }
-
-      /* ── Render cards ── */
-      function renderCards(list) {
-        if (list.length === 0) {
-          grid.innerHTML = "";
-          if (emptyEl) emptyEl.classList.add("pex-show");
-          return;
-        }
-        if (emptyEl) emptyEl.classList.remove("pex-show");
-
-        grid.innerHTML = list
-          .map(function (paper, i) {
-            var isActive = activePaper && activePaper.id === paper.id;
-            var seoHref = paper.slug
-              ? "/question-papers/" + paper.slug + "/"
-              : "#";
-            return (
-              '<div class="pex-paper-card' +
-              (isActive ? " pex-active" : "") +
-              '"' +
-              ' data-id="' +
-              paper.id +
-              '"' +
-              ' style="animation-delay:' +
-              i * 0.05 +
-              's">' +
-              '<div class="pex-card-top">' +
-              '<div class="pex-card-icon"><i class="fa-solid fa-file-pdf"></i></div>' +
-              '<span class="pex-year-badge">' +
-              paper.year +
-              "</span>" +
-              "</div>" +
-              '<h4 class="pex-card-title">' +
-              (paper.shortTitle || paper.title) +
-              "</h4>" +
-              '<p class="pex-card-meta"><i class="fa-regular fa-file-lines"></i> ' +
-              (paper.meta || "") +
-              (paper.pages ? " · " + paper.pages + " pages" : "") +
-              "</p>" +
-              '<div class="pex-card-footer">' +
-              '<div class="pex-active-chip"><i class="fa-solid fa-eye"></i> Previewing</div>' +
-              '<a class="pex-seo-link" href="' +
-              seoHref +
-              '" title="Full page for ' +
-              (paper.shortTitle || paper.title) +
-              '"' +
-              ' onclick="event.stopPropagation()">' +
-              '<i class="fa-solid fa-arrow-up-right-from-square"></i>' +
-              "</a>" +
-              "</div>" +
-              "</div>"
-            );
-          })
-          .join("");
-
-        grid.querySelectorAll(".pex-paper-card").forEach(function (card) {
-          card.addEventListener("click", function () {
-            var id = card.dataset.id;
-            var found = papers.filter(function (p) {
-              return p.id === id;
-            })[0];
-            if (found) selectPaper(found);
-          });
-        });
-      }
-
-      /* ── Filter ── */
-      function applyFilter() {
-        var filtered = papers.slice();
-        if (activeYear !== "all") {
-          filtered = filtered.filter(function (p) {
-            return p.year === activeYear;
-          });
-        }
-        if (searchQuery) {
-          var q = searchQuery;
-          filtered = filtered.filter(function (p) {
-            return (
-              (p.title || "").toLowerCase().indexOf(q) !== -1 ||
-              (p.shortTitle || "").toLowerCase().indexOf(q) !== -1 ||
-              (p.year || "").indexOf(q) !== -1 ||
-              (p.shift || "").toLowerCase().indexOf(q) !== -1
-            );
-          });
-        }
-        renderCards(filtered);
-        var stillVisible = filtered.some(function (p) {
-          return activePaper && p.id === activePaper.id;
-        });
-        if (filtered.length && !stillVisible) selectPaper(filtered[0]);
-      }
-
-      /* ── Tab listeners (bound on live DOM after tab build) ── */
-      function bindTabs() {
-        var tabs = document.querySelectorAll("#pex-tabs .pex-tab");
-        tabs.forEach(function (tab) {
-          tab.addEventListener("click", function () {
-            tabs.forEach(function (t) {
-              t.classList.remove("active");
-            });
-            tab.classList.add("active");
-            activeYear = tab.dataset.year;
-            applyFilter();
-          });
-        });
-      }
-      bindTabs();
-
-      /* ── Search listener ── */
-      var searchInput = document.getElementById("pex-search");
-      if (searchInput) {
-        searchInput.addEventListener("input", function () {
-          searchQuery = searchInput.value.toLowerCase().trim();
-          applyFilter();
-        });
-      }
-
-      /* ── Init ── */
-      renderCards(papers);
-      if (papers.length) selectPaper(papers[0]);
-
-      // Restore scroll position on browser back
-      window.addEventListener("popstate", function (e) {
-        if (e.state && e.state.paperId) {
-          var found = papers.filter(function (p) {
-            return p.id === e.state.paperId;
-          })[0];
-          if (found) selectPaper(found);
-        }
-      });
-    }
-  }
-
-  // --- 10b. STATIC PAPER EXPLORER (for pages with manually-written paper cards) ---
-  function initStaticPaperExplorer() {
-    var grid = document.querySelector(".pex-paper-grid");
-    if (!grid || grid.id === "pex-paper-grid") return;
-
-    var iframe = document.getElementById("pex-iframe");
-    var skeleton = document.getElementById("pex-skeleton");
-    var locked = document.getElementById("pex-locked-state");
-    var lockedTitle = document.getElementById("pex-locked-title");
-    var lockedSub = document.getElementById("pex-locked-sub");
-    var infoYear = document.getElementById("pex-info-year");
-    var infoTitle = document.getElementById("pex-info-title");
-    var dlBtn = document.getElementById("pex-download-btn");
-    var zoomLbl = document.getElementById("pex-zoom-label");
-    var tabsEl = document.querySelector(".pex-tabs");
-    var searchEl = document.getElementById("pex-search");
-    var emptyEl = document.getElementById("pex-empty");
-    var currentZoom = 100;
-
-    if (locked) locked.classList.add("pex-show");
-    if (skeleton) skeleton.classList.add("pex-hidden");
-
-    var zIn = document.getElementById("pex-zoom-in");
-    var zOut = document.getElementById("pex-zoom-out");
-    function setZoom(z) {
-      currentZoom = Math.max(60, Math.min(200, z));
-      if (iframe) {
-        iframe.style.transform = "scale(" + currentZoom / 100 + ")";
-        iframe.style.transformOrigin = "top center";
-      }
-      if (zoomLbl) zoomLbl.textContent = currentZoom + "%";
-    }
-    if (zIn)
-      zIn.addEventListener("click", function () {
-        setZoom(currentZoom + 20);
-      });
-    if (zOut)
-      zOut.addEventListener("click", function () {
-        setZoom(currentZoom - 20);
-      });
-
-    var fsBtn = document.getElementById("pex-fullscreen-btn");
-    if (fsBtn) {
-      fsBtn.addEventListener("click", function () {
-        var card = document.getElementById("pex-preview-card");
-        if (!card) return;
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-          fsBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-        } else {
-          if (card.requestFullscreen) card.requestFullscreen();
-          fsBtn.innerHTML = '<i class="fa-solid fa-compress"></i>';
-        }
-      });
-    }
-
-    function loadPreview(pdfUrl, year, title) {
-      if (infoYear) infoYear.textContent = year || "";
-      if (infoTitle) infoTitle.textContent = title || "";
-
-      if (!pdfUrl) {
-        if (skeleton) skeleton.classList.add("pex-hidden");
-        if (lockedTitle) lockedTitle.textContent = title || "Paper Unavailable";
-        if (lockedSub)
-          lockedSub.textContent = "Enroll to access and download this paper.";
-        if (locked) locked.classList.add("pex-show");
-        if (iframe) {
-          iframe.classList.remove("pex-loaded");
-          iframe.src = "";
-        }
-        if (dlBtn) {
-          dlBtn.removeAttribute("href");
-          dlBtn.style.opacity = "0.38";
-          dlBtn.style.pointerEvents = "none";
-        }
-        return;
-      }
-
-      if (dlBtn) {
-        dlBtn.href = pdfUrl;
-        dlBtn.setAttribute("target", "_blank");
-        dlBtn.style.opacity = "";
-        dlBtn.style.pointerEvents = "";
-      }
-      if (locked) locked.classList.remove("pex-show");
-      if (skeleton) skeleton.classList.remove("pex-hidden");
-      if (iframe) {
-        iframe.classList.remove("pex-loaded");
-        iframe.src = "";
-        setTimeout(function () {
-          iframe.onload = function () {
-            if (skeleton) skeleton.classList.add("pex-hidden");
-            iframe.classList.add("pex-loaded");
-          };
-          iframe.src = pdfUrl;
-        }, 100);
-      }
-    }
-
-    function getCardPdf(card) {
-      if (card.dataset.pdf !== undefined) return card.dataset.pdf;
-      var href = card.getAttribute("href");
-      if (href && href !== "#" && href.indexOf(".pdf") !== -1) return card.href;
-      return "";
-    }
-
-    function handleCardClick(card, e) {
-      if (e.target.closest(".pex-seo-link")) return;
-      e.preventDefault();
-      var yearEl = card.querySelector(".pex-year-badge");
-      var titleEl = card.querySelector(".pex-card-title, h4");
-      var year = card.dataset.year || (yearEl ? yearEl.textContent.trim() : "");
-      var title =
-        card.dataset.title || (titleEl ? titleEl.textContent.trim() : "");
-      grid.querySelectorAll(".pex-paper-card").forEach(function (c) {
-        c.classList.remove("pex-active");
-      });
-      card.classList.add("pex-active");
-      loadPreview(getCardPdf(card), year, title);
-    }
-
-    grid.querySelectorAll(".pex-paper-card").forEach(function (card) {
-      card.addEventListener("click", function (e) {
-        handleCardClick(card, e);
-      });
-    });
-
-    function applyFilter(year, query) {
-      var anyVisible = false;
-      grid.querySelectorAll(".pex-paper-card").forEach(function (card) {
-        var yearEl = card.querySelector(".pex-year-badge");
-        var titleEl = card.querySelector(".pex-card-title, h4");
-        var cardYear =
-          card.dataset.year || (yearEl ? yearEl.textContent.trim() : "");
-        var title = (
-          card.dataset.title || (titleEl ? titleEl.textContent.trim() : "")
-        ).toLowerCase();
-        var yearMatch = year === "all" || cardYear === year;
-        var searchMatch =
-          !query ||
-          title.indexOf(query) !== -1 ||
-          cardYear.toLowerCase().indexOf(query) !== -1;
-        var visible = yearMatch && searchMatch;
-        card.style.display = visible ? "" : "none";
-        if (visible) anyVisible = true;
-      });
-      if (emptyEl) emptyEl.classList.toggle("pex-show", !anyVisible);
-    }
-
-    if (tabsEl) {
-      tabsEl.addEventListener("click", function (e) {
-        var btn = e.target.closest(".pex-tab");
-        if (!btn) return;
-        tabsEl.querySelectorAll(".pex-tab").forEach(function (t) {
-          t.classList.remove("active");
-        });
-        btn.classList.add("active");
-        applyFilter(
-          btn.dataset.year || "all",
-          searchEl ? searchEl.value.toLowerCase().trim() : "",
-        );
-      });
-    }
-
-    if (searchEl) {
-      searchEl.addEventListener("input", function () {
-        var activeTab = tabsEl ? tabsEl.querySelector(".pex-tab.active") : null;
-        var year = activeTab ? activeTab.dataset.year || "all" : "all";
-        applyFilter(year, searchEl.value.toLowerCase().trim());
-      });
-    }
-  }
-
   // --- 10c. QP EXPLORER — New unified question-papers design (qp- prefix) ---
   function initQPExplorer() {
     var cardGrid = document.querySelector(".qp-card-grid");
@@ -3921,7 +3425,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPreparation,
     renderProcess,
     renderWhyEduooz,
-    renderPapers,
     renderPracticeTests,
     renderResources,
     renderFAQ,
@@ -3948,7 +3451,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initReviewCounters,
     initReviewCarousel,
     initMockTestSystem,
-    initStaticPaperExplorer,
     initQPExplorer,
   ].forEach((fn) => {
     try {
@@ -4598,6 +4100,110 @@ function initSyllabusTabs() {
   const panels = document.querySelectorAll(".syl-panel");
   if (!tabs.length) return;
 
+  // --- Floating scroll progress indicator (replaces the native scrollbar) ---
+  const SYL_TRACK_WIDTH = 160;
+  const SYL_MIN_THUMB = 80;
+  const SYL_MAX_THUMB = 160;
+  let progressEl = null;
+  let progressThumb = null;
+
+  if (tabNav) {
+    const existing = tabNav.nextElementSibling;
+    if (existing && existing.classList.contains("syl-scroll-progress")) {
+      progressEl = existing;
+    } else {
+      progressEl = document.createElement("div");
+      progressEl.className = "syl-scroll-progress";
+      progressEl.setAttribute("aria-hidden", "true");
+      const track = document.createElement("span");
+      track.className = "syl-scroll-progress-track";
+      const thumb = document.createElement("span");
+      thumb.className = "syl-scroll-progress-thumb";
+      track.appendChild(thumb);
+      progressEl.appendChild(track);
+      tabNav.insertAdjacentElement("afterend", progressEl);
+    }
+    progressThumb = progressEl.querySelector(".syl-scroll-progress-thumb");
+  }
+
+  function updateScrollProgress() {
+    if (!tabNav) return;
+    const { scrollWidth, clientWidth, scrollLeft } = tabNav;
+    const overflowing = scrollWidth > clientWidth + 1;
+    tabNav.classList.toggle("is-overflowing", overflowing);
+
+    if (!progressEl || !progressThumb) return;
+    progressEl.classList.toggle("is-visible", overflowing);
+    if (!overflowing) return;
+
+    const visibleRatio = clientWidth / scrollWidth;
+    const thumbWidth = Math.min(
+      SYL_MAX_THUMB,
+      Math.max(SYL_MIN_THUMB, SYL_TRACK_WIDTH * visibleRatio),
+    );
+    const maxScroll = scrollWidth - clientWidth;
+    const scrollRatio = maxScroll > 0 ? scrollLeft / maxScroll : 0;
+    const maxOffset = SYL_TRACK_WIDTH - thumbWidth;
+
+    progressThumb.style.width = `${thumbWidth}px`;
+    progressThumb.style.transform = `translateX(${scrollRatio * maxOffset}px)`;
+  }
+
+  // --- Drag the floating progress thumb to scroll the tab strip ---
+  if (tabNav && progressEl && progressThumb) {
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartScrollLeft = 0;
+
+    const pointerX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
+
+    const onDragMove = (e) => {
+      if (!dragging) return;
+      const maxScroll = tabNav.scrollWidth - tabNav.clientWidth;
+      const thumbWidth = progressThumb.offsetWidth;
+      const usableTrack = SYL_TRACK_WIDTH - thumbWidth;
+      if (maxScroll <= 0 || usableTrack <= 0) return;
+      if (e.cancelable) e.preventDefault();
+      const deltaX = pointerX(e) - dragStartX;
+      const scrollDelta = (deltaX / usableTrack) * maxScroll;
+      tabNav.scrollLeft = dragStartScrollLeft + scrollDelta;
+    };
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      progressEl.classList.remove("is-dragging");
+      tabNav.classList.remove("syl-scroll-no-smooth");
+      document.body.style.userSelect = "";
+      document.removeEventListener("mousemove", onDragMove);
+      document.removeEventListener("mouseup", endDrag);
+      document.removeEventListener("touchmove", onDragMove);
+      document.removeEventListener("touchend", endDrag);
+    };
+
+    const startDrag = (e) => {
+      if (tabNav.scrollWidth <= tabNav.clientWidth) return;
+      dragging = true;
+      dragStartX = pointerX(e);
+      dragStartScrollLeft = tabNav.scrollLeft;
+      progressEl.classList.add("is-dragging");
+      // Direct manipulation needs 1:1 tracking — CSS scroll-behavior:smooth
+      // would lag the thumb behind the pointer, so it's suspended mid-drag.
+      tabNav.classList.add("syl-scroll-no-smooth");
+      document.body.style.userSelect = "none";
+      if (e.cancelable) e.preventDefault();
+      document.addEventListener("mousemove", onDragMove);
+      document.addEventListener("mouseup", endDrag);
+      document.addEventListener("touchmove", onDragMove, { passive: false });
+      document.addEventListener("touchend", endDrag);
+    };
+
+    progressThumb.addEventListener("mousedown", startDrag);
+    progressThumb.addEventListener("touchstart", startDrag, {
+      passive: false,
+    });
+  }
+
   function buildSyllabusAccordions() {
     const MIN_HEADING_COUNT = 2;
     const MIN_TOPIC_COUNT = 8;
@@ -4780,9 +4386,8 @@ function initSyllabusTabs() {
 
   function syncTabNavScrollState() {
     if (!tabNav) return;
-    const isOverflowing = tabNav.scrollWidth > tabNav.clientWidth + 1;
-    tabNav.classList.toggle("is-overflowing", isOverflowing);
     tabNav.scrollLeft = 0;
+    updateScrollProgress();
   }
 
   function activateTab(tab) {
@@ -4843,6 +4448,83 @@ function initSyllabusTabs() {
   if (firstPanel) {
     void firstPanel.offsetWidth;
     firstPanel.classList.add("entering");
+  }
+
+  if (tabNav) {
+    let scrollRaf = null;
+    tabNav.addEventListener(
+      "scroll",
+      () => {
+        if (scrollRaf) return;
+        scrollRaf = requestAnimationFrame(() => {
+          updateScrollProgress();
+          scrollRaf = null;
+        });
+      },
+      { passive: true },
+    );
+
+    // Convert plain vertical mouse-wheel input into horizontal scroll.
+    // The native scrollbar (previously the only drag handle for non-trackpad
+    // mice) is hidden in favour of the floating progress indicator, so this
+    // is now the primary way desktop mouse users can scroll the tab strip.
+    //
+    // Root cause of the earlier failed attempt: this site runs Lenis, a
+    // global smooth-scroller bound to `window` (see initLenis() above,
+    // exposed as window.lenis). A plain tabNav-only wheel listener that
+    // calls preventDefault() still lets the same event bubble up to
+    // Lenis's own window-level listener, which scrolls the whole page
+    // vertically at the same time — confirmed by logging: on one wheel
+    // tick, window.lenis.scroll jumped ~120px within 50ms while
+    // tabNav.scrollLeft only caught up ~800ms later, via CSS
+    // scroll-behavior:smooth. The page-level scroll visually dominated,
+    // making the tab strip look unresponsive. The fix mirrors the
+    // existing, working pattern used for the testimonial playlist above
+    // (search "smooth-scroller (Lenis) hijacking"): pause Lenis while
+    // hovering/touching the tab strip, and stopPropagation so the event
+    // never reaches Lenis's listener at all.
+    const pauseLenisForTabNav = () => {
+      try {
+        if (window.lenis && typeof window.lenis.stop === "function") {
+          window.lenis.stop();
+        }
+      } catch (e) {}
+    };
+    const resumeLenisForTabNav = () => {
+      try {
+        if (window.lenis && typeof window.lenis.start === "function") {
+          window.lenis.start();
+        }
+      } catch (e) {}
+    };
+    tabNav.addEventListener("mouseenter", pauseLenisForTabNav);
+    tabNav.addEventListener("mouseleave", resumeLenisForTabNav);
+    tabNav.addEventListener("touchstart", pauseLenisForTabNav, {
+      passive: true,
+    });
+    tabNav.addEventListener("touchend", resumeLenisForTabNav);
+
+    const handleTabNavWheel = (e) => {
+      if (tabNav.scrollWidth <= tabNav.clientWidth) return;
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      tabNav.scrollLeft += e.deltaY;
+    };
+    tabNav.addEventListener("wheel", handleTabNavWheel, { passive: false });
+
+    // Fallback: if Lenis's window-level listener still wins the race
+    // (e.g. the very first wheel tick, before mouseenter has fired),
+    // intercept in the capture phase — before the event ever reaches
+    // Lenis — same fallback pattern as the playlist above.
+    document.addEventListener(
+      "wheel",
+      (e) => {
+        if (e.target !== tabNav && !tabNav.contains(e.target)) return;
+        handleTabNavWheel(e);
+      },
+      { passive: false, capture: true },
+    );
   }
 
   syncTabNavScrollState();
@@ -6573,5 +6255,188 @@ gsap.from(".g-test-reveal", {
     document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
+  }
+})();
+
+/**
+ * Syllabus component — single JS module for every course landing page.
+ *
+ * Structure (max 3 levels, no recursion):
+ *   Level 1: .syllabus-tabs > .syllabus-tablist > .syllabus-tab (+ .syllabus-panels > .syllabus-panel)
+ *   Level 2: .syllabus-accordion > .syllabus-accordion-item > .syllabus-accordion-trigger + .syllabus-accordion-content
+ *   Level 3 (optional): a second .syllabus-accordion nested inside a level-2 .syllabus-accordion-content,
+ *                        using the exact same markup/classes as level 2.
+ *
+ * No JS changes are needed to add tabs or accordion items — this module works purely
+ * off the class names above via event delegation, so pages only need to add HTML.
+ */
+(function () {
+  "use strict";
+
+  // Floating scroll-progress pill dimensions (mirrors the site's other
+  // horizontally-scrollable tab strips).
+  const SCROLL_TRACK_WIDTH = 160;
+  const SCROLL_MIN_THUMB = 80;
+  const SCROLL_MAX_THUMB = 160;
+
+  function initScrollProgress(tablist) {
+    let progressEl = tablist.nextElementSibling;
+    if (!progressEl || !progressEl.classList.contains("syllabus-scroll-progress")) {
+      progressEl = document.createElement("div");
+      progressEl.className = "syllabus-scroll-progress";
+      progressEl.setAttribute("aria-hidden", "true");
+      const track = document.createElement("span");
+      track.className = "syllabus-scroll-progress-track";
+      const thumb = document.createElement("span");
+      thumb.className = "syllabus-scroll-progress-thumb";
+      track.appendChild(thumb);
+      progressEl.appendChild(track);
+      tablist.insertAdjacentElement("afterend", progressEl);
+    }
+    const thumb = progressEl.querySelector(".syllabus-scroll-progress-thumb");
+
+    function update() {
+      const { scrollWidth, clientWidth, scrollLeft } = tablist;
+      const overflowing = scrollWidth > clientWidth + 1;
+      tablist.classList.toggle("is-overflowing", overflowing);
+      progressEl.classList.toggle("is-visible", overflowing);
+      if (!overflowing) return;
+
+      const visibleRatio = clientWidth / scrollWidth;
+      const thumbWidth = Math.min(
+        SCROLL_MAX_THUMB,
+        Math.max(SCROLL_MIN_THUMB, SCROLL_TRACK_WIDTH * visibleRatio),
+      );
+      const maxScroll = scrollWidth - clientWidth;
+      const scrollRatio = maxScroll > 0 ? scrollLeft / maxScroll : 0;
+      const maxOffset = SCROLL_TRACK_WIDTH - thumbWidth;
+
+      thumb.style.width = thumbWidth + "px";
+      thumb.style.transform = "translateX(" + scrollRatio * maxOffset + "px)";
+    }
+
+    tablist.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    update();
+
+    // Drag the thumb to scroll the tab strip.
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartScrollLeft = 0;
+    const pointerX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
+
+    function onDragMove(e) {
+      if (!dragging) return;
+      const maxScroll = tablist.scrollWidth - tablist.clientWidth;
+      const thumbWidth = thumb.offsetWidth;
+      const usableTrack = SCROLL_TRACK_WIDTH - thumbWidth;
+      if (maxScroll <= 0 || usableTrack <= 0) return;
+      if (e.cancelable) e.preventDefault();
+      const deltaX = pointerX(e) - dragStartX;
+      tablist.scrollLeft = dragStartScrollLeft + (deltaX / usableTrack) * maxScroll;
+    }
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      progressEl.classList.remove("is-dragging");
+      tablist.classList.remove("syllabus-scroll-no-smooth");
+      document.body.style.userSelect = "";
+      document.removeEventListener("mousemove", onDragMove);
+      document.removeEventListener("mouseup", endDrag);
+      document.removeEventListener("touchmove", onDragMove);
+      document.removeEventListener("touchend", endDrag);
+    }
+
+    function startDrag(e) {
+      if (tablist.scrollWidth <= tablist.clientWidth) return;
+      dragging = true;
+      dragStartX = pointerX(e);
+      dragStartScrollLeft = tablist.scrollLeft;
+      progressEl.classList.add("is-dragging");
+      tablist.classList.add("syllabus-scroll-no-smooth");
+      document.body.style.userSelect = "none";
+      if (e.cancelable) e.preventDefault();
+      document.addEventListener("mousemove", onDragMove);
+      document.addEventListener("mouseup", endDrag);
+      document.addEventListener("touchmove", onDragMove, { passive: false });
+      document.addEventListener("touchend", endDrag);
+    }
+
+    thumb.addEventListener("mousedown", startDrag);
+    thumb.addEventListener("touchstart", startDrag, { passive: false });
+  }
+
+  function initTabs(root) {
+    const tablist = root.querySelector(":scope > .syllabus-tablist");
+    const panelsWrap = root.querySelector(":scope > .syllabus-panels");
+    if (!tablist || !panelsWrap) return;
+
+    const tabs = Array.from(tablist.querySelectorAll(".syllabus-tab"));
+    const panels = Array.from(panelsWrap.querySelectorAll(":scope > .syllabus-panel"));
+
+    function activate(index) {
+      tabs.forEach((tab, i) => {
+        const isActive = i === index;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", isActive ? "true" : "false");
+        tab.tabIndex = isActive ? 0 : -1;
+      });
+      panels.forEach((panel, i) => {
+        panel.classList.toggle("active", i === index);
+      });
+      tabs[index].scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => activate(i));
+      tab.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        const dir = e.key === "ArrowRight" ? 1 : -1;
+        const next = (i + dir + tabs.length) % tabs.length;
+        tabs[next].focus();
+        activate(next);
+      });
+    });
+
+    initScrollProgress(tablist);
+  }
+
+  function initAccordions(root) {
+    root.querySelectorAll(".syllabus-accordion-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", () => {
+        const item = trigger.closest(".syllabus-accordion-item");
+        if (!item) return;
+        const group = item.parentElement; // the .syllabus-accordion this item belongs to
+        const isOpen = item.classList.contains("is-open");
+
+        // Close sibling accordion items within the same group only —
+        // ancestor accordions (if this is a nested level-3 group) are left untouched.
+        Array.from(group.children).forEach((sibling) => {
+          if (sibling !== item && sibling.classList.contains("syllabus-accordion-item")) {
+            sibling.classList.remove("is-open");
+            const sibTrigger = sibling.querySelector(".syllabus-accordion-trigger");
+            if (sibTrigger) sibTrigger.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        item.classList.toggle("is-open", !isOpen);
+        trigger.setAttribute("aria-expanded", String(!isOpen));
+      });
+    });
+  }
+
+  function initSyllabus() {
+    document.querySelectorAll(".syllabus-tabs").forEach((root) => {
+      initTabs(root);
+      initAccordions(root);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSyllabus);
+  } else {
+    initSyllabus();
   }
 })();

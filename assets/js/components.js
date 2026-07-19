@@ -190,9 +190,10 @@
       .then((html) => {
         // Fix relative paths if we are in a subdirectory
         if (basePath && basePath !== "" && basePath !== "/") {
-          // Update href and src that don't start with http, /, #, or mailto
+          // Update href and src that don't start with http(s), mailto, tel,
+          // javascript, data, a hash anchor, or a root-relative path
           html = html.replace(
-            /(href|src)="(?!(?:https?:\/\/|#|mailto:|\/))([^"]+)"/g,
+            /(href|src)="(?!(?:https?:|mailto:|tel:|javascript:|data:|#|\/))([^"]+)"/g,
             '$1="' + basePath + '$2"',
           );
         }
