@@ -3955,6 +3955,33 @@ body {
   line-height: 1.1;
 }
 
+.faculty-banner-wrapper {
+  width: 100%;
+  margin: 0 auto;
+}
+.faculty-banner-img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+.faculty-banner-mobile {
+  display: none;
+}
+.faculty-banner-desktop {
+  display: block;
+}
+@media (max-width: 768px) {
+  .faculty-banner-mobile {
+    display: block;
+  }
+  .faculty-banner-desktop {
+    display: none;
+  }
+}
+.fac-banner-cta {
+  margin-top: 32px;
+}
+
 /* --- Infinite Typographic River (Light Silver) --- */
 .marquee-wrapper {
   position: absolute;
