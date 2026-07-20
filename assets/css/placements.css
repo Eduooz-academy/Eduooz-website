@@ -67,6 +67,32 @@ body {
     width: 100%;
   }
 }
+
+
+
+.placement-hero {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-image: url('../images/optimized/rank-banner-2-landscap.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding-top: 100px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .placement-hero {
+    aspect-ratio: 392 / 523;
+    background-image: url('../images/optimized/rank-banner-2-portrait.png');
+    background-position: top center;
+  }
+}
+
+
+
 .placement-other-rank {
   margin-top: 150px;
 }
@@ -114,7 +140,9 @@ body {
   margin-top: 2rem;
   grid-auto-flow: dense;
 }
-
+.placement-first-rank{
+  padding-top: 80px;
+}
 .placement-first-rank .first-rank-grid {
   display: flex;
   flex-wrap: wrap;

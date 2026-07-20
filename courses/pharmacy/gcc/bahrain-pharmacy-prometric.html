@@ -857,12 +857,6 @@
           </h2>
         </div>
 
-        <!--
-        TEMPORARILY HIDDEN:
-        Existing inner content is incorrect or not specific to this landing page.
-        Keep this code for later replacement with unique content.
-
-        [[ Tab Navigation ]]
         <div
           class="syllabus-tabs-nav"
           role="tablist"
@@ -872,265 +866,197 @@
             class="syl-tab active"
             role="tab"
             aria-selected="true"
-            id="syl-tab-awareness"
-            aria-controls="syl-panel-awareness"
-            data-tab="awareness"
+            id="syl-tab-pattern"
+            aria-controls="syl-panel-pattern"
+            data-tab="pattern"
           >
-            <span class="syl-tab-icon"><i class="fa-solid fa-hospital-user"></i></span>
-            <span class="syl-tab-label">Clinical Pharmacy</span>
+            <span class="syl-tab-icon"><i class="fa-solid fa-chart-pie"></i></span>
+            <span class="syl-tab-label">Exam Weightage</span>
           </button>
           <button
             class="syl-tab"
             role="tab"
             aria-selected="false"
-            id="syl-tab-aptitude"
-            aria-controls="syl-panel-aptitude"
-            data-tab="aptitude"
+            id="syl-tab-foundations"
+            aria-controls="syl-panel-foundations"
+            data-tab="foundations"
           >
-            <span class="syl-tab-icon"
-              ><i class="fa-solid fa-flask"></i
-            ></span>
-            <span class="syl-tab-label">Pharmaceutical Sciences</span>
+            <span class="syl-tab-icon"><i class="fa-solid fa-pills"></i></span>
+            <span class="syl-tab-label">Pharmaceutical Foundations</span>
           </button>
           <button
             class="syl-tab"
             role="tab"
             aria-selected="false"
-            id="syl-tab-nursing"
-            aria-controls="syl-panel-nursing"
-            data-tab="nursing"
+            id="syl-tab-core"
+            aria-controls="syl-panel-core"
+            data-tab="core"
           >
-            <span class="syl-tab-icon"
-              ><i class="fa-solid fa-scale-balanced"></i
-            ></span>
-            <span class="syl-tab-label">Professional Practice</span>
+            <span class="syl-tab-icon"><i class="fa-solid fa-dna"></i></span>
+            <span class="syl-tab-label">Basic Biomedical Sciences</span>
+          </button>
+          <button
+            class="syl-tab"
+            role="tab"
+            aria-selected="false"
+            id="syl-tab-admin"
+            aria-controls="syl-panel-admin"
+            data-tab="admin"
+          >
+            <span class="syl-tab-icon"><i class="fa-solid fa-scale-balanced"></i></span>
+            <span class="syl-tab-label">Social &amp; Administrative Sciences</span>
+          </button>
+          <button
+            class="syl-tab"
+            role="tab"
+            aria-selected="false"
+            id="syl-tab-clinical"
+            aria-controls="syl-panel-clinical"
+            data-tab="clinical"
+          >
+            <span class="syl-tab-icon"><i class="fa-solid fa-user-doctor"></i></span>
+            <span class="syl-tab-label">Clinical Pharmacy Services</span>
           </button>
         </div>
 
-        [[ Tab Panels ]]
         <div class="syllabus-tab-panels">
-          [[ Clinical Pharmacy ]]
           <div
             class="syl-panel active"
-            id="syl-panel-awareness"
+            id="syl-panel-pattern"
             role="tabpanel"
-            aria-labelledby="syl-tab-awareness"
+            aria-labelledby="syl-tab-pattern"
+          >
+            <div class="syl-panel-inner">
+              <div class="syl-table-wrap">
+                <table class="syl-table">
+                  <thead>
+                    <tr>
+                      <th>Exam Pillar</th>
+                      <th>Weightage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Pharmaceutical Foundations</td><td>35%</td></tr>
+                    <tr><td>Basic Biomedical Sciences</td><td>10%</td></tr>
+                    <tr><td>Social, Behavioural &amp; Administrative Sciences</td><td>20%</td></tr>
+                    <tr><td>Clinical Pharmacy Services</td><td>35%</td></tr>
+                    <tr class="syl-table-total">
+                      <td><strong>Total</strong></td>
+                      <td><strong>100%</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="syl-panel"
+            id="syl-panel-foundations"
+            role="tabpanel"
+            aria-labelledby="syl-tab-foundations"
           >
             <div class="syl-panel-inner">
               <div class="syl-panel-lists">
                 <ul class="syllabus-list">
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Clinical Pharmacy
-                    Practice
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Hospital
-                    Pharmacy Services
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Community
-                    Pharmacy Practice
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Drug Information
-                    &amp; Patient Counseling
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmaceutical
-                    Care Planning
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Dispensing
-                    &amp; Prescription Review
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Adverse Drug
-                    Reaction Monitoring
-                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Autonomic Nervous System (ANS)</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Cardiovascular System (CVS)</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Central Nervous System (CNS)</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Gastrointestinal Tract (GIT)</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Respiratory System</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Hormones</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Antibiotics</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Autocoids</li>
                 </ul>
                 <ul class="syllabus-list">
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Therapeutic Drug
-                    Monitoring
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Drug Interactions
-                    &amp; Contraindications
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pathophysiology
-                    of Disease
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Toxicology
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmacy
-                    Management
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Drug Store
-                    Management
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Biopharmaceutics
-                    &amp; Pharmacokinetics
-                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Toxicology</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Natural Products &amp; Dietary Supplements</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmaceutics &amp; Biopharmaceutics</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Medicinal Chemistry</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmaceutical Analysis</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmacognosy</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Vitamins &amp; Nutritional Pharmacology</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Alcohol-Related Pharmacology</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          [[ Pharmaceutical Sciences ]]
           <div
             class="syl-panel"
-            id="syl-panel-aptitude"
+            id="syl-panel-core"
             role="tabpanel"
-            aria-labelledby="syl-tab-aptitude"
+            aria-labelledby="syl-tab-core"
           >
             <div class="syl-panel-inner">
               <div class="syl-panel-lists">
                 <ul class="syllabus-list">
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> General
-                    Pharmacology
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Autonomic
-                    Nervous System
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Cardiovascular
-                    &amp; Renal Pharmacology
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Chemotherapy
-                    &amp; Antimicrobials
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmaceutics
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Dosage Forms
-                    &amp; Design
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Novel Drug
-                    Delivery Systems
-                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Biochemistry &ndash; Amino Acids</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Biochemistry &ndash; Nucleic Acids</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Microbiology</li>
                 </ul>
                 <ul class="syllabus-list">
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmaceutical
-                    Chemistry
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Medicinal
-                    Chemistry
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmaceutical
-                    Analysis
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmacognosy
-                    &amp; Natural Products
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Biochemistry
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Microbiology
-                    &amp; Infection Control
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Human Anatomy
-                    &amp; Physiology
-                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Immunology</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Vaccines &amp; Immunization</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Biostatistics</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          [[ Professional Practice ]]
           <div
             class="syl-panel"
-            id="syl-panel-nursing"
+            id="syl-panel-admin"
             role="tabpanel"
-            aria-labelledby="syl-tab-nursing"
+            aria-labelledby="syl-tab-admin"
           >
             <div class="syl-panel-inner">
               <div class="syl-panel-lists">
                 <ul class="syllabus-list">
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmacy Ethics
-                    &amp; Professional Standards
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> NHRA Licensing
-                    &amp; Regulatory Framework
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Patient Rights
-                    &amp; Advocacy
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Cultural
-                    Competence &amp; Sensitivity
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Communication
-                    &amp; Interpersonal Skills
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Clinical
-                    Documentation &amp; Reporting
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Evidence-Based
-                    Practice
-                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmacy Law</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Ethics &amp; Ethical Decision Making</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmacoeconomics</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Drug Information Resources</li>
                 </ul>
                 <ul class="syllabus-list">
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Pharmacy
-                    Leadership &amp; Management
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Regulatory
-                    Affairs
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Continuing
-                    Professional Development
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Interprofessional
-                    Collaboration
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Confidentiality
-                    &amp; Data Protection
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Healthcare Law
-                    &amp; Liability
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-chevron-right"></i> Quality
-                    Assurance in Pharmacy
-                  </li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmacoepidemiology &amp; Biostatistics</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Population-Based Care</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Communication Skills</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Healthcare Delivery Systems</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="syl-panel"
+            id="syl-panel-clinical"
+            role="tabpanel"
+            aria-labelledby="syl-tab-clinical"
+          >
+            <div class="syl-panel-inner">
+              <div class="syl-panel-lists">
+                <ul class="syllabus-list">
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmacogenomics</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmacotherapeutics</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Pharmaceutical Calculations</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Immunosuppressants</li>
+                </ul>
+                <ul class="syllabus-list">
+                  <li><i class="fa-solid fa-chevron-right"></i> Osteoporosis Management</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Clinical Pharmacy Practice</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Treatment Guidelines &amp; Protocols</li>
+                  <li><i class="fa-solid fa-chevron-right"></i> Adverse Reaction Analysis &amp; Dose Optimization</li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        [[ /syllabus-tab-panels ]]
-        -->
 
-        <div class="coming-soon-block">
-          
-          <span>Coming Soon</span>
+        <div class="text-center">
+          <a href="/assets/Syllabus/pharmacy/GCC%20SYLLABUS.pdf" target="_blank" rel="noopener" class="btn-download-syllabus g-exam-reveal">
+            <i class="fa-solid fa-download"></i> Download Official Syllabus PDF
+          </a>
         </div>
       </div>
     </section>
