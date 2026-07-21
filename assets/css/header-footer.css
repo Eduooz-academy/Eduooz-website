@@ -944,6 +944,10 @@
   .footer-grid > .footer-col:nth-child(2) {
     grid-column: 1 / -1;
   }
+
+  .logo-footer img {
+    height: 90px;
+  }
 }
 
 /* =========================================
@@ -2476,7 +2480,8 @@ body.chat-is-open .scroll-to-top {
    flex/grid structure with zero visual change. */
 .dropdown-panel-inner,
 .course-section-body,
-.course-section-body-inner {
+.course-section-body-inner,
+.category-panel-inner {
   display: contents;
 }
 
@@ -2530,7 +2535,8 @@ body.chat-is-open .scroll-to-top {
   /* Desktop-only hover bridges; on mobile they can overlap the trigger row
      and swallow taps meant for the dropdown link/caret. */
   .simple-menu::before,
-  .mega-menu::before {
+  .mega-menu::before,
+  .nav-item.dropdown::after {
     display: none;
   }
 
@@ -2585,38 +2591,80 @@ body.chat-is-open .scroll-to-top {
     font-size: 0.85rem;
   }
 
-  /* ---- Courses: compact grouped category selector ---- */
-  .mega-menu-sidebar {
+  /* ---- Courses: nested accordion ----
+     .mega-menu-sidebar and .mega-menu-content are two separate desktop
+     columns (tab list + panel area), so in source order every panel sits
+     after ALL four category tabs. display:contents lifts their children
+     (the sidebar-items and category-panels) up to be siblings inside
+     .dropdown-panel-inner, and the explicit `order` below re-threads them
+     so each panel sits directly beneath its own category tab, matching the
+     required "Nursing / its children / Pharmacy / its children" hierarchy.
+     Desktop is untouched: this only runs inside this mobile media query. */
+  .mega-menu-sidebar,
+  .mega-menu-content {
+    display: contents;
+  }
+
+  .mega-menu .dropdown-panel-inner {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    border-right: none;
-    background: rgba(91, 33, 182, 0.04);
-    border: 1px solid rgba(91, 33, 182, 0.09);
-    border-radius: 16px;
-    padding: 4px;
-    margin-bottom: 10px;
+    gap: 8px;
   }
 
   .sidebar-item {
     padding: 13px 12px;
-    background: transparent;
-    margin-bottom: 0;
+    background: rgba(91, 33, 182, 0.05);
+    border: 1px solid rgba(91, 33, 182, 0.09);
     border-radius: 12px;
-    border-bottom: 1px solid rgba(91, 33, 182, 0.07);
-  }
-
-  .sidebar-item:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
   }
 
   .sidebar-item:hover {
-    background: rgba(91, 33, 182, 0.06);
+    background: rgba(91, 33, 182, 0.08);
   }
 
+  /* .active still tracks the desktop hover tab (kept in sync so desktop
+     is unaffected on resize); on mobile only .expanded should read as
+     "currently open", so .active alone is reset back to the plain look. */
   .sidebar-item.active {
-    background: rgba(91, 33, 182, 0.09);
+    background: rgba(91, 33, 182, 0.05);
     box-shadow: none;
+  }
+
+  .sidebar-item.active::before {
+    display: none;
+  }
+
+  .sidebar-item.active .sidebar-info h4 {
+    color: #1e0a3c;
+  }
+
+  .sidebar-item.active i {
+    color: rgba(91, 33, 182, 0.4);
+    transform: none;
+  }
+
+  .sidebar-item.expanded {
+    background: rgba(91, 33, 182, 0.09);
+    border-color: rgba(91, 33, 182, 0.2);
+    box-shadow: none;
+  }
+
+  .sidebar-item.expanded .sidebar-info h4 {
+    color: var(--brand-purple);
+  }
+
+  .sidebar-item i {
+    transition:
+      color 0.3s ease,
+      transform 0.22s ease;
+  }
+
+  /* Reuses the existing chevron-right icon: rotated 90deg it reads as
+     pointing down, the same "open" affordance as the other carets. */
+  .sidebar-item.expanded i {
+    color: var(--brand-purple);
+    transform: rotate(90deg);
   }
 
   .sidebar-info h4 {
@@ -2627,16 +2675,55 @@ body.chat-is-open .scroll-to-top {
     display: none;
   }
 
-  .mega-menu-content {
-    padding: 0;
+  /* Fixed placement for each category tab + its panel, independent of
+     their original DOM position (see comment above). */
+  .sidebar-item[data-category="nursing"] {
+    order: 1;
+  }
+  .category-panel#nursing {
+    order: 2;
+  }
+  .sidebar-item[data-category="pharmacy"] {
+    order: 3;
+  }
+  .category-panel#pharmacy {
+    order: 4;
+  }
+  .sidebar-item[data-category="mlt"] {
+    order: 5;
+  }
+  .category-panel#mlt {
+    order: 6;
+  }
+  .sidebar-item[data-category="german"] {
+    order: 7;
   }
 
-  .category-panel {
-    display: none;
+  /* Nursing ships with class="active" directly in the markup (desktop's
+     default tab), which would otherwise beat a plain .category-panel
+     override on specificity alone (.category-panel.active is two classes
+     vs. one) and force it permanently open. Matching that specificity
+     here is what lets .expanded be the only thing controlling visibility
+     on mobile. */
+  .mega-menu-content .category-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    /* Desktop's panelFadeIn keyframe fills opacity:1 forwards; neutralize
+       it here so it can't fight this collapse/expand transition. */
+    animation: none;
   }
 
-  .category-panel.active {
+  .mega-menu-content .category-panel.expanded {
+    grid-template-rows: 1fr;
+  }
+
+  .category-panel-inner {
     display: block;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 8px;
   }
 
   /* ---- Level 3: course-section headers act as accordion toggles ---- */

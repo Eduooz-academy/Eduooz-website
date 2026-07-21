@@ -186,7 +186,7 @@ body {
 /* ================== FORM CARD ================== */
 .form-container {
     padding-left: 20px;
-    margin-bottom: -180px;
+    margin-bottom: 20px;
     position: relative;
     z-index: 15;
 }

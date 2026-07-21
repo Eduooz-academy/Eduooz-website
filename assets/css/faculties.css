@@ -95,6 +95,12 @@ body {
   .fac-hero {
     background-image: url('../images/optimized/faculty-banner-portrait.png');
     background-position: top center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: #05020a;
+    min-height: 0;
+    box-sizing: border-box;
+    aspect-ratio: 1454 / 1556;
   }
 }
 
@@ -439,6 +445,11 @@ body {
   box-shadow: 0 0 5px var(--cglow, rgba(91,33,182,0.4));
 }
 
+/* Tap indicator: injected via JS, hidden outside mobile */
+.fpc-tap-indicator {
+  display: none;
+}
+
 /* =========================================
    SCROLL REVEAL
    ========================================= */
@@ -465,10 +476,54 @@ body {
 @media (max-width: 900px) {
   .fac-hero { padding: 150px 0 80px; }
   .fpc-card { height: 400px; }
-  /* Always show details on touch devices */
+  /* Always show details on tablet/touch devices */
   .fpc-details { grid-template-rows: 1fr; opacity: 1; }
   .fpc-glass {
     background: linear-gradient(to top, rgba(5,2,10,0.97) 0%, rgba(5,2,10,0.85) 65%, transparent 100%);
+  }
+}
+
+/* =========================================
+   MOBILE — TAP TO EXPAND (max-width: 768px only)
+   ========================================= */
+@media (max-width: 768px) {
+  .fpc-card { cursor: pointer; }
+
+  /* Collapsed by default: details hidden, glass panel compact */
+  .fpc-details {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  .fpc-card.fpc-expanded .fpc-details {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .fpc-glass {
+    background: linear-gradient(to top, rgba(5,2,10,0.97) 0%, rgba(5,2,10,0.85) 65%, transparent 100%);
+  }
+  .fpc-card.fpc-expanded .fpc-glass {
+    background: linear-gradient(to top, rgba(5,2,10,0.98) 0%, rgba(5,2,10,0.90) 70%, rgba(5,2,10,0.30) 100%);
+  }
+
+  /* Tap indicator */
+  .fpc-tap-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--ca, #a78bfa);
+    opacity: 0.9;
+  }
+  .fpc-tap-indicator i {
+    font-size: 0.68rem;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .fpc-card.fpc-expanded .fpc-tap-indicator i {
+    transform: rotate(180deg);
   }
 }
 

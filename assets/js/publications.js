@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "#publication-lightbox-img",
   );
   const closeBtn = publicationsPage.querySelector(".lightbox-close");
-  const cards = publicationsPage.querySelectorAll(".publication-card img");
+  const previewButtons = publicationsPage.querySelectorAll(".btn-preview");
 
   const openLightbox = (src, alt) => {
     if (!lightbox || !lightboxImg) return;
@@ -26,11 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 300);
   };
 
-  cards.forEach((img) => {
-    img.addEventListener("click", () => {
-      openLightbox(img.src, img.alt);
+  previewButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      openLightbox(btn.dataset.previewSrc, btn.dataset.previewAlt);
     });
-    img.setAttribute("loading", "lazy");
   });
 
   if (closeBtn) {

@@ -2097,7 +2097,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 7. GSAP Z-Axis Spatial Scroll (Why Eduooz) ---
   let mmSpatial = gsap.matchMedia();
 
-  mmSpatial.add("(min-width: 320px)", () => {
+  // Pin + scrub scroll-jacking is desktop/tablet only: on phones this fights
+  // native touch/momentum scrolling (feels "stuck") and can leave cards
+  // mid-transition (overlapping). Below 769px the cards render as a normal
+  // static stacked list instead (see index.css mobile media query).
+  mmSpatial.add("(min-width: 769px)", () => {
     // Shortened scroll: each card transition = ~1 screen height of scroll
     const spatialTl = gsap.timeline({
       scrollTrigger: {
@@ -3165,8 +3169,10 @@ document.addEventListener("DOMContentLoaded", () => {
       let currentX = 0;
       let isDragging = false;
       let startPointerX = 0;
+      let startPointerY = 0;
       let dragAnchorX = 0;
       let halfWidth = 0;
+      let touchAxis = null; // 'x' | 'y' | null — locked per touch gesture on mobile
 
       function measure() {
         halfWidth = track.scrollWidth / 2;
@@ -3183,19 +3189,42 @@ document.addEventListener("DOMContentLoaded", () => {
       function onDown(e) {
         isDragging = true;
         startPointerX = e.clientX ?? e.touches[0].clientX;
+        startPointerY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
         dragAnchorX = targetX;
+        touchAxis = null;
       }
       // Pointer Move
       function onMove(e) {
         if (!isDragging) return;
-        e.preventDefault();
         const px = e.clientX ?? e.touches?.[0]?.clientX;
         if (px == null) return;
+
+        // Touch on mobile: don't claim the gesture until it's clearly
+        // horizontal — a mostly-vertical swipe must fall through as a
+        // normal page scroll instead of getting hijacked by the marquee.
+        if (e.touches && window.innerWidth <= 768) {
+          if (touchAxis === null) {
+            const py = e.touches[0].clientY;
+            const dx = px - startPointerX;
+            const dy = py - startPointerY;
+            if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+            touchAxis = Math.abs(dy) > Math.abs(dx) ? "y" : "x";
+            if (touchAxis === "y") {
+              isDragging = false;
+              return;
+            }
+          } else if (touchAxis === "y") {
+            return;
+          }
+        }
+
+        e.preventDefault();
         targetX = dragAnchorX + (px - startPointerX);
       }
       // Pointer Up
       function onUp() {
         isDragging = false;
+        touchAxis = null;
       }
 
       container.addEventListener("mousedown", onDown);

@@ -173,6 +173,21 @@ body {
   }
 }
 
+/* Mobile: clear the fixed header (70px, see header-footer.css) so the
+   pinned "Who We Are" panels never start underneath it. The section's
+   own height is compensated on .horizon-sticky-container/.horizon-panel
+   so no extra scroll whitespace is introduced. */
+@media (max-width: 768px) {
+  .who-horizon-section {
+    padding-top: 80px;
+  }
+
+  .horizon-sticky-container,
+  .horizon-panel {
+    height: calc(100vh - 80px);
+  }
+}
+
 .gradient-mesh-bg {
   position: absolute;
   top: 0;
@@ -552,6 +567,28 @@ body {
   }
   .center-right {
     right: 0;
+  }
+}
+
+/* Mobile-only: the panel content (pill + heading + copy + image) is
+   vertically centered inside a fixed-height, overflow:hidden panel
+   (see .horizon-panel / .horizon-sticky-container height clamp above).
+   Once that stacked content is taller than the viewport, centering it
+   clips equally off the top and bottom of the panel — cropping
+   .frost-pill-light and .panel-title, the first two elements, right at
+   the top. Anchoring to the top keeps the pill and heading fully
+   visible; the tighter gap/image height keep any leftover overflow
+   from spilling past the bottom of the panel. */
+@media (max-width: 768px) {
+  .horizon-panel {
+    align-items: flex-start;
+    padding-top: 28px;
+  }
+  .panel-content-grid {
+    gap: 24px;
+  }
+  .panel-visual-zone {
+    height: 34vh;
   }
 }
 

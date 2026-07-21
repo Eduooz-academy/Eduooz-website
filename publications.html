@@ -125,71 +125,164 @@
 
       <section class="publications-archive-section">
         <div class="container publications-archive-inner">
+          <!-- Book cards grid: to add a new publication, copy one .book-card
+               <article> block below (including its images, title,
+               description and buttons) and edit its content. -->
           <div class="publications-grid">
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
+
+            <article class="book-card">
+              <!-- Row 1: cover images (front + back), equal size -->
+              <div class="book-card-images">
                 <img
-                  src="https://images.unsplash.com/photo-1517971071642-34a2c3f783a8?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Healthcare Study Guide cover"
+                  src="assets/images/classroom-lecture-anatomy.png"
+                  alt="Healthcare Entrance Exam Study Guide front cover"
+                  loading="lazy"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=600"
+                  alt="Healthcare Entrance Exam Study Guide back cover"
+                  loading="lazy"
                 />
               </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
+
+              <!-- Row 2: book title -->
+              <h3 class="book-card-title">
+                Healthcare Entrance Exam Complete Study Guide
+              </h3>
+
+              <!-- Row 3: book description -->
+              <p class="book-card-desc">
+                A comprehensive study companion covering anatomy, physiology,
+                pharmacology and exam strategy for nursing, pharmacy and lab
+                technology entrance exams, with solved question banks and
+                quick-revision notes for last-minute preparation.
+              </p>
+
+              <!-- Row 4: action buttons -->
+              <div class="book-card-actions">
+                <button
+                  type="button"
+                  class="btn-preview"
+                  data-preview-src="https://images.unsplash.com/photo-1517971071642-34a2c3f783a8?auto=format&fit=contain&q=80&w=1200"
+                  data-preview-alt="Healthcare Entrance Exam Study Guide preview"
+                >
+                  Preview
+                </button>
+                <a href="#" class="btn-download" download>Download</a>
+              </div>
+            </article>
+
+            <article class="book-card">
+              <div class="book-card-images">
                 <img
-                  src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Nursing Exam Strategy poster"
+                  src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&q=80&w=600"
+                  alt="Nursing Exam Strategy Manual front cover"
+                  loading="lazy"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600"
+                  alt="Nursing Exam Strategy Manual back cover"
+                  loading="lazy"
                 />
               </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
+
+              <h3 class="book-card-title">
+                Nursing Exam Strategy &amp; Practice Manual
+              </h3>
+
+              <p class="book-card-desc">
+                Targeted practice sets and time-management strategies for
+                central and state nursing recruitment exams, curated by
+                Eduooz faculty with topic-wise mock tests and answer keys.
+              </p>
+
+              <div class="book-card-actions">
+                <button
+                  type="button"
+                  class="btn-preview"
+                  data-preview-src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=contain&q=80&w=1200"
+                  data-preview-alt="Nursing Exam Strategy Manual preview"
+                >
+                  Preview
+                </button>
+                <a href="#" class="btn-download" download>Download</a>
+              </div>
+            </article>
+
+            <article class="book-card">
+              <div class="book-card-images">
                 <img
-                  src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Academic Release cover"
+                  src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=600"
+                  alt="Academic Release Workbook front cover"
+                  loading="lazy"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=600"
+                  alt="Academic Release Workbook back cover"
+                  loading="lazy"
                 />
               </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
+
+              <h3 class="book-card-title">
+                Academic Release Review Workbook
+              </h3>
+
+              <p class="book-card-desc">
+                A structured revision workbook featuring chapter-end reviews,
+                key-term glossaries and self-assessment checklists designed
+                for quick recall before major examinations.
+              </p>
+
+              <div class="book-card-actions">
+                <button
+                  type="button"
+                  class="btn-preview"
+                  data-preview-src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=contain&q=80&w=1200"
+                  data-preview-alt="Academic Release Review Workbook preview"
+                >
+                  Preview
+                </button>
+                <a href="#" class="btn-download" download>Download</a>
+              </div>
+            </article>
+
+            <article class="book-card">
+              <div class="book-card-images">
                 <img
-                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Learning Materials publication"
+                  src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600"
+                  alt="Featured Resource Guide front cover"
+                  loading="lazy"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600"
+                  alt="Featured Resource Guide back cover"
+                  loading="lazy"
                 />
               </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
-                <img
-                  src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Review Workbook cover"
-                />
+
+              <h3 class="book-card-title">
+                Featured Publication Resource Guide
+              </h3>
+
+              <p class="book-card-desc">
+                Eduooz's flagship resource guide combining exam-pattern
+                analysis, previous-year question trends and expert tips for
+                aspirants preparing for GCC and central-level exams.
+              </p>
+
+              <div class="book-card-actions">
+                <button
+                  type="button"
+                  class="btn-preview"
+                  data-preview-src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=contain&q=80&w=1200"
+                  data-preview-alt="Featured Publication Resource Guide preview"
+                >
+                  Preview
+                </button>
+                <a href="#" class="btn-download" download>Download</a>
               </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
-                <img
-                  src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Exam Prep booklet"
-                />
-              </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
-                <img
-                  src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Resource Guide volume"
-                />
-              </div>
-            </button>
-            <button class="publication-card" type="button">
-              <div class="publication-card-inner">
-                <img
-                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=contain&q=80&w=1000"
-                  alt="Eduooz Featured Publication cover"
-                />
-              </div>
-            </button>
+            </article>
+
           </div>
         </div>
       </section>

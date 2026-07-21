@@ -460,6 +460,78 @@
     }
   }
 
+  // The category shown by default whenever the Courses mega menu opens
+  // fresh (first hover, or after having been fully closed).
+  const DEFAULT_MEGA_MENU_CATEGORY = "nursing";
+
+  function activateMegaMenuCategory(category) {
+    const sidebarItems = document.querySelectorAll(".sidebar-item");
+    const panels = document.querySelectorAll(".category-panel");
+    if (!sidebarItems.length || !panels.length) return;
+
+    sidebarItems.forEach((si) => {
+      si.classList.remove("active");
+      si.setAttribute("aria-selected", "false");
+    });
+    panels.forEach((panel) => {
+      panel.classList.remove("active");
+      if (panel.id === category) panel.classList.add("active");
+    });
+    const active = document.querySelector(
+      '.sidebar-item[data-category="' + category + '"]',
+    );
+    if (active) {
+      active.classList.add("active");
+      active.setAttribute("aria-selected", "true");
+    }
+
+    // Switching category always starts from the fully-collapsed course
+    // list, so the panel that opens is never the huge, all-expanded one.
+    document.querySelectorAll(".course-section.expanded").forEach((s) => {
+      s.classList.remove("expanded");
+      const t = s.querySelector(".course-section-toggle");
+      if (t) t.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  /**
+   * Mobile-only: expand/collapse a category's course list directly beneath
+   * its own sidebar-item (true nested accordion), instead of switching
+   * which single panel is visible like the desktop tab list does.
+   * Only one category stays open at a time, mirroring the accordion
+   * behavior already used for the top-level dropdowns and course-sections.
+   */
+  function toggleMobileCategory(category) {
+    const sidebarItem = document.querySelector(
+      '.sidebar-item[data-category="' + category + '"]',
+    );
+    const panel = document.querySelector(".category-panel#" + category);
+    if (!sidebarItem || !panel) return;
+
+    const wasExpanded = sidebarItem.classList.contains("expanded");
+
+    document.querySelectorAll(".sidebar-item.expanded").forEach((item) => {
+      item.classList.remove("expanded");
+      item.setAttribute("aria-selected", "false");
+    });
+    document.querySelectorAll(".category-panel.expanded").forEach((p) => {
+      p.classList.remove("expanded");
+      // Collapse nested course-section accordions too, so reopening this
+      // category later always starts fully collapsed.
+      p.querySelectorAll(".course-section.expanded").forEach((s) => {
+        s.classList.remove("expanded");
+        const t = s.querySelector(".course-section-toggle");
+        if (t) t.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    if (!wasExpanded) {
+      sidebarItem.classList.add("expanded");
+      sidebarItem.setAttribute("aria-selected", "true");
+      panel.classList.add("expanded");
+    }
+  }
+
   /**
    * Initialize Mega Menu functionality (Desktop)
    * - Handles category switching on hover and keyboard (Enter/Space)
@@ -468,55 +540,42 @@
   function initMegaMenu() {
     const sidebarItems = document.querySelectorAll(".sidebar-item");
     const panels = document.querySelectorAll(".category-panel");
-    const dropdownWrapper = document.querySelector(".nav-item.dropdown");
     const trigger = document.getElementById("courses-menu-trigger");
+    const dropdownWrapper = trigger ? trigger.closest(".nav-item.dropdown") : null;
 
     if (!sidebarItems.length || !panels.length) return;
 
-    function activateCategory(category) {
-      sidebarItems.forEach((si) => {
-        si.classList.remove("active");
-        si.setAttribute("aria-selected", "false");
-      });
-      panels.forEach((panel) => {
-        panel.classList.remove("active");
-        if (panel.id === category) panel.classList.add("active");
-      });
-      const active = document.querySelector(
-        '.sidebar-item[data-category="' + category + '"]',
-      );
-      if (active) {
-        active.classList.add("active");
-        active.setAttribute("aria-selected", "true");
-      }
-
-      // Switching category always starts from the fully-collapsed course
-      // list, so the panel that opens is never the huge, all-expanded one.
-      document.querySelectorAll(".course-section.expanded").forEach((s) => {
-        s.classList.remove("expanded");
-        const t = s.querySelector(".course-section-toggle");
-        if (t) t.setAttribute("aria-expanded", "false");
-      });
-    }
-
     sidebarItems.forEach((item) => {
       item.addEventListener("mouseenter", function () {
-        activateCategory(this.getAttribute("data-category"));
+        activateMegaMenuCategory(this.getAttribute("data-category"));
       });
 
       item.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        const category = this.getAttribute("data-category");
+
+        if (window.innerWidth > 1024) {
           e.preventDefault();
-          activateCategory(this.getAttribute("data-category"));
+          activateMegaMenuCategory(category);
+          return;
+        }
+
+        // Mobile: only intercept the key when there's a nested course list
+        // to expand; a category with no panel (e.g. German) should navigate.
+        if (document.querySelector(".category-panel#" + category)) {
+          e.preventDefault();
+          toggleMobileCategory(category);
         }
       });
 
-      // On mobile there's no hover preview, so tapping a category tab
-      // switches the panel instead of navigating straight to its page.
+      // On mobile there's no hover preview, so tapping a category expands
+      // its course list in place instead of navigating straight to its page.
       item.addEventListener("click", function (e) {
         if (window.innerWidth > 1024) return; // desktop: let the link navigate
+        const category = this.getAttribute("data-category");
+        if (!document.querySelector(".category-panel#" + category)) return; // no submenu: let it navigate
         e.preventDefault();
-        activateCategory(this.getAttribute("data-category"));
+        toggleMobileCategory(category);
       });
     });
 
@@ -524,9 +583,12 @@
       dropdownWrapper.addEventListener("mouseenter", () =>
         trigger.setAttribute("aria-expanded", "true"),
       );
-      dropdownWrapper.addEventListener("mouseleave", () =>
-        trigger.setAttribute("aria-expanded", "false"),
-      );
+      dropdownWrapper.addEventListener("mouseleave", () => {
+        trigger.setAttribute("aria-expanded", "false");
+        // So the mega menu always reopens on its default category instead
+        // of whichever one the mouse happened to leave it on.
+        activateMegaMenuCategory(DEFAULT_MEGA_MENU_CATEGORY);
+      });
     }
   }
 
@@ -554,6 +616,13 @@
 
     wrapChildrenOnce(document.querySelector(".simple-menu"), "dropdown-panel-inner");
     wrapChildrenOnce(document.querySelector(".mega-menu"), "dropdown-panel-inner");
+
+    // Each category panel gets its own inner wrapper so it can collapse via
+    // a single grid-template-rows track, the same technique used for the
+    // course-section bodies below.
+    document.querySelectorAll(".category-panel").forEach((panel) => {
+      wrapChildrenOnce(panel, "category-panel-inner");
+    });
 
     let sectionId = 0;
     document.querySelectorAll(".course-section").forEach((section) => {
@@ -660,6 +729,17 @@
         const toggle = el.querySelector(":scope > .course-section-title .course-section-toggle");
         if (toggle) toggle.setAttribute("aria-expanded", "false");
       });
+      // And the mobile category accordion (Nursing/Pharmacy/MLT/German).
+      navLinks.querySelectorAll(".sidebar-item.expanded").forEach((el) => {
+        el.classList.remove("expanded");
+        el.setAttribute("aria-selected", "false");
+      });
+      navLinks.querySelectorAll(".category-panel.expanded").forEach((el) => {
+        el.classList.remove("expanded");
+      });
+      // Keeps the desktop hover tab in sync too, so it reopens on Nursing
+      // Coaching if the viewport is later resized past the mobile breakpoint.
+      activateMegaMenuCategory(DEFAULT_MEGA_MENU_CATEGORY);
     }
 
     navbarToggler.addEventListener("click", function () {
@@ -703,6 +783,7 @@
         if (isOpen) {
           navItem.classList.remove("open");
           this.setAttribute("aria-expanded", "false");
+          activateMegaMenuCategory(DEFAULT_MEGA_MENU_CATEGORY);
           return;
         }
 

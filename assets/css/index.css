@@ -2329,11 +2329,58 @@ body {
     font-size: 0.7rem;
   }
 
+  .active-video-meta {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 16px 16px;
+    background: linear-gradient(
+      to top,
+      rgba(7, 3, 14, 0.95) 10%,
+      rgba(7, 3, 14, 0.65) 80%,
+      transparent 100%
+    );
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .active-video-meta .vid-badge {
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+  }
+
   .active-video-meta h3 {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
   }
   .active-video-meta p {
-    font-size: 0.9rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+  }
+
+  .active-video-meta .vid-stats {
+    font-size: 0.72rem;
+    margin-top: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -2341,6 +2388,30 @@ body {
   .playlist-card {
     width: 110px; /* Ensures 3 cards are visible on tiny phones */
     height: 85px; /* Proportional height */
+  }
+
+  .active-video-meta {
+    padding: 10px 12px 12px;
+  }
+
+  .active-video-meta .vid-badge {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+    margin-bottom: 6px;
+  }
+
+  .active-video-meta h3 {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+
+  .active-video-meta p {
+    font-size: 0.72rem;
+  }
+
+  .active-video-meta .vid-stats {
+    font-size: 0.68rem;
+    margin-top: 4px;
   }
 }
 
@@ -2590,20 +2661,49 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* Below 769px the GSAP pin/scrub fly-through is disabled (index.js) so
+     the cards must lay out normally instead of sitting absolutely
+     stacked on top of each other waiting on JS to reveal them. */
   .spatial-sticky-container {
-    min-height: 100vh;
-    min-height: 100svh; /* Safe viewport height for mobile browsers */
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    display: block;
+    padding: 90px 0 50px;
+  }
+  #gyro-canvas {
+    display: none;
   }
   .spatial-header {
-    top: 4%;
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 90%;
+    margin: 0 auto 30px;
   }
   /* .spatial-header h2 { font-size: 1.9rem; } */
   .z-cards-container {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 90%;
     max-width: 92%;
-    height: 380px;
-    transform: translate(-50%, -35%);
+    height: auto;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    perspective: none;
   }
   .z-card {
+    position: relative;
+    width: 100%;
+    height: auto;
+    opacity: 1;
+    transform: none;
+    filter: none;
     padding: 35px 22px;
     border-radius: 24px;
   }
@@ -2631,9 +2731,6 @@ body {
 
 @media (max-width: 480px) {
   /* .spatial-header h2 { font-size: 1.6rem; } */
-  .z-cards-container {
-    height: 360px;
-  }
   .z-card {
     padding: 30px 18px;
   }

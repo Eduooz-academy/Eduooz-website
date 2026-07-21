@@ -122,65 +122,132 @@ body {
   pointer-events: none;
 }
 
+/* Grid: 2 book cards per row on desktop/tablet, 1 per row on mobile.
+   Equal card height comes from the grid row stretching every card to the
+   tallest sibling, combined with each .book-card being a flex column. */
 .publications-page .publications-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
   margin-top: 20px;
+  align-items: stretch;
 }
 
-.publications-page .publication-card {
-  display: grid;
-  align-items: center;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 26px;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
-  min-height: 380px;
+/* --- Book card --- */
+.publications-page .book-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
   transition:
     transform 0.35s ease,
-    box-shadow 0.35s ease,
-    border-color 0.35s ease;
-  cursor: pointer;
+    box-shadow 0.35s ease;
 }
 
-.publications-page .publication-card:hover,
-.publications-page .publication-card:focus-visible {
+.publications-page .book-card:hover,
+.publications-page .book-card:focus-within {
   transform: translateY(-6px);
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.14);
-  border-color: rgba(6, 182, 212, 0.18);
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.16);
+}
+
+/* Row 1: two cover images side by side, equal width/height */
+.publications-page .book-card-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.publications-page .book-card-images img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+/* Row 2: title, capped at 2 lines */
+.publications-page .book-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 10px;
+  color: #000000;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Row 3: description, capped at 4 lines, grows to push buttons to the bottom */
+.publications-page .book-card-desc {
+  flex: 1 1 auto;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(15, 23, 42, 0.65);
+  margin: 0 0 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Row 4: Preview / Download buttons, equal width */
+.publications-page .book-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.publications-page .book-card-actions .btn-preview,
+.publications-page .book-card-actions .btn-download {
+  flex: 1 1 140px;
+  text-align: center;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.publications-page .btn-preview {
+  background: transparent;
+  border-color: var(--brand-cyan)!important;
+  color: var(--brand-cyan);
+}
+
+.publications-page .btn-preview:hover,
+.publications-page .btn-preview:focus-visible {
+  background: var(--brand-cyan);
+  color: #ffffff;
+  transform: translateY(-2px);
   outline: none;
 }
 
-.publications-page .publication-card:focus-visible {
-  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.16);
+.publications-page .btn-download {
+  background: var(--brand-purple);
+  color: #ffffff;
 }
 
-.publications-page .publication-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  border-radius: 18px;
-  background: #090b14;
-  transition:
-    transform 0.45s ease,
-    filter 0.45s ease;
-}
-
-.publications-page .publication-card:hover img {
-  transform: scale(1.04);
-}
-
-.publications-page .publication-card-inner {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-}
-
-.publications-page .publication-card span {
-  display: none;
+.publications-page .btn-download:hover,
+.publications-page .btn-download:focus-visible {
+  background: var(--brand-magenta);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(91, 33, 182, 0.3);
+  outline: none;
 }
 
 .publications-page .publications-lightbox {
@@ -245,22 +312,26 @@ body {
   margin-top: 1rem;
 }
 
-@media (max-width: 1200px) {
-  .publications-page .publications-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
+/* Tablet: keep 2 cards per row, tighten spacing */
 @media (max-width: 900px) {
   .publications-page .page-hero-section {
     padding: 140px 0 80px;
   }
 
   .publications-page .publications-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .publications-page .book-card {
+    padding: 16px;
+  }
+
+  .publications-page .book-card-images img {
+    height: 180px;
   }
 }
 
+/* Mobile: 1 card per row */
 @media (max-width: 680px) {
   .publications-page .publications-grid {
     grid-template-columns: 1fr;
@@ -274,13 +345,13 @@ body {
     padding: 0 0 40px 0;
   }
 
-  .publications-page .publication-card {
-    min-height: 320px;
-    padding: 0.85rem;
+  .publications-page .book-card-images img {
+    height: 200px;
   }
 
-  .publications-page .publication-card img {
-    border-radius: 18px;
+  .publications-page .book-card-actions .btn-preview,
+  .publications-page .book-card-actions .btn-download {
+    flex: 1 1 100%;
   }
 
   .publications-page .lightbox-content {
@@ -291,5 +362,16 @@ body {
   .publications-page .lightbox-close {
     top: 20px;
     right: 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  .publications-page .book-card-images {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .publications-page .book-card-images img {
+    height: 140px;
   }
 }
