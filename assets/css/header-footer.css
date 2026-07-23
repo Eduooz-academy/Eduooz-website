@@ -811,10 +811,12 @@
   }
 
   .nav-links a {
-    font-size: 1.02rem;
-    font-weight: 600;
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: 0.1px;
     color: var(--brand-dark) !important;
     text-align: center;
+    overflow-wrap: anywhere;
   }
 
   /* Every top-level entry (plain link or dropdown trigger) shares one
@@ -832,8 +834,8 @@
     justify-content: center;
     gap: 12px;
     width: 100%;
-    min-height: 52px;
-    padding: 0 20px;
+    min-height: 56px;
+    padding: 0 24px;
     box-sizing: border-box;
     border-bottom: 1px solid rgba(91, 33, 182, 0.08);
   }
@@ -2193,6 +2195,13 @@ body.chat-is-open .scroll-to-top {
   display: block;
 }
 
+/* Mobile-only "view all" link (see components/header.html) — on desktop
+   the sidebar tab itself already navigates to the hub page on click, so
+   this extra link only needs to exist inside the mobile accordion. */
+.category-view-all {
+  display: none;
+}
+
 @keyframes panelFadeIn {
   from {
     opacity: 0;
@@ -2557,6 +2566,8 @@ body.chat-is-open .scroll-to-top {
   }
 
   .simple-menu-item {
+    box-sizing: border-box;
+    min-height: 44px;
     background: transparent;
     border: none;
     box-shadow: none;
@@ -2564,6 +2575,7 @@ body.chat-is-open .scroll-to-top {
     padding: 12px 12px;
     gap: 12px;
     font-size: 0.88rem;
+    white-space: normal;
     border-bottom: 1px solid rgba(91, 33, 182, 0.07);
   }
 
@@ -2589,6 +2601,7 @@ body.chat-is-open .scroll-to-top {
 
   .simple-menu-item span {
     font-size: 0.85rem;
+    overflow-wrap: anywhere;
   }
 
   /* ---- Courses: nested accordion ----
@@ -2608,15 +2621,19 @@ body.chat-is-open .scroll-to-top {
   .mega-menu .dropdown-panel-inner {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .sidebar-item {
-    padding: 13px 12px;
+    position: relative;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 14px 14px 14px 20px;
     background: rgba(91, 33, 182, 0.05);
     border: 1px solid rgba(91, 33, 182, 0.09);
     border-radius: 12px;
     margin-bottom: 0;
+    overflow: hidden;
   }
 
   .sidebar-item:hover {
@@ -2650,8 +2667,22 @@ body.chat-is-open .scroll-to-top {
     box-shadow: none;
   }
 
+  /* Left accent bar marks the open category, same visual language as the
+     desktop hover-active tab (.sidebar-item.active::before), but keyed off
+     .expanded since .active alone is neutralized on mobile (see above). */
+  .sidebar-item.expanded::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
+  }
+
   .sidebar-item.expanded .sidebar-info h4 {
     color: var(--brand-purple);
+    font-weight: 800;
   }
 
   .sidebar-item i {
@@ -2669,6 +2700,8 @@ body.chat-is-open .scroll-to-top {
 
   .sidebar-info h4 {
     font-size: 0.9rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
   }
 
   .sidebar-info p {
@@ -2704,11 +2737,21 @@ body.chat-is-open .scroll-to-top {
      override on specificity alone (.category-panel.active is two classes
      vs. one) and force it permanently open. Matching that specificity
      here is what lets .expanded be the only thing controlling visibility
-     on mobile. */
+     on mobile.
+
+     This uses max-height rather than the grid-template-rows 0fr/1fr trick
+     used elsewhere on this page: .category-panel is itself a flex item
+     here (mega-menu-sidebar/mega-menu-content are display:contents, which
+     lifts it up to be a direct child of the flex .dropdown-panel-inner).
+     WebKit/Safari cannot resolve a grid track's 1fr auto-content size for
+     a grid container that is simultaneously a flex item, and collapses it
+     to ~0 instead — so tapping Nursing/Pharmacy/MLT silently failed to
+     reveal anything on iOS. max-height only needs ordinary block intrinsic
+     sizing, which WebKit handles fine in this same flex-item context. */
   .mega-menu-content .category-panel {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    max-height: 0;
+    transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     /* Desktop's panelFadeIn keyframe fills opacity:1 forwards; neutralize
        it here so it can't fight this collapse/expand transition. */
@@ -2716,14 +2759,50 @@ body.chat-is-open .scroll-to-top {
   }
 
   .mega-menu-content .category-panel.expanded {
-    grid-template-rows: 1fr;
+    /* Comfortably above any real category's content height; only caps the
+       transition's travel distance, never clips actual content. */
+    max-height: 2000px;
   }
 
   .category-panel-inner {
     display: block;
     min-height: 0;
     overflow: hidden;
-    padding-top: 8px;
+    padding-top: 12px;
+    padding-left: 14px;
+  }
+
+  /* Tapping the sidebar row expands this accordion instead of navigating
+     (see toggleMobileCategory in components.js), so this is the only way
+     to actually reach the category's own hub page (e.g. courses/nursing.html)
+     on mobile. */
+  /* .nav-links a's own !important color rule outranks a single class on
+     specificity, so this needs the ".nav-links" prefix to actually win. */
+  .nav-links .category-view-all {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 44px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(91, 33, 182, 0.09);
+    color: var(--brand-purple) !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: left;
+    text-decoration: none !important;
+  }
+
+  .category-view-all i {
+    flex-shrink: 0;
+  }
+
+  .category-view-all:hover,
+  .category-view-all:active,
+  .category-view-all:focus-visible {
+    background: rgba(91, 33, 182, 0.14);
   }
 
   /* ---- Level 3: course-section headers act as accordion toggles ---- */
@@ -2741,9 +2820,13 @@ body.chat-is-open .scroll-to-top {
     border-bottom: none;
     text-transform: none;
     letter-spacing: 0;
-    font-size: 1rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
   }
 
+  /* Level 3: no fill, no rounded corners — just a thin purple vertical
+     line, so it reads as "nested under Level 2" rather than another card. */
   .course-section-toggle {
     appearance: none;
     -webkit-appearance: none;
@@ -2751,38 +2834,51 @@ body.chat-is-open .scroll-to-top {
     align-items: center;
     gap: 10px;
     width: 100%;
+    min-height: 40px;
     margin: 0;
-    padding: 12px 14px;
-    background: rgba(91, 33, 182, 0.05);
-    border: 1px solid rgba(91, 33, 182, 0.09);
-    border-radius: 12px;
+    padding: 8px 10px 8px 12px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid rgba(91, 33, 182, 0.22);
+    border-radius: 0;
     font: inherit;
     text-transform: none;
     color: inherit;
     text-align: left;
     cursor: pointer;
+    box-sizing: border-box;
+    transition:
+      background 0.2s ease,
+      border-left-color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .course-section-toggle:hover,
+  .course-section-toggle:active,
+  .course-section-toggle:focus-visible {
+    background: rgba(91, 33, 182, 0.045);
   }
 
   .course-section-toggle:focus-visible {
     outline: 2px solid var(--brand-purple);
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
 
   .section-caret {
     display: inline-block;
     margin-left: auto;
-    font-size: 0.72rem;
-    color: var(--brand-purple);
+    font-size: 0.62rem;
+    color: rgba(91, 33, 182, 0.55);
     transition: transform 0.22s ease;
   }
 
   .course-section.expanded .course-section-toggle {
-    background: rgba(91, 33, 182, 0.09);
-    border-color: rgba(91, 33, 182, 0.2);
+    background: rgba(91, 33, 182, 0.05);
+    border-left-color: var(--brand-purple);
   }
 
   .course-section.expanded .section-caret {
+    color: var(--brand-purple);
     transform: rotate(180deg);
   }
 
@@ -2801,7 +2897,8 @@ body.chat-is-open .scroll-to-top {
     display: block;
     min-height: 0;
     overflow: hidden;
-    padding-top: 6px;
+    padding-top: 8px;
+    padding-left: 12px;
   }
 
   /* ---- Level 4: compact list rows instead of large pills ---- */
@@ -2810,16 +2907,23 @@ body.chat-is-open .scroll-to-top {
     gap: 6px;
   }
 
+  /* Level 4: plain link rows, no card chrome — just enough hover/active
+     tint to confirm a tap registered. */
   .course-card {
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.7);
-    border-color: rgba(91, 33, 182, 0.08);
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 10px 10px;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
     box-shadow: none;
   }
 
-  .course-card:hover {
+  .course-card:hover,
+  .course-card:active,
+  .course-card:focus-visible {
     transform: none;
+    background: rgba(91, 33, 182, 0.06);
     box-shadow: none;
   }
 
@@ -2833,6 +2937,7 @@ body.chat-is-open .scroll-to-top {
   .course-card span {
     font-size: 0.85rem;
     line-height: 1.3;
+    overflow-wrap: anywhere;
   }
 
   .course-subsection {

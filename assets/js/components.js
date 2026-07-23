@@ -562,7 +562,14 @@
 
         // Mobile: only intercept the key when there's a nested course list
         // to expand; a category with no panel (e.g. German) should navigate.
-        if (document.querySelector(".category-panel#" + category)) {
+        // And once it's already expanded, let a second activation navigate
+        // to the category's own overview page instead of just collapsing it
+        // — otherwise there'd be no way to ever reach e.g. courses/nursing.html
+        // from mobile.
+        if (
+          document.querySelector(".category-panel#" + category) &&
+          !this.classList.contains("expanded")
+        ) {
           e.preventDefault();
           toggleMobileCategory(category);
         }
@@ -570,10 +577,14 @@
 
       // On mobile there's no hover preview, so tapping a category expands
       // its course list in place instead of navigating straight to its page.
+      // A second tap on an already-expanded category lets the link navigate,
+      // the same "tap to reveal, tap again to go" pattern used by the
+      // top-level Courses/About Us dropdown triggers below.
       item.addEventListener("click", function (e) {
         if (window.innerWidth > 1024) return; // desktop: let the link navigate
         const category = this.getAttribute("data-category");
         if (!document.querySelector(".category-panel#" + category)) return; // no submenu: let it navigate
+        if (this.classList.contains("expanded")) return; // already open: let the link navigate
         e.preventDefault();
         toggleMobileCategory(category);
       });
@@ -832,11 +843,11 @@
     });
   }
 
-  // Load components when DOM is ready
-  document.addEventListener("DOMContentLoaded", function () {
-    loadComponent(components.header, "header-container");
-    loadComponent(components.footer, "footer-container");
-    loadComponent(components.chat, "chat-container");
-    loadComponent(components.enquiryForm, "enquiry-form-container");
-  });
+  // Load components immediately — this script sits after the container divs
+  // in the DOM, so there's no need to wait for DOMContentLoaded (which would
+  // otherwise stack the fetch behind every later script on the page).
+  loadComponent(components.header, "header-container");
+  loadComponent(components.footer, "footer-container");
+  loadComponent(components.chat, "chat-container");
+  loadComponent(components.enquiryForm, "enquiry-form-container");
 })();

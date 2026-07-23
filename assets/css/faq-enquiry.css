@@ -474,6 +474,9 @@
   .enquiry-glass-panel {
     padding: 40px 30px;
   }
+  .enquiry-info {
+    text-align: center;
+  }
   .glass-form {
     padding: 30px 20px;
     margin: 0 auto;
@@ -486,7 +489,7 @@
 @media (max-width: 768px) {
   .enquiry-subtitle {
     font-size: 1rem;
-    text-align: left;
+    text-align: center;
   }
   .c-method h5 {
     text-align: justify;

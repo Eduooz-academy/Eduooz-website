@@ -3208,7 +3208,11 @@ body {
   overflow: hidden;
   z-index: 10;
 }
-
+@media (max-width:524px) {
+  .testimonials-premium-section {
+    padding-bottom: 50px;
+  }
+}
 .test-header {
   margin-bottom: 60px;
   position: relative;
