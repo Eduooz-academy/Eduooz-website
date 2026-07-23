@@ -2562,7 +2562,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ── Subscription-gate state ── */
     var SUB_STORAGE_KEY = "previousPaperSubscribed";
-    var isSubscribed = sessionStorage.getItem(SUB_STORAGE_KEY) === "true";
+    var isSubscribed =
+      sessionStorage.getItem(SUB_STORAGE_KEY) === "true" ||
+      localStorage.getItem("popupLeadFormSubmitted") === "true";
     var selectedPaper = null; /* { pdfUrl, downloadUrl, title, year } */
     var lastFocusedEl = null;
 
@@ -2813,6 +2815,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function unlockSubscription() {
       isSubscribed = true;
       sessionStorage.setItem(SUB_STORAGE_KEY, "true");
+      localStorage.setItem("popupLeadFormSubmitted", "true");
       applyAccessState();
     }
 
@@ -3054,6 +3057,138 @@ document.addEventListener("DOMContentLoaded", () => {
        mobile idle state — moving/detaching it never re-runs any of the
        setup above. */
     if (isMobileLayout()) detachPreviewPanel();
+  }
+
+  // --- 10d. SYLLABUS DOWNLOAD GATE — lead-capture popup before the PDF
+  // unlocks, reusing the same .qp-lead-modal-* markup/styles and the
+  // .lead-form submit handling as the Previous Year Question Paper gate. ---
+  function initSyllabusGate() {
+    var dlLink = document.querySelector(".btn-download-syllabus");
+    if (!dlLink) return;
+
+    var href = dlLink.getAttribute("href") || "";
+    // Some courses don't have a PDF yet and route this button straight to a
+    // WhatsApp enquiry instead — that's already a lead-capture action, so
+    // don't gate it behind a second form.
+    if (/wa\.me|api\.whatsapp\.com/i.test(href)) return;
+
+    var SUB_STORAGE_KEY = "syllabusSubscribed";
+    var isSubscribed =
+      sessionStorage.getItem(SUB_STORAGE_KEY) === "true" ||
+      localStorage.getItem("popupLeadFormSubmitted") === "true";
+    var lastFocusedEl = null;
+
+    /* ── Build lead-enquiry modal (reuses .glass-form/.lead-form) ── */
+    var leadModalOverlay = document.getElementById("syllabus-lead-modal-overlay");
+    if (!leadModalOverlay) {
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        '<div class="qp-lead-modal-overlay" id="syllabus-lead-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="syllabus-lead-modal-title">' +
+          '<div class="qp-lead-modal-content">' +
+          '<button type="button" class="qp-lead-modal-close" id="syllabus-lead-modal-close" aria-label="Close subscribe form"><i class="fa-solid fa-xmark"></i></button>' +
+          '<div class="qp-lead-modal-header">' +
+          '<span class="qp-lead-modal-eyebrow"><i class="fa-solid fa-lock"></i> Unlock Full Access</span>' +
+          '<h3 class="qp-lead-modal-title" id="syllabus-lead-modal-title">Subscribe to download syllabus</h3>' +
+          "<p class=\"qp-lead-modal-sub\">Share your details and we'll unlock the official syllabus PDF download instantly.</p>" +
+          "</div>" +
+          '<form class="glass-form lead-form" id="syllabus-lead-modal-form">' +
+          '<div class="form-row">' +
+          '<div class="input-group"><input type="text" name="name" required placeholder="Full Name"></div>' +
+          '<div class="input-group"><input type="tel" name="phone" required placeholder="Phone Number"></div>' +
+          "</div>" +
+          '<div class="input-group"><input type="email" name="email" placeholder="Email Address"></div>' +
+          '<div class="input-group select-wrapper">' +
+          '<select name="course" required>' +
+          '<option value="" disabled selected>Select Course Category</option>' +
+          '<option value="nursing">Nursing Coaching</option>' +
+          '<option value="pharmacy">Pharmacist Exams</option>' +
+          '<option value="mlt">Lab Technician Courses</option>' +
+          '<option value="german">German Languages</option>' +
+          "</select>" +
+          '<i class="fa-solid fa-chevron-down select-icon"></i>' +
+          "</div>" +
+          '<div class="input-group"><textarea name="message" rows="3" placeholder="How can we help you?"></textarea></div>' +
+          '<input type="hidden" name="source" value="Syllabus Download">' +
+          '<button type="submit" class="btn-form-submit">Submit &amp; Unlock <i class="fa-solid fa-unlock" style="margin-left:8px;"></i></button>' +
+          "</form>" +
+          "</div>" +
+          "</div>",
+      );
+      leadModalOverlay = document.getElementById("syllabus-lead-modal-overlay");
+    }
+    var leadModalContent = leadModalOverlay.querySelector(".qp-lead-modal-content");
+    var leadModalForm = document.getElementById("syllabus-lead-modal-form");
+    var leadModalClose = document.getElementById("syllabus-lead-modal-close");
+
+    function onModalKeydown(e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeLeadModal();
+        return;
+      }
+      if (e.key === "Tab" && leadModalContent) {
+        var focusables = leadModalContent.querySelectorAll(
+          "input, select, textarea, button:not([disabled])",
+        );
+        if (!focusables.length) return;
+        var first = focusables[0],
+          last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    function openLeadModal() {
+      lastFocusedEl = document.activeElement;
+      leadModalOverlay.classList.add("qp-active");
+      document.body.classList.add("qp-modal-open");
+      document.addEventListener("keydown", onModalKeydown);
+      var firstField = leadModalForm
+        ? leadModalForm.querySelector("input, select, textarea")
+        : null;
+      if (firstField) firstField.focus();
+    }
+
+    function closeLeadModal() {
+      leadModalOverlay.classList.remove("qp-active");
+      document.body.classList.remove("qp-modal-open");
+      document.removeEventListener("keydown", onModalKeydown);
+      if (lastFocusedEl && typeof lastFocusedEl.focus === "function")
+        lastFocusedEl.focus();
+    }
+
+    if (leadModalClose) leadModalClose.addEventListener("click", closeLeadModal);
+    leadModalOverlay.addEventListener("click", function (e) {
+      if (e.target === leadModalOverlay) closeLeadModal();
+    });
+
+    function unlockSubscription() {
+      isSubscribed = true;
+      sessionStorage.setItem(SUB_STORAGE_KEY, "true");
+      localStorage.setItem("popupLeadFormSubmitted", "true");
+    }
+
+    if (leadModalForm) {
+      leadModalForm.addEventListener("leadFormSuccess", function () {
+        closeLeadModal();
+        unlockSubscription();
+        dlLink.click(); // re-fire the click now that isSubscribed is true, letting it proceed normally
+      });
+      leadModalForm.addEventListener("leadFormError", function () {
+        /* keep modal open, PDF stays locked — forms.js already surfaced the error */
+      });
+    }
+
+    dlLink.addEventListener("click", function (e) {
+      if (isSubscribed) return; // already unlocked — let the download proceed
+      e.preventDefault();
+      openLeadModal();
+    });
   }
 
   // --- 11. RENDER PRACTICE TESTS ---
@@ -3452,6 +3587,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initReviewCarousel,
     initMockTestSystem,
     initQPExplorer,
+    initSyllabusGate,
   ].forEach((fn) => {
     try {
       fn();
