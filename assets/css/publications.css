@@ -85,7 +85,6 @@ body {
   width: 560px;
   height: 560px;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.18), transparent 55%);
   filter: blur(80px);
   pointer-events: none;
 }
@@ -118,8 +117,50 @@ body {
   right: -120px;
   width: 260px;
   height: 260px;
-  background: radial-gradient(circle, rgba(91, 33, 182, 0.14), transparent 63%);
+  background: transparent;
   pointer-events: none;
+}
+
+/* --- Filter Tabs --- */
+.publications-page .filter-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.publications-page .tab-btn {
+  padding: 12px 30px;
+  border-radius: 100px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: var(--text-muted-light);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.publications-page .tab-btn.active {
+  background: var(--brand-purple);
+  color: #fff;
+  border-color: var(--brand-purple);
+  box-shadow: 0 15px 30px rgba(91, 33, 182, 0.2);
+  transform: translateY(-2px);
+}
+
+.publications-page .publications-empty-state {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(15, 23, 42, 0.55);
+  font-size: 1rem;
+}
+
+.publications-page .publications-empty-state.visible {
+  display: block;
 }
 
 /* Grid: 2 book cards per row on desktop/tablet, 1 per row on mobile.

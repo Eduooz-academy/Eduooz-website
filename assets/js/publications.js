@@ -57,6 +57,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // --- Filter Tabs: Book Category Filtering ---
+  const emptyState = publicationsPage.querySelector(
+    ".publications-empty-state",
+  );
+
+  publicationsPage.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.classList.contains("active")) return;
+
+      const filter = btn.getAttribute("data-filter");
+      publicationsPage
+        .querySelectorAll(".tab-btn")
+        .forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const cards = publicationsPage.querySelectorAll(".book-card");
+      const hasGsap = typeof gsap !== "undefined";
+
+      const applyFilter = () => {
+        let visibleCount = 0;
+        cards.forEach((card) => {
+          const matches =
+            filter === "all" || card.getAttribute("data-category") === filter;
+          if (matches) {
+            visibleCount++;
+            card.style.display = "flex";
+            if (hasGsap) {
+              gsap.to(card, {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.4,
+                ease: "back.out(1.5)",
+                stagger: 0.05,
+              });
+            }
+          } else {
+            card.style.display = "none";
+          }
+        });
+        if (emptyState) {
+          emptyState.classList.toggle("visible", visibleCount === 0);
+        }
+      };
+
+      if (hasGsap) {
+        gsap.to(cards, {
+          opacity: 0,
+          scale: 0.9,
+          y: 20,
+          duration: 0.2,
+          onComplete: applyFilter,
+        });
+      } else {
+        applyFilter();
+      }
+    });
+  });
+
   // --- Scroll to Top Button ---
   const scrollTopBtn = document.getElementById("scrollTopBtn");
   if (scrollTopBtn) {

@@ -2560,6 +2560,11 @@ document.addEventListener("DOMContentLoaded", () => {
     var frameWrap = document.querySelector(".qp-frame-wrap");
     var currentZoom = 100;
 
+    if (noResults) {
+      var noResultsMsg = noResults.querySelector("p");
+      if (noResultsMsg) noResultsMsg.textContent = "No question papers available";
+    }
+
     /* ── Subscription-gate state ── */
     var SUB_STORAGE_KEY = "previousPaperSubscribed";
     var isSubscribed =
@@ -2781,17 +2786,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return (base || "question-paper") + ".pdf";
     }
 
-    /* ── Reflect current subscription state onto the preview/toolbar ── */
+    /* ── Reflect current subscription state onto the toolbar/download button.
+       The PDF preview itself is never gated — only the Download action is
+       locked behind the lead form, so the preview blur overlay is always
+       kept hidden here. ── */
     function applyAccessState() {
       if (subscribedBadge) subscribedBadge.classList.toggle("qp-show", isSubscribed);
+      if (subLock) subLock.classList.remove("qp-show");
 
-      if (!selectedPaper || !selectedPaper.pdfUrl) {
-        if (subLock) subLock.classList.remove("qp-show");
-        return;
-      }
+      if (!selectedPaper || !selectedPaper.pdfUrl) return;
 
       if (isSubscribed) {
-        if (subLock) subLock.classList.remove("qp-show");
         if (dlBtn) {
           dlBtn.href = selectedPaper.downloadUrl;
           dlBtn.setAttribute("download", makeDownloadFilename(selectedPaper.title));
@@ -2801,7 +2806,6 @@ document.addEventListener("DOMContentLoaded", () => {
           dlBtn.style.pointerEvents = "";
         }
       } else {
-        if (subLock) subLock.classList.add("qp-show");
         if (dlBtn) {
           dlBtn.setAttribute("href", "#");
           dlBtn.setAttribute("aria-disabled", "true");
@@ -2905,7 +2909,13 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ── Load preview ── */
     function loadPreview(pdfUrl, year, title, downloadUrl) {
       if (infoYear) infoYear.textContent = year || "";
-      if (infoTitle) infoTitle.textContent = title || "";
+      if (infoTitle) {
+        infoTitle.textContent = title || "";
+        /* Truncated with ellipsis in CSS — title attr gives a native
+           hover tooltip so the full paper name is still readable. */
+        if (title) infoTitle.title = title;
+        else infoTitle.removeAttribute("title");
+      }
 
       if (!pdfUrl) {
         selectedPaper = null;
@@ -3016,8 +3026,33 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    /* ── Year filter tabs ── */
+    /* ── Hover tooltips for card text that CSS truncates with ellipsis
+       (.qp-card-title, .qp-card-category) — lets users read the full
+       title/category on hover instead of guessing at the cut-off text. ── */
+    cardGrid.querySelectorAll(".qp-card").forEach(function (card) {
+      var titleEl = card.querySelector(".qp-card-title");
+      if (titleEl) {
+        var titleText = (card.dataset.title || titleEl.textContent || "").trim();
+        if (titleText) titleEl.title = titleText;
+      }
+      var categoryEl = card.querySelector(".qp-card-category");
+      if (categoryEl) {
+        var categoryText = (categoryEl.textContent || "").trim();
+        if (categoryText) categoryEl.title = categoryText;
+      }
+    });
+
+    /* ── Year filter tabs ──
+       Switching (or initially applying) a filter always auto-selects a
+       card within it and loads it into the preview: a card with an actual
+       PDF is preferred, but if the filter only has "Coming Soon" cards
+       (no data-pdf yet) the first of those is selected instead — reusing
+       the existing locked "Coming Soon" preview state rather than hiding
+       the preview panel. The preview is only hidden, with a "No question
+       papers available" message, when the filter matches no cards at all. */
     function applyFilter(year) {
+      var firstPdfCard = null;
+      var firstVisibleCard = null;
       var anyVisible = false;
       cardGrid.querySelectorAll(".qp-card").forEach(function (card) {
         var cardYear =
@@ -3027,15 +3062,26 @@ document.addEventListener("DOMContentLoaded", () => {
             : "");
         var visible = year === "all" || cardYear === year;
         card.style.display = visible ? "" : "none";
-        if (visible) anyVisible = true;
+        if (visible) {
+          anyVisible = true;
+          if (!firstVisibleCard) firstVisibleCard = card;
+          if (card.dataset.pdf && !firstPdfCard) firstPdfCard = card;
+        }
       });
       if (noResults) noResults.classList.toggle("qp-show", !anyVisible);
 
-      if (isMobileLayout() && selectedPaper) {
-        var activeCard = cardGrid.querySelector(".qp-card.qp-active");
-        if (!activeCard || activeCard.style.display === "none") {
-          detachPreviewPanel();
-        }
+      var cardToSelect = firstPdfCard || firstVisibleCard;
+      if (cardToSelect) {
+        if (previewPanel) previewPanel.style.display = "";
+        activateCard(cardToSelect); /* also handles mobile placement */
+      } else {
+        selectedPaper = null;
+        cardGrid.querySelectorAll(".qp-card").forEach(function (c) {
+          c.classList.remove("qp-active");
+        });
+        resetToIdle();
+        if (previewPanel) previewPanel.style.display = "none";
+        if (isMobileLayout()) detachPreviewPanel();
       }
     }
 
@@ -3051,12 +3097,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    /* Everything above must finish wiring while the preview panel is
-       still attached to the document (so document.getElementById lookups
-       inside it resolve). Only now, at the very end, detach it for the
-       mobile idle state — moving/detaching it never re-runs any of the
-       setup above. */
-    if (isMobileLayout()) detachPreviewPanel();
+    /* ── Default state: "All" filter active, first available PDF selected
+       and previewed automatically. Everything above must finish wiring
+       while the preview panel is still attached to the document (so
+       document.getElementById lookups inside it resolve) — this call
+       relies on that and handles mobile placement/detachment itself. */
+    var initialTab = tabsEl ? tabsEl.querySelector(".qp-year-tab.active") : null;
+    applyFilter(initialTab ? initialTab.dataset.year || "all" : "all");
   }
 
   // --- 10d. SYLLABUS DOWNLOAD GATE — lead-capture popup before the PDF
