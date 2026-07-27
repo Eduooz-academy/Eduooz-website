@@ -168,7 +168,7 @@ body {
    tallest sibling, combined with each .book-card being a flex column. */
 .publications-page .publications-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2rem;
   margin-top: 20px;
   align-items: stretch;
@@ -206,9 +206,11 @@ body {
 .publications-page .book-card-images img {
   width: 100%;
   height: 220px;
-  object-fit: cover;
+  object-fit: contain;
+  background: #f1f5f9;
   border-radius: 12px;
   display: block;
+  cursor: pointer;
 }
 
 /* Row 2: title, capped at 2 lines */
@@ -235,6 +237,64 @@ body {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Tagline pill, shown below the description */
+.publications-page .book-card-pill {
+  display: inline-block;
+  align-self: flex-start;
+  margin: 0 0 14px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: rgba(91, 33, 182, 0.08);
+  color: var(--brand-purple);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Exam list: tags with a Read More toggle for the overflow */
+.publications-page .book-card-exams {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.publications-page .exam-tag {
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: #f1f5f9;
+  color: rgba(15, 23, 42, 0.7);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.publications-page .exam-tag-extra {
+  display: none;
+}
+
+.publications-page .book-card-exams.is-expanded .exam-tag-extra {
+  display: inline-block;
+}
+
+.publications-page .btn-read-more {
+  padding: 5px 4px;
+  border: none;
+  background: none;
+  color: var(--brand-cyan);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.publications-page .btn-read-more:hover,
+.publications-page .btn-read-more:focus-visible {
+  text-decoration: underline;
+  outline: none;
 }
 
 /* Row 4: Preview / Download buttons, equal width */
@@ -303,6 +363,7 @@ body {
   justify-content: center;
   opacity: 0;
   pointer-events: none;
+  overflow: hidden;
   transition: opacity 0.35s ease;
 }
 
@@ -332,34 +393,113 @@ body {
   border-color: var(--brand-cyan);
 }
 
+.publications-page .lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(15, 23, 42, 0.55);
+  color: #ffffff;
+  display: none;
+  place-items: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.publications-page .lightbox-nav.visible {
+  display: grid;
+}
+
+.publications-page .lightbox-prev {
+  left: 28px;
+}
+
+.publications-page .lightbox-next {
+  right: 28px;
+}
+
+.publications-page .lightbox-nav:hover,
+.publications-page .lightbox-nav:focus-visible {
+  color: var(--brand-cyan);
+  border-color: var(--brand-cyan);
+  outline: none;
+}
+
+@media (max-width: 680px) {
+  .publications-page .lightbox-prev {
+    left: 12px;
+  }
+
+  .publications-page .lightbox-next {
+    right: 12px;
+  }
+
+  .publications-page .lightbox-nav {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+  }
+}
+
 .publications-page .lightbox-content {
   width: min(92%, 1200px);
-  max-height: 88vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 88vh;
   padding: 1rem;
+  overflow: auto;
+  text-align: center;
+  touch-action: pan-x pan-y;
+  scrollbar-width: none;
+}
+
+.publications-page .lightbox-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Inline-block + full-height pseudo-element centers the image without
+   the flex/grid "can't scroll to the clipped start edge" overflow bug,
+   so a zoomed-in image can be panned to reveal every edge. */
+.publications-page .lightbox-content::after {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
 }
 
 .publications-page .lightbox-content img {
-  width: 100%;
-  max-height: 88vh;
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   border-radius: 22px;
   box-shadow: 0 48px 120px rgba(0, 0, 0, 0.55);
+  transition: width 0.15s ease-out, height 0.15s ease-out;
+  cursor: zoom-in;
+}
+
+.publications-page .lightbox-content.is-zoomed img {
+  cursor: grab;
+}
+
+.publications-page .lightbox-content.is-dragging img {
+  cursor: grabbing;
 }
 
 .publications-page .section-desc {
   margin-top: 1rem;
 }
 
-/* Tablet: keep 2 cards per row, tighten spacing */
+/* Tablet: drop to 2 cards per row, tighten spacing */
 @media (max-width: 900px) {
   .publications-page .page-hero-section {
     padding: 140px 0 80px;
   }
 
   .publications-page .publications-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem;
   }
 
