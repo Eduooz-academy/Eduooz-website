@@ -2,6 +2,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const publicationsPage = document.querySelector(".publications-page");
   if (!publicationsPage) return;
 
+  // --- Keep an expanding card from visually dragging its row-siblings
+  //     along with it. The grid's equal-height rows (align-items: stretch)
+  //     size every card in a row to the tallest one, so when a card grows
+  //     via Read More, its siblings get stretched into blank empty space
+  //     even though nothing in them changed. See syncRowAlignment below. ---
+  const cardHasExpansion = (card) => {
+    const desc = card.querySelector(".book-card-desc-wrap");
+    const exams = card.querySelector(".book-card-exams");
+    return (
+      (desc && desc.classList.contains("is-expanded")) ||
+      (exams && exams.classList.contains("is-expanded"))
+    );
+  };
+
+  const getRowSiblings = (card) => {
+    const grid = card.closest(".publications-grid");
+    if (!grid) return [card];
+    const rowTop = card.offsetTop;
+    return Array.from(grid.querySelectorAll(".book-card")).filter(
+      (c) => c.style.display !== "none" && Math.abs(c.offsetTop - rowTop) < 1,
+    );
+  };
+
+  const syncRowAlignment = (card) => {
+    const rowSiblings = getRowSiblings(card);
+    // Once anything in the row is expanded, every card in it (expanded or
+    // not) is pinned to its own natural height so growth in one never
+    // shows up as blank stretch in another. .book-card is styled with
+    // height: 100% (to stretch across the row) which has to be overridden
+    // inline too, since align-self alone can't shrink an element whose
+    // height is explicitly set to fill its area. With nothing expanded in
+    // the row, the overrides are cleared and the default equal-height
+    // layout is restored untouched.
+    const rowHasExpansion = rowSiblings.some(cardHasExpansion);
+    rowSiblings.forEach((sibling) => {
+      sibling.style.alignSelf = rowHasExpansion ? "start" : "";
+      sibling.style.height = rowHasExpansion ? "auto" : "";
+    });
+  };
+
   // --- Exam list Read More / Show Less toggle ---
   // Scoped with .closest() to the exams list inside the clicked button's own
   // card, so expanding one card's exam tags never affects any other card.
@@ -13,7 +53,101 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.textContent = expanded
         ? btn.dataset.labelLess
         : btn.dataset.labelMore;
+      const card = btn.closest(".book-card");
+      if (card) syncRowAlignment(card);
     });
+  });
+
+  // --- Word-safe description truncation ---
+  // The 4-line CSS clamp (-webkit-line-clamp) crops at a fixed character
+  // position, which can slice a word in half. To always cut on a whole
+  // word, measure the real text (with the actual Read More button appended,
+  // exactly as it will render live) in a hidden, unclamped clone, and binary
+  // search for the longest word count where that combination still fits the
+  // clamped box's own height. The button is then moved to be the last
+  // inline child of the <p> itself, so it renders right after the dots with
+  // ordinary inline spacing — no separate gap/overlap accounting needed.
+  // The untouched original text stays in dataset.fullText for Show Less.
+  const computeTruncatedText = (desc, fullText, btn) => {
+    const maxHeight = desc.clientHeight;
+    if (!maxHeight) return fullText;
+
+    const clone = desc.cloneNode(true);
+    clone.style.cssText =
+      "position:absolute; left:-9999px; top:0; visibility:hidden; " +
+      "pointer-events:none; height:auto; max-height:none; " +
+      "-webkit-line-clamp:unset; overflow:visible;";
+    clone.style.width = `${desc.clientWidth}px`;
+    const cloneTrailing = clone.lastChild;
+    clone.appendChild(btn.cloneNode(true));
+    document.body.appendChild(clone);
+
+    cloneTrailing.textContent = fullText;
+    if (clone.scrollHeight <= maxHeight + 1) {
+      document.body.removeChild(clone);
+      return fullText;
+    }
+
+    const words = fullText.trim().split(/\s+/);
+    let lo = 0;
+    let hi = words.length;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      cloneTrailing.textContent = `${words.slice(0, mid).join(" ")}...`;
+      if (clone.scrollHeight <= maxHeight + 1) {
+        lo = mid;
+      } else {
+        hi = mid - 1;
+      }
+    }
+
+    document.body.removeChild(clone);
+    return lo > 0 ? `${words.slice(0, lo).join(" ")}...` : "...";
+  };
+
+  const applyDescriptionTruncation = () => {
+    publicationsPage.querySelectorAll(".book-card-desc-wrap").forEach((wrap) => {
+      const desc = wrap.querySelector(".book-card-desc");
+      const btn = wrap.querySelector(".btn-read-more-desc");
+      if (!desc || !btn) return;
+
+      // On a re-run (resize, fonts ready) the button is already the last
+      // child of desc from the previous pass — detach it first so cloning
+      // desc for measurement below doesn't double-count it.
+      if (btn.parentElement === desc) {
+        btn.remove();
+      }
+
+      const trailingText = desc.lastChild;
+      if (!trailingText || trailingText.nodeType !== Node.TEXT_NODE) return;
+
+      if (!desc.dataset.fullText) {
+        desc.dataset.fullText = trailingText.textContent;
+      }
+      desc.dataset.truncatedText = computeTruncatedText(
+        desc,
+        desc.dataset.fullText,
+        btn,
+      );
+      if (!wrap.classList.contains("is-expanded")) {
+        trailingText.textContent = desc.dataset.truncatedText;
+      }
+      desc.appendChild(btn);
+    });
+  };
+
+  applyDescriptionTruncation();
+  // Re-run once web fonts finish loading — if they're still swapping in at
+  // DOMContentLoaded, the button's measured width (part of the fit check
+  // above) can be off, based on the fallback font.
+  if (document.fonts && document.fonts.status !== "loaded") {
+    document.fonts.ready.then(applyDescriptionTruncation);
+  }
+
+  let resizeTimer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(applyDescriptionTruncation, 200);
   });
 
   // --- Description Read More / Show Less toggle ---
@@ -27,6 +161,20 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.textContent = expanded
         ? btn.dataset.labelLess
         : btn.dataset.labelMore;
+
+      // btn is the last child of desc (moved there by
+      // applyDescriptionTruncation), so its previous sibling is the
+      // trailing text node whose content needs to swap.
+      const desc = descWrap.querySelector(".book-card-desc");
+      const trailing = btn.previousSibling;
+      if (desc && trailing && trailing.nodeType === Node.TEXT_NODE) {
+        trailing.textContent = expanded
+          ? desc.dataset.fullText
+          : desc.dataset.truncatedText;
+      }
+
+      const card = btn.closest(".book-card");
+      if (card) syncRowAlignment(card);
     });
   });
 
