@@ -555,21 +555,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 6. GSAP Bento Parallax & Hover Effects ---
-    const bentoImages = gsap.utils.toArray('.bento-img');
-    bentoImages.forEach(img => {
-        gsap.to(img, {
-            yPercent: 15,
-            ease: "none",
-            scrollTrigger: {
-                trigger: img.parentElement,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 1 // Smoothed scrub to stop shattering
-            },
-            force3D: true
+    // --- 6. Bento Parallax (vanilla rAF, see parallax.js) ---
+    if (window.EduoozParallax) {
+        window.EduoozParallax.init({
+            selector: '.bento-img',
+            clipSelector: '.bento-card',
+            wrap: true,
+            strength: 0.12
         });
-    });
+    }
 
     // --- 7. GSAP Bento Box Reveal ---
     
@@ -647,21 +641,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 3. Image parallax inside approach cards
-    const approachImages = gsap.utils.toArray('.approach-card .card-img-zone img');
-    approachImages.forEach(img => {
-        gsap.to(img, {
-            yPercent: 10,
-            ease: "none",
-            scrollTrigger: {
-                trigger: img.closest('.timeline-row'),
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 1 // Added inertia smoothing
-            },
-            force3D: true
+    // 3. Image parallax inside approach cards (vanilla rAF, see parallax.js)
+    if (window.EduoozParallax) {
+        window.EduoozParallax.init({
+            selector: '.approach-card .card-img-zone img',
+            clipSelector: '.card-img-zone',
+            wrap: true,
+            strength: 0.12
         });
-    });
+    }
 
     // 4. Completion Badge Entrance
     const completionBadge = document.querySelector('.timeline-completion');

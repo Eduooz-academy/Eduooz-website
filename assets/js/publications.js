@@ -3,11 +3,27 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!publicationsPage) return;
 
   // --- Exam list Read More / Show Less toggle ---
+  // Scoped with .closest() to the exams list inside the clicked button's own
+  // card, so expanding one card's exam tags never affects any other card.
   publicationsPage.querySelectorAll(".btn-read-more").forEach((btn) => {
     btn.addEventListener("click", () => {
       const examsList = btn.closest(".book-card-exams");
       if (!examsList) return;
       const expanded = examsList.classList.toggle("is-expanded");
+      btn.textContent = expanded
+        ? btn.dataset.labelLess
+        : btn.dataset.labelMore;
+    });
+  });
+
+  // --- Description Read More / Show Less toggle ---
+  // Uses its own wrapper/class (.book-card-desc-wrap) so it toggles
+  // independently of the exam list's Read More in the same card.
+  publicationsPage.querySelectorAll(".btn-read-more-desc").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const descWrap = btn.closest(".book-card-desc-wrap");
+      if (!descWrap) return;
+      const expanded = descWrap.classList.toggle("is-expanded");
       btn.textContent = expanded
         ? btn.dataset.labelLess
         : btn.dataset.labelMore;

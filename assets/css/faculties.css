@@ -81,10 +81,16 @@ body {
    /* --- 1. Hero Section --- */
 .fac-hero {
   position: relative;
-  min-height: 100vh;
-  background-image: url('../images/optimized/faculty-banner-landscap.png');
-  background-size: cover;
+  /* Locked to the banner image's own ratio (1920x800) so the section's
+     height always scales exactly with its width — the image covers with
+     zero crop and zero letterbox at any viewport size. If the banner is
+     regenerated at a different ratio, update this value to match. */
+  aspect-ratio: 1920 / 800;
+  box-sizing: border-box;
+  background-image: url('../images/optimized/faculty-banner-landscap (2).jpeg');
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   padding-top: 100px;

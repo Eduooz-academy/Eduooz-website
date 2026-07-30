@@ -5,8 +5,8 @@
 AIIMS NORCET
 DSSSB Nursing Officer Exam
 ESIC Nursing Officer Exam
-JIPMER Nursing Officer Recruitment.html
-Military Nursing Service (MNS).html
+JIPMER Nursing Officer Recruitment
+Military Nursing Service (MNS)
 NVS School Nurse Recruitment
 PGIMER
 RCC
@@ -121,7 +121,7 @@ practice Test question and answer updation
 
 How to Add the Next Exam Type
 
-Create components/mock-test-questions/<key>.html — copy nursing-central.html, replace the question array
+Create components/mock-test-questions/<key>.html — copy nursing-questions.html, replace the question array
 On the course page: add data-question-bank="<key>" to #mts-wrapper and the same two script tags
 No changes to practice-test.js, course-landing.js, or any CSS
 
@@ -164,7 +164,14 @@ When a new Previous Question Paper PDF is added:
 
 
 
-
+Test 
+Subjects: 10
+Topics per subject: 5
+Total topics = 10 × 5 = 50
+Tests per topic: 5
+Total tests = 50 × 5 = 250
+Questions per test: 25
+Total questions = 250 × 25 = 6,250
 
 
 

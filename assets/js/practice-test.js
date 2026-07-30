@@ -3,21 +3,26 @@
 // Reads question data from window.EXAM_QUESTION_BANK
 // Initialized by the question-bank loader below after the bank is fetched
 //
-// Hierarchy: Category (5) -> Topic (5) -> Section (5) -> Question (25)
-// Target content: 5 Categories x 5 Topics x 5 Sections x 25 Questions
-// = 3,125 questions. Real per-topic content isn't supplied yet, so each
-// topic temporarily reuses the category's existing 5 sections (25 Q each,
-// order shuffled per topic instance) — swap in real content by adding a
-// `topics` array to a category in the question-bank data file; this
-// generator only runs when a category has no `topics` field of its own.
+// Hierarchy: Subject (count varies per exam) -> Topic (count varies per
+//            subject) -> Test (5, fixed) -> Question (25, fixed)
+// Each Test = 25 Qs. Each Topic = 5 Tests = 125 Qs (fixed). Each Subject's
+// total = its own topic count x 125 — topic count is NOT fixed at 5; it
+// scales per subject as real content is supplied, so there is no single
+// fixed bank-wide total. Real per-topic content isn't supplied yet for
+// most subjects, so any subject with no `topics` field of its own
+// temporarily reuses its existing 5 sections (25 Q each, order shuffled
+// per topic instance) as a stand-in for 5 topics — swap in real content by
+// adding a `topics` array (any length) to that subject in the
+// question-bank data file; this generator only runs when a subject has no
+// `topics` field of its own.
 // =============================================================
 (function () {
     function init() {
         const wrapper = document.getElementById('mts-wrapper');
         if (!wrapper) return;
 
-        const CATEGORIES = window.EXAM_QUESTION_BANK;
-        if (!CATEGORIES || !CATEGORIES.length) {
+        const SUBJECTS = window.EXAM_QUESTION_BANK;
+        if (!SUBJECTS || !SUBJECTS.length) {
             console.warn('[PracticeTest] window.EXAM_QUESTION_BANK is empty or not set.');
             return;
         }
@@ -31,31 +36,31 @@
             return a;
         }
 
-        // ── Topics (temporary: category's existing 5 sections, reused by
+        // ── Topics (temporary: subject's existing 5 tests, reused by
         //    every topic with question order shuffled per topic) — cached
-        //    once per category so the shuffle stays stable during the session.
-        const topicsCache = {}; // catIdx -> topics array
-        function topicsFor(catIdx) {
-            if (topicsCache[catIdx]) return topicsCache[catIdx];
-            const cat = CATEGORIES[catIdx];
-            const topics = cat.topics || Array.from({ length: 5 }, (_, t) => ({
+        //    once per subject so the shuffle stays stable during the session.
+        const topicsCache = {}; // subIdx -> topics array
+        function topicsFor(subIdx) {
+            if (topicsCache[subIdx]) return topicsCache[subIdx];
+            const subj = SUBJECTS[subIdx];
+            const topics = subj.topics || Array.from({ length: 5 }, (_, t) => ({
                 name: 'Topic ' + (t + 1),
-                sections: cat.sections.map(sec => ({
+                sections: subj.sections.map(sec => ({
                     name: sec.name,
                     questions: shuffled(sec.questions)
                 }))
             }));
-            topicsCache[catIdx] = topics;
+            topicsCache[subIdx] = topics;
             return topics;
         }
 
-        // ── Per-category state — progress persists across category switches;
+        // ── Per-subject state — progress persists across subject switches;
         //    each topic remembers its own last-visited section/question so
-        //    returning to a category or topic resumes exactly where it left off.
-        const categoryStates = {}; // catIdx -> state
+        //    returning to a subject or topic resumes exactly where it left off.
+        const subjectStates = {}; // subIdx -> state
 
-        function freshCategoryState(catIdx) {
-            const topics = topicsFor(catIdx);
+        function freshSubjectState(subIdx) {
+            const topics = topicsFor(subIdx);
             return {
                 currentTopic: 0,
                 topicCursor:  topics.map(() => ({ section: 0, question: 0 })),
@@ -64,19 +69,32 @@
             };
         }
 
-        let activeCategory = 0;
-        let TOPICS = topicsFor(activeCategory);
-        let state  = (categoryStates[activeCategory] = freshCategoryState(activeCategory));
+        // Boot into the first subject that actually has topics — subjects
+        // with an explicit empty `topics: []` (no real content yet) are
+        // shown in the nav as disabled "Coming Soon" entries and must never
+        // become the active subject.
+        let activeSubject = SUBJECTS.findIndex((s, i) => topicsFor(i).length > 0);
+        if (activeSubject === -1) {
+            console.warn('[PracticeTest] No subject in the question bank has any topics yet.');
+            return;
+        }
+        let TOPICS = topicsFor(activeSubject);
+        let state  = (subjectStates[activeSubject] = freshSubjectState(activeSubject));
         let chartInstances = {};
+        // Which subject's topic accordion is expanded in the left nav — starts
+        // in sync with activeSubject but toggles independently afterward, so
+        // re-clicking the active subject just collapses/expands it instead of
+        // re-navigating to the exam screen every time.
+        let expandedSubject = activeSubject;
 
-        function switchToCategory(catIdx) {
-            activeCategory = catIdx;
-            TOPICS = topicsFor(catIdx);
-            if (!categoryStates[catIdx]) categoryStates[catIdx] = freshCategoryState(catIdx);
-            state = categoryStates[catIdx];
+        function switchToSubject(subIdx) {
+            activeSubject = subIdx;
+            TOPICS = topicsFor(subIdx);
+            if (!subjectStates[subIdx]) subjectStates[subIdx] = freshSubjectState(subIdx);
+            state = subjectStates[subIdx];
         }
 
-        // Shorthand accessors for the current position within the active category
+        // Shorthand accessors for the current position within the active subject
         function curCursor()  { return state.topicCursor[state.currentTopic]; }
         function curTopic()   { return TOPICS[state.currentTopic]; }
         function curSection() { return curTopic().sections[curCursor().section]; }
@@ -123,13 +141,13 @@
             if (target) target.classList.remove('mts-hidden');
         }
 
-        // ── Per-category score — aggregated across every topic/section
-        //    answered so far in that category (independent per category). ──
-        function categoryAggregate(catIdx) {
-            const cState = categoryStates[catIdx];
-            if (!cState) return { answered: 0, correct: 0, wrong: 0 };
+        // ── Per-subject score — aggregated across every topic/section
+        //    answered so far in that subject (independent per subject). ──
+        function subjectAggregate(subIdx) {
+            const sState = subjectStates[subIdx];
+            if (!sState) return { answered: 0, correct: 0, wrong: 0 };
             let answered = 0, correct = 0, wrong = 0;
-            cState.answers.forEach(topicAnswers => {
+            sState.answers.forEach(topicAnswers => {
                 topicAnswers.forEach(sectionAnswers => {
                     sectionAnswers.forEach(a => {
                         if (a === null) return;
@@ -141,20 +159,25 @@
             return { answered, correct, wrong };
         }
 
-        // ── Category + Topic Nav (left panel, accordion) ─────────────
-        // Only the active category's topic panel is expanded; switching
-        // category is non-destructive — each category keeps its own progress.
-        function buildCatNav() {
-            const catNav = document.getElementById('mts-cat-nav');
-            if (!catNav) return;
-            catNav.innerHTML = CATEGORIES.map((cat, i) => {
-                const isActive = i === activeCategory;
-                const cState   = categoryStates[i];
-                const topics   = topicsFor(i);
-                const topicIdx = cState ? cState.currentTopic : 0;
+        // ── Subject + Topic Nav (left panel, accordion) ─────────────
+        // The expanded topic panel (expandedSubject) is independent of the
+        // active subject (activeSubject) — clicking the active subject's own
+        // button just toggles its accordion, it doesn't re-navigate; clicking
+        // a different subject switches to it and expands it. Switching
+        // subject is non-destructive — each subject keeps its own progress.
+        function buildSubjectNav() {
+            const subNav = document.getElementById('mts-cat-nav');
+            if (!subNav) return;
+            subNav.innerHTML = SUBJECTS.map((subj, i) => {
+                const isActive   = i === activeSubject;
+                const isOpen     = i === expandedSubject;
+                const sState     = subjectStates[i];
+                const topics     = topicsFor(i);
+                const hasContent = topics.length > 0;
+                const topicIdx = sState ? sState.currentTopic : 0;
                 const topicsHtml = topics.map((topic, t) => {
                     const total = topic.sections.reduce((n, s) => n + s.questions.length, 0);
-                    const answered = cState ? cState.answers[t].reduce((n, secAns) => n + secAns.filter(a => a !== null).length, 0) : 0;
+                    const answered = sState ? sState.answers[t].reduce((n, secAns) => n + secAns.filter(a => a !== null).length, 0) : 0;
                     const isTopicActive = isActive && t === topicIdx;
                     const isDone = total > 0 && answered === total;
                     const pct = total > 0 ? Math.round(answered / total * 100) : 0;
@@ -163,7 +186,7 @@
                     if (isDone)        cls += ' mts-topic-item-done';
                     const badge = isDone ? '<i class="fa-solid fa-check"></i>' : (t + 1);
                     const score = answered > 0 ? `<span class="mts-topic-item-score">${answered}/${total}</span>` : '';
-                    return `<button class="${cls}" data-cat-idx="${i}" data-topic-idx="${t}">
+                    return `<button class="${cls}" data-sub-idx="${i}" data-topic-idx="${t}">
                         <span class="mts-topic-item-badge">${badge}</span>
                         <span class="mts-topic-item-body">
                             <span class="mts-topic-item-name">${topic.name}</span>
@@ -173,30 +196,39 @@
                     </button>`;
                 }).join('');
                 return `<div class="mts-left-cat-group">
-                    <button class="mts-left-cat${isActive ? ' mts-left-cat-active' : ''}" data-cat-idx="${i}" style="--cat-col:${cat.color}">
-                        <i class="fa-solid ${cat.icon}"></i>
-                        <span>${cat.name}</span>
-                        <i class="fa-solid fa-chevron-down mts-cat-topic-toggle${isActive ? ' mts-cat-topic-toggle-open' : ''}"></i>
+                    <button class="mts-left-cat${isActive ? ' mts-left-cat-active' : ''}" data-sub-idx="${i}" style="--cat-col:${subj.color}"${hasContent ? '' : ' disabled'}>
+                        <i class="fa-solid ${subj.icon}"></i>
+                        <span>${subj.name}</span>
+                        ${hasContent
+                            ? `<i class="fa-solid fa-chevron-down mts-cat-topic-toggle${isOpen ? ' mts-cat-topic-toggle-open' : ''}"></i>`
+                            : '<span class="mts-left-cat-soon">Coming Soon</span>'}
                     </button>
-                    <div class="mts-cat-topics${isActive ? '' : ' mts-hidden'}">${topicsHtml}</div>
+                    <div class="mts-cat-topics${isOpen ? '' : ' mts-hidden'}">${topicsHtml}</div>
                 </div>`;
             }).join('');
 
-            catNav.querySelectorAll('.mts-left-cat').forEach(btn => {
+            subNav.querySelectorAll('.mts-left-cat').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const idx = parseInt(btn.dataset.catIdx);
-                    if (idx !== activeCategory) switchToCategory(idx);
+                    const idx = parseInt(btn.dataset.subIdx);
+                    if (idx === activeSubject) {
+                        // Already the active subject — just toggle its accordion open/closed.
+                        expandedSubject = expandedSubject === idx ? -1 : idx;
+                        buildSubjectNav();
+                        return;
+                    }
+                    switchToSubject(idx);
+                    expandedSubject = idx;
                     showScreen('exam');
                     renderQuestion();
                 });
             });
 
-            catNav.querySelectorAll('.mts-topic-item').forEach(item => {
+            subNav.querySelectorAll('.mts-topic-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const catIdx   = parseInt(item.dataset.catIdx);
+                    const subIdx  = parseInt(item.dataset.subIdx);
                     const topicIdx = parseInt(item.dataset.topicIdx);
-                    if (catIdx !== activeCategory) switchToCategory(catIdx);
+                    if (subIdx !== activeSubject) switchToSubject(subIdx);
                     state.currentTopic = topicIdx; // that topic's own cursor resumes automatically
                     showScreen('exam');
                     renderQuestion();
@@ -207,8 +239,8 @@
         }
 
         // ── Mobile-only topic row — a flat horizontal strip of the active
-        //    category's topics (mobile hides the desktop accordion instead
-        //    of nesting topics under one category button, since that reads
+        //    subject's topics (mobile hides the desktop accordion instead
+        //    of nesting topics under one subject button, since that reads
         //    as a long broken layout on narrow screens). Hidden via CSS on
         //    desktop/tablet; same switch-topic logic as the desktop list. ──
         function buildMobileTopicNav() {
@@ -229,12 +261,12 @@
             }
             const row = document.getElementById('mts-mobile-topics-row');
             if (!row) return;
-            const cState  = categoryStates[activeCategory];
-            const topics  = topicsFor(activeCategory);
-            const topicIdx = cState ? cState.currentTopic : 0;
+            const sState  = subjectStates[activeSubject];
+            const topics  = topicsFor(activeSubject);
+            const topicIdx = sState ? sState.currentTopic : 0;
             row.innerHTML = topics.map((topic, t) => {
                 const total = topic.sections.reduce((n, s) => n + s.questions.length, 0);
-                const answered = cState ? cState.answers[t].reduce((n, secAns) => n + secAns.filter(a => a !== null).length, 0) : 0;
+                const answered = sState ? sState.answers[t].reduce((n, secAns) => n + secAns.filter(a => a !== null).length, 0) : 0;
                 const isActive = t === topicIdx;
                 const isDone = total > 0 && answered === total;
                 let cls = 'mts-mobile-topic-pill';
@@ -262,19 +294,21 @@
             const t = state.currentTopic;
             const sections = curTopic().sections;
             tabsScroll.innerHTML = sections.map((sec, i) => {
+                const hasQuestions = sec.questions.length > 0;
                 const ans = state.answers[t][i];
                 const answered = ans.filter(a => a !== null).length;
-                const allDone = answered === sec.questions.length;
+                const allDone = hasQuestions && answered === sec.questions.length;
                 const isCurrent = i === curCursor().section;
 
                 let cls = 'mts-tab';
                 let icon = '';
-                if (isCurrent)    { cls += ' mts-tab-active'; icon = '<i class="fa-solid fa-circle-dot"></i> '; }
-                else if (allDone) { cls += ' mts-tab-done';   icon = '<i class="fa-solid fa-check"></i> '; }
+                if (!hasQuestions)     { cls += ' mts-tab-locked'; }
+                else if (isCurrent)    { cls += ' mts-tab-active'; icon = '<i class="fa-solid fa-circle-dot"></i> '; }
+                else if (allDone)      { cls += ' mts-tab-done';   icon = '<i class="fa-solid fa-check"></i> '; }
 
-                const scoreEl = answered > 0
+                const scoreEl = hasQuestions && answered > 0
                     ? `<span class="mts-tab-score">${answered}/${sec.questions.length}</span>`
-                    : '';
+                    : (!hasQuestions ? '<span class="mts-tab-score">Soon</span>' : '');
                 return `<button class="${cls}" data-sec="${i}"><span>${icon}Test ${i + 1}</span>${scoreEl}</button>`;
             }).join('');
             tabsScroll.querySelectorAll('.mts-tab').forEach(btn => {
@@ -287,9 +321,9 @@
             });
         }
 
-        // ── Category score summary — sits inside the Question Progress box,
+        // ── Subject score summary — sits inside the Question Progress box,
         //    between the question counter and the Topic/Section badge,
-        //    scoped to the currently active category. Created once and
+        //    scoped to the currently active subject. Created once and
         //    inserted as a sibling of #mts-q-counter / #mts-section-badge
         //    inside .mts-q-progress-info (never wiped by other renders,
         //    which don't touch that container's children directly). ──
@@ -304,12 +338,37 @@
                 if (sectionBadge) container.insertBefore(row, sectionBadge);
                 else container.appendChild(row);
             }
-            const agg = categoryAggregate(activeCategory);
+            const agg = subjectAggregate(activeSubject);
             row.innerHTML = `
                 <span class="mts-cat-topscore-item mts-cat-topscore-answered"><span>Answered</span><strong>${agg.answered}</strong></span>
                 <span class="mts-cat-topscore-item mts-cat-topscore-correct"><span>Correct</span><strong>${agg.correct}</strong></span>
                 <span class="mts-cat-topscore-item mts-cat-topscore-wrong"><span>Wrong</span><strong>${agg.wrong}</strong></span>
             `;
+        }
+
+        // ── "Coming Soon" placeholder — shown instead of the question card
+        //    when the current test has 0 questions (topic/test structure
+        //    exists, real content not supplied yet). Created once and
+        //    reused, same pattern as #mts-cat-topscore. ─────────────────
+        function showComingSoonTest() {
+            hide(questionCard);
+            hide(feedbackCard);
+            hide(navBar);
+            hide(doneScreen);
+            const panel = questionCard ? questionCard.parentElement : null;
+            let el = document.getElementById('mts-coming-soon');
+            if (!el && panel) {
+                el = document.createElement('div');
+                el.id = 'mts-coming-soon';
+                el.className = 'mts-coming-soon';
+                el.innerHTML = `
+                    <div class="mts-coming-soon-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <p class="mts-coming-soon-title">Questions Coming Soon</p>
+                    <p class="mts-coming-soon-sub">This test hasn't been added yet — check back soon.</p>
+                `;
+                panel.appendChild(el);
+            }
+            if (el) show(el);
         }
 
         // ── Render question ────────────────────────────────────────
@@ -319,6 +378,21 @@
             const s   = cur.section;
             const qi  = cur.question;
             const sec = curSection();
+
+            hide(document.getElementById('mts-coming-soon'));
+
+            if (!sec.questions.length) {
+                showComingSoonTest();
+                if (qNum)          qNum.textContent      = '';
+                if (qCounter)      qCounter.textContent  = 'No questions yet';
+                if (sectionBadge)  sectionBadge.textContent = `Topic ${t + 1} · Test ${s + 1}`;
+                if (progressFill)  progressFill.style.width = '0%';
+                buildSubjectNav();
+                buildTabs();
+                updateCatScoreRow();
+                return;
+            }
+
             const q   = sec.questions[qi];
             const existing = state.answers[t][s][qi];
             const answered = existing !== null;
@@ -372,7 +446,7 @@
                 updateNavButtons(t, s, qi);
             }
 
-            buildCatNav();
+            buildSubjectNav();
             buildTabs();
             updateCatScoreRow();
         }
@@ -517,7 +591,7 @@
             }
         }
 
-        // ── Results screen — scoped to the active category, aggregated
+        // ── Results screen — scoped to the active subject, aggregated
         //    per topic (each topic sums its 5 sections). ───────────────
         function showResults() {
             showScreen('results');
@@ -698,11 +772,11 @@
             ).join('') || '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:0.85rem;">No questions to show.</div>';
         }
 
-        // ── Retest — resets ONLY the active category's progress ──────
-        //    (a full multi-category reset is intentionally not wired up here)
+        // ── Retest — resets ONLY the active subject's progress ──────
+        //    (a full multi-subject reset is intentionally not wired up here)
         function retest() {
-            categoryStates[activeCategory] = freshCategoryState(activeCategory);
-            state = categoryStates[activeCategory];
+            subjectStates[activeSubject] = freshSubjectState(activeSubject);
+            state = subjectStates[activeSubject];
             showScreen('exam');
             renderQuestion();
         }
@@ -751,8 +825,8 @@
         // Init: disable submit until option selected
         if (submitBtn) submitBtn.disabled = true;
 
-        // ── Boot straight into Cardiology (category 1), Topic 1, Section 1,
-        //    Question 1 — its panel expanded, no click required.
+        // ── Boot straight into Subject 1, Topic 1, Section 1, Question 1 —
+        //    its panel expanded, no click required.
         showScreen('exam');
         renderQuestion();
     }

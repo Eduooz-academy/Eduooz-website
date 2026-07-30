@@ -1113,18 +1113,15 @@ document.addEventListener("DOMContentLoaded", () => {
       "-=0.4",
     );
 
-  // Independent Parallax effect for the main image
-  gsap.to(".stack-main img", {
-    scrollTrigger: {
-      trigger: ".about-hybrid-premium",
-      start: "top bottom",
-      end: "bottom top",
-      scrub: 1.5, // Added scrubbing duration for smooth, non-jittery parallax
-    },
-    y: "15%",
-    ease: "none",
-    force3D: true,
-  });
+  // Independent Parallax effect for the main image (vanilla rAF, see parallax.js)
+  if (window.EduoozParallax) {
+    window.EduoozParallax.init({
+      selector: ".stack-main img",
+      clipSelector: ".stack-main",
+      wrap: true,
+      strength: 0.12,
+    });
+  }
 
   // --- 6. GSAP Why Eduooz Reveal & Stacking ---
   gsap.set(".g-why-reveal", { autoAlpha: 1 });

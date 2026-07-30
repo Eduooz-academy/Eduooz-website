@@ -789,7 +789,7 @@
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    background: #fdfcff;
+    background: linear-gradient(180deg, #ffffff 0%, #eee2fb 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
@@ -2553,6 +2553,11 @@ body.chat-is-open .scroll-to-top {
     display: block;
     min-height: 0;
     overflow: hidden;
+    visibility: hidden;
+  }
+
+  .nav-item.dropdown.open .dropdown-panel-inner {
+    visibility: visible;
   }
 
   /* ---- About Us: one cohesive card instead of five floating ones ---- */
