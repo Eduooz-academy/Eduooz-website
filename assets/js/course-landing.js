@@ -2686,7 +2686,10 @@ document.addEventListener("DOMContentLoaded", () => {
           '<div class="input-group"><input type="text" name="name" required placeholder="Full Name"></div>' +
           '<div class="input-group"><input type="tel" name="phone" required placeholder="Phone Number"></div>' +
           "</div>" +
+          '<div class="form-row">' +
           '<div class="input-group"><input type="email" name="email" placeholder="Email Address"></div>' +
+          '<div class="input-group"><input type="text" name="state" required placeholder="State"></div>' +
+          "</div>" +
           '<div class="input-group select-wrapper">' +
           '<select name="course" required>' +
           '<option value="" disabled selected>Select Course Category</option>' +
@@ -3143,7 +3146,10 @@ document.addEventListener("DOMContentLoaded", () => {
           '<div class="input-group"><input type="text" name="name" required placeholder="Full Name"></div>' +
           '<div class="input-group"><input type="tel" name="phone" required placeholder="Phone Number"></div>' +
           "</div>" +
+          '<div class="form-row">' +
           '<div class="input-group"><input type="email" name="email" placeholder="Email Address"></div>' +
+          '<div class="input-group"><input type="text" name="state" required placeholder="State"></div>' +
+          "</div>" +
           '<div class="input-group select-wrapper">' +
           '<select name="course" required>' +
           '<option value="" disabled selected>Select Course Category</option>' +

@@ -124,6 +124,16 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("headerLoaded", initNavbarScroll);
   }
 
+  // --- 2b. Course Meta "Read more" Toggle ---
+  document.querySelectorAll(".stack-courses-section .meta-toggle-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const wrap = btn.closest(".course-meta-wrap");
+      if (!wrap) return;
+      const expanded = wrap.classList.toggle("expanded");
+      btn.textContent = expanded ? "Show less" : "Read more";
+    });
+  });
+
   // --- 2. Three.js: Floating Healthcare Elements Backgroundy5t7yg7 ---
   const container = document.getElementById("cinematic-canvas");
   if (container) {

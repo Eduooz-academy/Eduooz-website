@@ -73,6 +73,7 @@ document.addEventListener("submit", async function (e) {
     name: form.elements["name"].value.trim(),
     phone: form.elements["phone"].value.trim(),
     email: form.elements["email"].value.trim(),
+    state: form.elements["state"] ? form.elements["state"].value.trim() : "",
     course: form.elements["course"].value,
     message: form.elements["message"].value.trim()
   };
