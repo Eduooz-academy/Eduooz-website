@@ -2,7 +2,7 @@
 
 Official static website for **Eduooz International Academy**, a healthcare exam coaching academy based in Trivandrum, Kerala, India, preparing candidates for Nursing, Pharmacy, Medical Laboratory Technology (MLT), and German-language recruitment and licensure exams.
 
-**Status:** 🟢 Active development (last commit: 2026-07-30)
+**Status:** 🟢 Active development (last commit: 2026-08-03)
 
 [![Made with HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 [![Made with CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
@@ -104,7 +104,7 @@ Official static website for **Eduooz International Academy**, a healthcare exam 
 
 | Technology | Purpose |
 |---|---|
-| HTML5 | Page structure (66+ static `.html` pages, no templating engine) |
+| HTML5 | Page structure (75 static `.html` pages, no templating engine) |
 | CSS3 | Styling — one stylesheet per page/section under `assets/css/` |
 | JavaScript (vanilla, ES5/ES6, no framework) | Interactivity, component loading, practice-test engine |
 | [GSAP](https://gsap.com/) + ScrollTrigger | Scroll and UI animation (loaded via cdnjs) |
@@ -126,7 +126,7 @@ All third-party libraries are loaded via CDN `<script>`/`<link>` tags directly i
 Eduooz-website/
 ├── assets/
 │   ├── css/                       # One stylesheet per page/feature (18 files)
-│   ├── js/                        # One script per page/feature (21 files)
+│   ├── js/                        # One script per page/feature (20 files)
 │   ├── images/                    # Site images, logo, favicon, mentor photos, gallery
 │   ├── Prev.Qn.papers/            # Downloadable previous-question-paper PDFs (nursing/…)
 │   └── Syllabus/                  # Downloadable syllabus PDFs (nursing/…)

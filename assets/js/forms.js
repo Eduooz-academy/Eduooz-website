@@ -96,6 +96,11 @@ document.addEventListener("submit", async function (e) {
 
     alert("Enquiry submitted successfully!");
     form.reset();
+    // Any successful lead-form submission (syllabus gate, question-paper
+    // gate, mock-test gate, or the plain enquiry section form) counts as
+    // "already subscribed" site-wide, so the other gated popups skip
+    // themselves instead of asking the same visitor twice.
+    localStorage.setItem("popupLeadFormSubmitted", "true");
     form.dispatchEvent(new CustomEvent("leadFormSuccess", { bubbles: true, detail: data }));
 
   } catch (error) {

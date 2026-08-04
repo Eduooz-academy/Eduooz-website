@@ -117,50 +117,6 @@ Total  = 58
 
 
 
-practice Test question and answer updation
-
-How to Add the Next Exam Type
-
-Create components/mock-test-questions/<key>.html — copy nursing-questions.html, replace the question array
-On the course page: add data-question-bank="<key>" to #mts-wrapper and the same two script tags
-No changes to practice-test.js, course-landing.js, or any CSS
-
-
-
-
-goggle reviews updation 
-To apply to other landing pages
-Add just two things to any other page:
-
-data-page-type="nursing" (or "pharmacy" / "german" / "lab-tech") on the <section id="reviews"> element
-Clear its hardcoded #greview-track cards
-Add <script src="[path]/google-reviews.js" defer></script> after course-landing.js
-
-What was applied to each page:
-
-data-page-type="nursing" on <section id="reviews"> — all nursing sub-types (GCC prometric, Kerala state, central govt) get the nursing keyword filter, which covers DHA, HAAD, MOH, NCLEX, NORCET, recruitment, etc.
-Hardcoded greview-card content cleared from #greview-track
-google-reviews.js script tag injected after course-landing.js
-
-
-
-
-
-Future updates
-
-When a new Previous Question Paper PDF is added:
-
-1. Upload the PDF to the existing `assets/Prev.Qn.papers/` folder.
-2. Update the corresponding `.qp-card`:
-   - Set `data-pdf` to the PDF path.
-   - Set `data-download` to the same PDF path.
-3. Change the badge text from `Coming Soon` to `Preview Available`.
-4. Ensure the preview and download work correctly.
-5. Do not modify any CSS or JavaScript. Reuse the existing implementation and logic.
-
-
-
-
 
 
 

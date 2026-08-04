@@ -512,6 +512,7 @@
             const isCorrect   = selectedIdx === TOPICS[t].sections[s].questions[qi].ans;
 
             state.answers[t][s][qi] = { selected: selectedIdx, correct: isCorrect };
+            answeredCount++;
             hide(submitBtn);
             renderQuestion();
         }
@@ -781,6 +782,126 @@
             renderQuestion();
         }
 
+        // ── Lead-capture gate — after the first LEAD_GATE_THRESHOLD
+        //    questions answered in this session, block further progress
+        //    until the popup form (reuses .glass-form/.lead-form and the
+        //    shared popupLeadFormSubmitted flag also used by the
+        //    syllabus-download and question-paper gates elsewhere on the
+        //    site) is submitted. Once unlocked, it stays unlocked for the
+        //    rest of the test — and for the other gated features too. ──
+        const LEAD_GATE_THRESHOLD   = 10;
+        const LEAD_GATE_STORAGE_KEY = 'popupLeadFormSubmitted';
+        let answeredCount    = 0;
+        let pendingAdvance   = null;
+        let leadGateLastFocusedEl = null;
+
+        // Read live (not cached) so a form submitted elsewhere on the same
+        // page view — the syllabus or question-paper gate, or the plain
+        // enquiry section form — is picked up immediately, without needing
+        // a page reload.
+        function isLeadGateUnlocked() {
+            return localStorage.getItem(LEAD_GATE_STORAGE_KEY) === 'true';
+        }
+
+        if (!document.getElementById('mts-lead-modal-overlay')) {
+            document.body.insertAdjacentHTML('beforeend',
+                '<div class="qp-lead-modal-overlay" id="mts-lead-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mts-lead-modal-title">' +
+                    '<div class="qp-lead-modal-content">' +
+                        '<button type="button" class="qp-lead-modal-close" id="mts-lead-modal-close" aria-label="Close form"><i class="fa-solid fa-xmark"></i></button>' +
+                        '<div class="qp-lead-modal-header">' +
+                            '<span class="qp-lead-modal-eyebrow"><i class="fa-solid fa-graduation-cap"></i> Keep Going</span>' +
+                            '<h3 class="qp-lead-modal-title" id="mts-lead-modal-title">Share your details to continue</h3>' +
+                            '<p class="qp-lead-modal-sub">You&rsquo;ve completed ' + LEAD_GATE_THRESHOLD + ' questions — tell us a bit about you to unlock the rest of this free practice test.</p>' +
+                        '</div>' +
+                        '<form class="glass-form lead-form" id="mts-lead-modal-form">' +
+                            '<div class="form-row">' +
+                                '<div class="input-group"><input type="text" name="name" required placeholder="Full Name"></div>' +
+                                '<div class="input-group"><input type="tel" name="phone" required placeholder="Phone Number"></div>' +
+                            '</div>' +
+                            '<div class="form-row">' +
+                                '<div class="input-group"><input type="email" name="email" placeholder="Email Address"></div>' +
+                                '<div class="input-group"><input type="text" name="state" required placeholder="State"></div>' +
+                            '</div>' +
+                            '<div class="input-group select-wrapper">' +
+                                '<select name="course" required>' +
+                                    '<option value="" disabled selected>Select Course Category</option>' +
+                                    '<option value="nursing">Nursing Coaching</option>' +
+                                    '<option value="pharmacy">Pharmacist Exams</option>' +
+                                    '<option value="mlt">Lab Technician Courses</option>' +
+                                    '<option value="german">German Languages</option>' +
+                                '</select>' +
+                                '<i class="fa-solid fa-chevron-down select-icon"></i>' +
+                            '</div>' +
+                            '<div class="input-group"><textarea name="message" rows="3" placeholder="How can we help you?"></textarea></div>' +
+                            '<input type="hidden" name="source" value="Free Practice Test">' +
+                            '<button type="submit" class="btn-form-submit">Submit &amp; Continue Test <i class="fa-solid fa-arrow-right" style="margin-left:8px;"></i></button>' +
+                        '</form>' +
+                    '</div>' +
+                '</div>');
+        }
+        const leadGateOverlay = document.getElementById('mts-lead-modal-overlay');
+        const leadGateForm    = document.getElementById('mts-lead-modal-form');
+        const leadGateClose   = document.getElementById('mts-lead-modal-close');
+
+        function onLeadGateKeydown(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeLeadGateModal();
+                return;
+            }
+            if (e.key === 'Tab' && leadGateOverlay) {
+                const content = leadGateOverlay.querySelector('.qp-lead-modal-content');
+                const focusables = content ? content.querySelectorAll('input, select, textarea, button:not([disabled])') : [];
+                if (!focusables.length) return;
+                const first = focusables[0], last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }
+
+        function openLeadGateModal() {
+            if (!leadGateOverlay) return;
+            leadGateLastFocusedEl = document.activeElement;
+            leadGateOverlay.classList.add('qp-active');
+            document.body.classList.add('qp-modal-open');
+            document.addEventListener('keydown', onLeadGateKeydown);
+            const firstField = leadGateOverlay.querySelector('input, select, textarea');
+            if (firstField) firstField.focus();
+        }
+
+        function closeLeadGateModal() {
+            if (!leadGateOverlay) return;
+            leadGateOverlay.classList.remove('qp-active');
+            document.body.classList.remove('qp-modal-open');
+            document.removeEventListener('keydown', onLeadGateKeydown);
+            if (leadGateLastFocusedEl && typeof leadGateLastFocusedEl.focus === 'function')
+                leadGateLastFocusedEl.focus();
+        }
+
+        if (leadGateClose) leadGateClose.addEventListener('click', closeLeadGateModal);
+        if (leadGateOverlay) {
+            leadGateOverlay.addEventListener('click', (e) => {
+                if (e.target === leadGateOverlay) closeLeadGateModal();
+            });
+        }
+        if (leadGateForm) {
+            leadGateForm.addEventListener('leadFormSuccess', () => {
+                // forms.js already sets LEAD_GATE_STORAGE_KEY on every
+                // successful .lead-form submission — nothing to write here.
+                closeLeadGateModal();
+                if (pendingAdvance) {
+                    const fn = pendingAdvance;
+                    pendingAdvance = null;
+                    fn();
+                }
+            });
+        }
+
         // ── Wire events ────────────────────────────────────────────
         if (submitBtn) submitBtn.addEventListener('click', submitAnswer);
 
@@ -792,7 +913,7 @@
             }
         });
 
-        if (nextBtn) nextBtn.addEventListener('click', () => {
+        function proceedToNext() {
             const t   = state.currentTopic;
             const cur = curCursor();
             const s   = cur.section;
@@ -817,6 +938,15 @@
             } else {
                 showResults();
             }
+        }
+
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+            if (!isLeadGateUnlocked() && answeredCount >= LEAD_GATE_THRESHOLD) {
+                pendingAdvance = proceedToNext;
+                openLeadGateModal();
+                return;
+            }
+            proceedToNext();
         });
 
         const retestBtn = document.getElementById('mts-retest-btn');

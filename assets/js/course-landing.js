@@ -2565,11 +2565,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (noResultsMsg) noResultsMsg.textContent = "No question papers available";
     }
 
-    /* ── Subscription-gate state ── */
+    /* ── Subscription-gate state ──
+       Read live (not cached) so a lead form submitted anywhere else on the
+       same page view — the main enquiry form, a course application form,
+       the syllabus gate, or the mock-test gate — is picked up immediately,
+       without needing a page reload. */
     var SUB_STORAGE_KEY = "previousPaperSubscribed";
-    var isSubscribed =
-      sessionStorage.getItem(SUB_STORAGE_KEY) === "true" ||
-      localStorage.getItem("popupLeadFormSubmitted") === "true";
+    function isSubscribed() {
+      return (
+        sessionStorage.getItem(SUB_STORAGE_KEY) === "true" ||
+        localStorage.getItem("popupLeadFormSubmitted") === "true"
+      );
+    }
     var selectedPaper = null; /* { pdfUrl, downloadUrl, title, year } */
     var lastFocusedEl = null;
 
@@ -2666,7 +2673,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
     if (toolbarActions) subscribedBadge = document.getElementById("qp-tbtn-subscribed");
-    if (subscribedBadge && isSubscribed) subscribedBadge.classList.add("qp-show");
+    if (subscribedBadge && isSubscribed()) subscribedBadge.classList.add("qp-show");
 
     /* ── Build lead-enquiry subscribe modal (reuses .glass-form/.lead-form) ── */
     var leadModalOverlay = document.getElementById("qp-lead-modal-overlay");
@@ -2794,12 +2801,12 @@ document.addEventListener("DOMContentLoaded", () => {
        locked behind the lead form, so the preview blur overlay is always
        kept hidden here. ── */
     function applyAccessState() {
-      if (subscribedBadge) subscribedBadge.classList.toggle("qp-show", isSubscribed);
+      if (subscribedBadge) subscribedBadge.classList.toggle("qp-show", isSubscribed());
       if (subLock) subLock.classList.remove("qp-show");
 
       if (!selectedPaper || !selectedPaper.pdfUrl) return;
 
-      if (isSubscribed) {
+      if (isSubscribed()) {
         if (dlBtn) {
           dlBtn.href = selectedPaper.downloadUrl;
           dlBtn.setAttribute("download", makeDownloadFilename(selectedPaper.title));
@@ -2820,9 +2827,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function unlockSubscription() {
-      isSubscribed = true;
       sessionStorage.setItem(SUB_STORAGE_KEY, "true");
-      localStorage.setItem("popupLeadFormSubmitted", "true");
       applyAccessState();
     }
 
@@ -2839,7 +2844,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (subDlBtn) {
       subDlBtn.addEventListener("click", function (e) {
         e.preventDefault();
-        if (!isSubscribed) {
+        if (!isSubscribed()) {
           openLeadModal();
           return;
         }
@@ -2853,7 +2858,7 @@ document.addEventListener("DOMContentLoaded", () => {
           e.preventDefault();
           return;
         }
-        if (!isSubscribed) {
+        if (!isSubscribed()) {
           e.preventDefault();
           openLeadModal();
         }
@@ -3122,10 +3127,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // don't gate it behind a second form.
     if (/wa\.me|api\.whatsapp\.com/i.test(href)) return;
 
+    // Read live (not cached) so a lead form submitted anywhere else on the
+    // same page view — the main enquiry form, a course application form,
+    // the QP gate, or the mock-test gate — is picked up immediately,
+    // without needing a page reload.
     var SUB_STORAGE_KEY = "syllabusSubscribed";
-    var isSubscribed =
-      sessionStorage.getItem(SUB_STORAGE_KEY) === "true" ||
-      localStorage.getItem("popupLeadFormSubmitted") === "true";
+    function isSubscribed() {
+      return (
+        sessionStorage.getItem(SUB_STORAGE_KEY) === "true" ||
+        localStorage.getItem("popupLeadFormSubmitted") === "true"
+      );
+    }
     var lastFocusedEl = null;
 
     /* ── Build lead-enquiry modal (reuses .glass-form/.lead-form) ── */
@@ -3221,16 +3233,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function unlockSubscription() {
-      isSubscribed = true;
       sessionStorage.setItem(SUB_STORAGE_KEY, "true");
-      localStorage.setItem("popupLeadFormSubmitted", "true");
     }
 
     if (leadModalForm) {
       leadModalForm.addEventListener("leadFormSuccess", function () {
         closeLeadModal();
         unlockSubscription();
-        dlLink.click(); // re-fire the click now that isSubscribed is true, letting it proceed normally
+        dlLink.click(); // re-fire the click now that isSubscribed() is true, letting it proceed normally
       });
       leadModalForm.addEventListener("leadFormError", function () {
         /* keep modal open, PDF stays locked — forms.js already surfaced the error */
@@ -3238,7 +3248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     dlLink.addEventListener("click", function (e) {
-      if (isSubscribed) return; // already unlocked — let the download proceed
+      if (isSubscribed()) return; // already unlocked — let the download proceed
       e.preventDefault();
       openLeadModal();
     });

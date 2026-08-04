@@ -1244,3 +1244,20 @@ body {
     padding: 25px;
   }
 }
+
+/* ---- Coming Soon status badges (placeholder articles) ---- */
+.badge-soon {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 50px;
+}
+.img-badge.soon {
+  left: 20px;
+  right: auto;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}

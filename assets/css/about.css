@@ -725,6 +725,7 @@ body {
 .card-content {
   position: relative;
   z-index: 2;
+  justify-content: center;
 }
 
 .icon-wrapper {
