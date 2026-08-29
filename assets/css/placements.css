@@ -73,7 +73,7 @@ body {
 .placement-hero {
   position: relative;
   aspect-ratio: 16 / 9;
-  background-image: url('../images/optimized/rank-banner-2-landscap.png');
+  background-image: url('../images/optimized/rank-banner-2-landscap.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -86,7 +86,7 @@ body {
 @media (max-width: 900px) {
   .placement-hero {
     aspect-ratio: 392 / 523;
-    background-image: url('../images/optimized/rank-banner-2-portrait.png');
+    background-image: url('../images/optimized/rank-banner-2-portrait.webp');
     background-position: top center;
   }
 }
