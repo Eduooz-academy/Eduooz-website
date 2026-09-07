@@ -5082,7 +5082,7 @@ const facultyPool = [
     role: "Former AIIMS Faculty | UGC NET | MHA | PGDHSR",
     badge: "Assistant Professor | PGIMER MSc (N) | PhD Scholar",
     icon: '<i class="fa-solid fa-trophy"></i>',
-    img: "/assets/images/Mentors/SHINE.png",
+    img: "/assets/images/Mentors/SHINE.webp",
     quals: [
       "Asst. Professor – Govt. Nursing College (on leave)",
       "Former Faculty, College of Nursing AIIMS",
@@ -5110,7 +5110,7 @@ const facultyPool = [
     role: "NCLEX RN Passed",
     badge: "MSc Nursing (Orthopedic)",
     icon: '<i class="fa-solid fa-stethoscope"></i>',
-    img: "/assets/images/Mentors/vidhu-r-vijayan.jpg",
+    img: "/assets/images/Mentors/vidhu-r-vijayan.webp",
     quals: ["MSc. Nursing (Orthopedic)", "NCLEX RN Passed"],
   },
   // Batch 2
@@ -5131,7 +5131,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Microbiology | 2nd Rank Holder",
     icon: '<i class="fa-solid fa-microscope"></i>',
-    img: "/assets/images/Mentors/sreelakshmi-em.jpg",
+    img: "/assets/images/Mentors/sreelakshmi-em.webp",
     quals: ["MSc Microbiology", "2nd Rank Holder", "Kerala PSC Rank Holder"],
   },
   {
@@ -5139,7 +5139,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Nursing (Pediatrics) – KUHS",
     icon: '<i class="fa-solid fa-child"></i>',
-    img: "/assets/images/Mentors/arathy-surendran.jpg",
+    img: "/assets/images/Mentors/arathy-surendran.webp",
     quals: ["MSc Nursing (Pediatrics) – KUHS", "Kerala PSC Rank Holder"],
   },
   // Batch 3
@@ -5148,7 +5148,7 @@ const facultyPool = [
     role: "GPAT Kerala Rank Holder | Research Conclave Winner",
     badge: "M.Pharm Pharmaceutical Chemistry | GPAT Kerala Rank Holder",
     icon: '<i class="fa-solid fa-flask-vial"></i>',
-    img: "/assets/images/Mentors/sai-kiran-tc.jpg",
+    img: "/assets/images/Mentors/sai-kiran-tc.webp",
     quals: [
       "Senior Pharmacy Faculty",
       "M.Pharm – Pharmaceutical Chemistry",
@@ -5162,7 +5162,7 @@ const facultyPool = [
     role: "International Scholar | MSc Pharmacology (UK) – Commendation",
     badge: "Doctor of Pharmacy | MSc Pharmacology (UK)",
     icon: '<i class="fa-solid fa-graduation-cap"></i>',
-    img: "/assets/images/Mentors/MANJIMA.jpeg",
+    img: "/assets/images/Mentors/MANJIMA.webp",
     quals: [
       "Doctor of Pharmacy",
       "MSc Pharmacology (UK) – Commendation",
@@ -5174,7 +5174,7 @@ const facultyPool = [
     role: "German A1–B2 Qualified | Nursing Background",
     badge: "German B1–B2 Certified | BSc Nursing",
     icon: '<i class="fa-solid fa-language"></i>',
-    img: "/assets/images/Mentors/jesna-prasad.jpg",
+    img: "/assets/images/Mentors/jesna-prasad.webp",
     quals: ["BSc Nursing", "German A1-A2 Certified", "German B1-B2 Certified"],
   },
   // Batch 4
@@ -5183,7 +5183,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Nursing (Pediatric)",
     icon: '<i class="fa-solid fa-heart-pulse"></i>',
-    img: "/assets/images/Mentors/jeethu-paul.jpg",
+    img: "/assets/images/Mentors/jeethu-paul.webp",
     quals: ["MSc Nursing (Pediatric)", "Kerala PSC Rank Holder"],
   },
   {
@@ -5191,7 +5191,7 @@ const facultyPool = [
     role: "AIIMS Raipur & RRB Nursing Officer Rank Holder",
     badge: "MSc Nursing (Paediatrics)",
     icon: '<i class="fa-solid fa-baby"></i>',
-    img: "/assets/images/Mentors/RESHMA R.png",
+    img: "/assets/images/Mentors/RESHMA R.webp",
     quals: [
       "MSc Nursing (Paediatrics)",
       "Cleared AIIMS Raipur Nursing Officer Exam",
@@ -5204,7 +5204,7 @@ const facultyPool = [
     role: "Oncology Nursing Specialist",
     badge: "BSc Nursing (Oncology Nursing)",
     icon: '<i class="fa-solid fa-ribbon"></i>',
-    img: "/assets/images/Mentors/revathy-bc.jpg",
+    img: "/assets/images/Mentors/revathy-bc.webp",
     quals: ["BSc Nursing", "Speciality in Oncology Nursing"],
   },
   // Batch 5
@@ -5213,7 +5213,7 @@ const facultyPool = [
     role: "OBG Nursing Specialist",
     badge: "MSc Nursing (OBG)",
     icon: '<i class="fa-solid fa-baby-carriage"></i>',
-    img: "/assets/images/Mentors/ASHNA ASHOK.png",
+    img: "/assets/images/Mentors/ASHNA ASHOK.webp",
     quals: ["BSc Nursing", "MSc Nursing (OBG)"],
   },
   {
@@ -5221,7 +5221,7 @@ const facultyPool = [
     role: "Former AIIMS Faculty | UGC NET | MHA | PGDHSR",
     badge: "Assistant Professor | PGIMER MSc (N) | PhD Scholar",
     icon: '<i class="fa-solid fa-trophy"></i>',
-    img: "/assets/images/Mentors/SHINE.png",
+    img: "/assets/images/Mentors/SHINE.webp",
     quals: [
       "Asst. Professor – Govt. Nursing College (on leave)",
       "Former Faculty, College of Nursing AIIMS",

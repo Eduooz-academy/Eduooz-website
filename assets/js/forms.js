@@ -23,6 +23,7 @@ if (contactForm) {
       name: contactForm.elements["name"].value.trim(),
       email: contactForm.elements["email"].value.trim(),
       phone: contactForm.elements["phone"].value.trim(),
+      state:contactForm.elements["state"].value.trim(),
       subject: contactForm.elements["subject"].value.trim(),
       message: contactForm.elements["message"].value.trim()
     };
