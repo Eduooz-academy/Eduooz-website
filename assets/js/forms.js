@@ -1,5 +1,5 @@
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwYV5JJjOZPLc_qRXaHZVpFoALGMWfVu3xzA6sLob7nVdxpZl_G5yhwqPLkwZ7AB5Lm/exec";
+  "https://script.google.com/macros/s/AKfycbwWaKNiZFQieppC2gC-gZFxX2j0iJX_9Jz5-lrZg-0pNRrPkuSsgxyglw49T41msoWe/exec";
 
 
 // CONTACT FORM
