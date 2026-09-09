@@ -5097,7 +5097,7 @@ const facultyPool = [
     role: "Distinction Holder | Kerala & Central Exam Ranker",
     badge: "M.Pharm Pharmacology | GPAT Rank Holder",
     icon: '<i class="fa-solid fa-award"></i>',
-    img: "/assets/images/Mentors/nayana-shaji.jpg",
+    img: "/assets/images/Mentors/nayana-shaji.webp",
     quals: [
       "M.Pharm Pharmacology",
       "Distinction Holder",
@@ -5119,7 +5119,7 @@ const facultyPool = [
     role: "Kerala PSC Rank Holder",
     badge: "MSc Molecular Biology | Distinction Holder",
     icon: '<i class="fa-solid fa-flask"></i>',
-    img: "/assets/images/Mentors/honey-mol-pv.jpg",
+    img: "/assets/images/Mentors/honey-mol-pv.webp",
     quals: [
       "MSc Molecular Biology",
       "Distinction Holder",
@@ -5236,7 +5236,7 @@ const facultyPool = [
     role: "Distinction Holder | Kerala & Central Exam Ranker",
     badge: "M.Pharm Pharmacology | GPAT Rank Holder",
     icon: '<i class="fa-solid fa-award"></i>',
-    img: "/assets/images/Mentors/nayana-shaji.jpg",
+    img: "/assets/images/Mentors/nayana-shaji.webp",
     quals: [
       "M.Pharm Pharmacology",
       "Distinction Holder",
