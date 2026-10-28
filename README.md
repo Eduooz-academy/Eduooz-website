@@ -522,12 +522,12 @@ Not a `components/` fragment — this markup is inline in each exam page, with a
 | `publications/` | 30 | flat |
 | `resized-images/` | 0 | **empty — dead folder**, safe to remove or repurpose |
 
-Plus ~30 loose top-level files directly in `assets/images/` (`favicon.ico`, `eduooz-log.png`, `eduooz-favicon.png`, `404_page.jpg`, etc.).
+Plus ~30 loose top-level files directly in `assets/images/` (`favicon.ico`, `eduooz-log.webp`, `eduooz-favicon.png`, `404_page.jpg`, etc.).
 
 ### Favicons and logo
 - `favicon.ico` — actively referenced as `<link rel="icon" href="https://eduooz.com/assets/images/favicon.ico">` on 10+ pages, always using the absolute production URL rather than a relative path.
 - `eduooz-favicon.png` — **zero references anywhere in the codebase.** Orphaned; either wire it up or remove it.
-- `eduooz-log.png` also does double duty as the `apple-touch-icon` and as most pages' Open Graph share image.
+- `eduooz-log.webp` also does double duty as the `apple-touch-icon` and as most pages' Open Graph share image.
 
 ### Case sensitivity — the single most impactful deployment gotcha
 GitHub Pages serves over a **case-sensitive** filesystem; a Windows local checkout is **case-insensitive**, so a wrong-case image path (e.g. `assets/images/mentors/…` instead of the real `assets/images/Mentors/…`) loads fine locally on Windows but **404s in production**. This exact bug happened once already (fixed 2026-07-09 across 49 pages) with the `Mentors/` folder. Always copy-paste the exact on-disk path/case rather than retyping it.
